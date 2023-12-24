@@ -29,6 +29,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
     return Scaffold(
       body: Column(
         children: [
+          SizedBox(height: 32,),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -44,6 +45,11 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
               decoration: const InputDecoration(
                 labelText: 'Search News Sources',
                 prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(30.0), // Adjust the value as needed
+                  ),
+                ),
               ),
             ),
           ),
