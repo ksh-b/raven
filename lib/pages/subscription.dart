@@ -52,10 +52,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
               itemCount: filteredNewsSources.length,
               itemBuilder: (context, sourceIndex) {
                 var newsSource = filteredNewsSources[sourceIndex];
-                var categories = (Hive.box("subscriptions").get("selected"))
-                    .where((element) => element.publisher==newsSource)
-                    .map((e) => e.category)
-                    .join(", ");
+                var categories = refreshCategories(newsSource);
                 return ListTile(
                   title: Text(newsSource),
                   subtitle: categories.isEmpty? null:Text(categories),
@@ -63,7 +60,11 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
                     showDialog(
                       context: context,
                       builder: (context) {
-                        return CategoryPopup(publishers, newsSource);
+                        return CategoryPopup(publishers, newsSource, callback: () {
+                          setState(() {
+                            categories = refreshCategories(newsSource);
+                          });
+                        });
                       },
                     );
                   },
@@ -76,6 +77,14 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
     );
   }
 
+  refreshCategories(String newsSource) {
+    var categories = (Hive.box("subscriptions").get("selected", defaultValue: []))
+        .where((element) => element.publisher==newsSource)
+        .map((e) => e.category)
+        .join(", ");
+    return categories;
+  }
+
   @override
   bool get wantKeepAlive => true;
 }
@@ -83,8 +92,9 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
 class CategoryPopup extends StatefulWidget {
   final Map<String, Publisher> publishers;
   final String newsSource;
+  final VoidCallback callback;
 
-  const CategoryPopup(this.publishers, this.newsSource, {super.key});
+  const CategoryPopup(this.publishers, this.newsSource, {super.key, required this.callback});
 
   @override
   State<CategoryPopup> createState() => _CategoryPopupState();
@@ -259,6 +269,7 @@ class _CategoryPopupState extends State<CategoryPopup> {
                         Hive.box("subscriptions")
                             .put("selected", selectedSources);
                         Navigator.of(context).pop();
+                        widget.callback();
                       },
                       child: const Text("SAVE"),
                     ),
