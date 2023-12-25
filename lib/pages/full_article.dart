@@ -44,7 +44,7 @@ class _ArticlePageState extends State<ArticlePage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Published: ${snapshot.data!.publishedAt}',
+                    'Published: ${snapshot.data!.publishedAt.value}',
                     style: const TextStyle(
                       fontStyle: FontStyle.italic,
                       color: Colors.grey,

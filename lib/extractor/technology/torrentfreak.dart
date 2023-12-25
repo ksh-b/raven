@@ -59,7 +59,8 @@ class TorrentFreak extends Publisher {
       var author = authorElement?.text;
       var excerpt = excerptElement?.text;
       var thumbnail = thumbnailElement?.attributes["data-bg"];
-      var time = timeElement?.attributes["datetime"];
+      var time = timeElement?.text;
+
       return NewsArticle(
         this,
         title ?? "",
@@ -107,7 +108,6 @@ class TorrentFreak extends Publisher {
             DateTime parsedDateTime = DateFormat("MMMM d, y, HH:mm").parse(time);
             time = DateFormat("yyyy-MM-dd HH:mm:ss").format(parsedDateTime);
           }
-
         }
 
         articles.add(NewsArticle(

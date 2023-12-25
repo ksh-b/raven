@@ -21,6 +21,7 @@ void main() {
     expect(article, isA<NewsArticle>());
     expect(article?.title, isNotEmpty);
     expect(article?.content, isNotEmpty);
+    expect(article?.publishedAt.value, isNot(0));
   });
 
   test('Reuters - Category Articles Test', () async {
