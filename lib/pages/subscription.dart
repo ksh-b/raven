@@ -44,7 +44,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
                 });
               },
               decoration: const InputDecoration(
-                labelText: 'Search News Sources',
+                labelText: 'Search subscriptions',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(

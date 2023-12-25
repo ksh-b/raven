@@ -66,7 +66,7 @@ class _FeedPageState extends State<FeedPage>
                           });
                         },
                         decoration: const InputDecoration(
-                          labelText: 'Search News',
+                          labelText: 'Search feed',
                           prefixIcon: Icon(Icons.search),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(
