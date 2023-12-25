@@ -37,8 +37,9 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
               onChanged: (value) {
                 setState(() {
                   filteredNewsSources = newsSources
-                      .where((source) =>
-                          source.toLowerCase().contains(value.toLowerCase()))
+                      .where((source) {
+                        return source.toLowerCase().contains(value.toLowerCase());
+                      })
                       .toList();
                 });
               },
@@ -58,7 +59,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
               itemCount: filteredNewsSources.length,
               itemBuilder: (context, sourceIndex) {
                 var newsSource = filteredNewsSources[sourceIndex];
-                var categories = refreshCategories(newsSource);
+                var categories = getSelectedCategories(newsSource);
                 return ListTile(
                   title: Text(newsSource),
                   subtitle: categories.isEmpty? null:Text(categories),
@@ -68,7 +69,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
                       builder: (context) {
                         return CategoryPopup(publishers, newsSource, callback: () {
                           setState(() {
-                            categories = refreshCategories(newsSource);
+                            categories = getSelectedCategories(newsSource);
                           });
                         });
                       },
@@ -83,7 +84,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
     );
   }
 
-  refreshCategories(String newsSource) {
+  String getSelectedCategories(String newsSource) {
     var categories = (Hive.box("subscriptions").get("selected", defaultValue: []))
         .where((element) => element.publisher==newsSource)
         .map((e) => e.category)
