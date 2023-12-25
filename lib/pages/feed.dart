@@ -48,7 +48,7 @@ class _FeedPageState extends State<FeedPage>
           child:ValueListenableBuilder(
             valueListenable: Hive.box('subscriptions').listenable(),
             builder: (BuildContext context, box, Widget? child) {
-              if(box.get("selected").isNotEmpty) {
+              if(box.get("selected")!=null && box.get("selected").isNotEmpty) {
                 return ListView.builder(
                 itemCount: filteredArticles.length + 2,
                 itemBuilder: (context, index) {
@@ -64,7 +64,6 @@ class _FeedPageState extends State<FeedPage>
                                 article!.title.toLowerCase().contains(value.toLowerCase()))
                                 .toList();
                           });
-                          print(filteredArticles.map((e) => e!.title).toList());
                         },
                         decoration: const InputDecoration(
                           labelText: 'Search News',
