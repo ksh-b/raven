@@ -108,17 +108,17 @@ class CategoryPopup extends StatefulWidget {
 }
 
 class _CategoryPopupState extends State<CategoryPopup> {
-  List selectedSources = []; // List<UserSubscription>
-  List customSources = []; // List<UserSubscription>
+  List selectedSubscriptions = []; // List<UserSubscription>
+  List customSubscriptions = []; // List<UserSubscription>
   String customCategory = "";
   TextEditingController customCategoryController = TextEditingController();
 
   @override
   void initState() {
     setState(() {
-      selectedSources = Hive.box("subscriptions").get("selected") ??
+      selectedSubscriptions = Hive.box("subscriptions").get("selected") ??
           List<UserSubscription>.empty(growable: true);
-      customSources = Hive.box("subscriptions").get("custom") ??
+      customSubscriptions = Hive.box("subscriptions").get("custom") ??
           List<UserSubscription>.empty(growable: true);
     });
     super.initState();
@@ -169,8 +169,14 @@ class _CategoryPopupState extends State<CategoryPopup> {
                         // All checkbox
                         return CheckboxListTile(
                           title: Text(subCategoryKey),
-                          value: selectedSources.contains(userSubscription),
+                          value: selectedSubscriptions.contains(userSubscription),
                           onChanged: (value) {
+                            if (value!) {
+                              selectedSubscriptions.removeWhere((element) {
+                                return element.publisher ==
+                                  userSubscription.publisher;
+                              });
+                            }
                             updateList(value, userSubscription);
                           },
                         );
@@ -184,9 +190,9 @@ class _CategoryPopupState extends State<CategoryPopup> {
                       // category checkbox
                       return CheckboxListTile(
                         title: Text(subCategoryKey),
-                        value: selectedSources.contains(userSubscription),
-                        onChanged: selectedSources
-                                .where((element) => element.category == "/")
+                        value: selectedSubscriptions.contains(userSubscription),
+                        onChanged: selectedSubscriptions
+                                .where((element) => element.publisher == userSubscription.publisher && element.category == "/")
                                 .isNotEmpty
                             ? null
                             : (value) {
@@ -197,23 +203,23 @@ class _CategoryPopupState extends State<CategoryPopup> {
                   ),
                   ListView.builder(
                     shrinkWrap: true,
-                    itemCount: customSources.length,
+                    itemCount: customSubscriptions.length,
                     itemBuilder: (context, index) {
                       return CheckboxListTile(
                         secondary: IconButton(icon: const Icon(Icons.delete_forever), onPressed: () {
-                          var subscription = customSources[index];
+                          var subscription = customSubscriptions[index];
                           setState(() {
-                            customSources.remove(subscription);
-                            selectedSources.remove(subscription);
+                            customSubscriptions.remove(subscription);
+                            selectedSubscriptions.remove(subscription);
                           });
 
-                          Hive.box("subscriptions").put("custom", customSources);
-                          Hive.box("subscriptions").put("selected", selectedSources);
+                          Hive.box("subscriptions").put("custom", customSubscriptions);
+                          Hive.box("subscriptions").put("selected", selectedSubscriptions);
                         }),
-                        title: Text(convertString((customSources[index] as UserSubscription).category)),
-                        value: selectedSources.contains(customSources[index]),
+                        title: Text(convertString((customSubscriptions[index] as UserSubscription).category)),
+                        value: selectedSubscriptions.contains(customSubscriptions[index]),
                         onChanged: (value) {
-                          updateList(value, customSources[index]);
+                          updateList(value, customSubscriptions[index]);
                         },
                       );
                   },),
@@ -248,14 +254,14 @@ class _CategoryPopupState extends State<CategoryPopup> {
                                     ? IconButton(
                                         onPressed: () {
                                           setState(() {
-                                            customSources.add(UserSubscription(
+                                            customSubscriptions.add(UserSubscription(
                                               widget.newsSource,
                                               customCategory,
                                             ));
                                           });
                                           Hive.box("subscriptions").put(
                                             "custom",
-                                            customSources,
+                                            customSubscriptions,
                                           );
                                         },
                                         icon: const Icon(Icons.save_alt))
@@ -274,7 +280,7 @@ class _CategoryPopupState extends State<CategoryPopup> {
                     child: FilledButton(
                       onPressed: () {
                         Hive.box("subscriptions")
-                            .put("selected", selectedSources);
+                            .put("selected", selectedSubscriptions);
                         Navigator.of(context).pop();
                         widget.callback();
                       },
@@ -302,9 +308,9 @@ class _CategoryPopupState extends State<CategoryPopup> {
   void updateList(bool? value, UserSubscription userSubscription) {
     setState(() {
       if (value!) {
-        selectedSources.add(userSubscription);
+        selectedSubscriptions.add(userSubscription);
       } else {
-        selectedSources.remove(userSubscription);
+        selectedSubscriptions.remove(userSubscription);
       }
     });
   }
