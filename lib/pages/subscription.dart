@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:whapp/model/publisher.dart';
 import 'package:whapp/model/user_subscription.dart';
@@ -62,6 +63,18 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
                 var categories = getSelectedCategories(newsSource);
                 return ListTile(
                   title: Text(newsSource),
+                  leading: CachedNetworkImage(
+                    imageUrl: publishers[newsSource]!.iconUrl,
+                    progressIndicatorBuilder:
+                        (context, url, downloadProgress) {
+                      return CircularProgressIndicator(
+                          value: downloadProgress.progress);
+                    },
+                    height: 24,
+                    width: 24,
+                    errorWidget: (context, url, error) =>
+                    const Icon(Icons.error),
+                  ),
                   subtitle: categories.isEmpty? null:Text(categories),
                   onTap: () {
                     showDialog(
@@ -117,7 +130,7 @@ class _CategoryPopupState extends State<CategoryPopup> {
   void initState() {
     setState(() {
       selectedSubscriptions = Store.selectedSubscriptions;
-      customSubscriptions = Store.customSubscriptions;
+      customSubscriptions = Store.customSubscriptions.where((element) => element.publisher==widget.newsSource).toList();
     });
     super.initState();
   }
@@ -201,7 +214,7 @@ class _CategoryPopupState extends State<CategoryPopup> {
                   ),
                   ListView.builder(
                     shrinkWrap: true,
-                    itemCount: customSubscriptions.length,
+                    itemCount: customSubscriptions.where((element) => element.publisher==widget.newsSource).length,
                     itemBuilder: (context, index) {
                       return CheckboxListTile(
                         secondary: IconButton(icon: const Icon(Icons.delete_forever), onPressed: () {
@@ -210,8 +223,12 @@ class _CategoryPopupState extends State<CategoryPopup> {
                             customSubscriptions.remove(subscription);
                             selectedSubscriptions.remove(subscription);
                           });
-                          Store.customSubscriptions = customSubscriptions;
-                          Store.selectedSubscriptions = selectedSubscriptions;
+                          var cs = Store.customSubscriptions;
+                          cs.remove(subscription);
+                          Store.customSubscriptions= cs;
+                          var ss = Store.selectedSubscriptions;
+                          ss.remove(subscription);
+                          Store.selectedSubscriptions = ss;
                         }),
                         title: Text(convertString((customSubscriptions[index] as UserSubscription).category)),
                         value: selectedSubscriptions.contains(customSubscriptions[index]),
@@ -256,7 +273,10 @@ class _CategoryPopupState extends State<CategoryPopup> {
                                               customCategory,
                                             ));
                                           });
-                                          Store.customSubscriptions = customSubscriptions;
+                                          Store.customSubscriptions +=[UserSubscription(
+                                            widget.newsSource,
+                                            customCategory,
+                                          )];
                                         },
                                         icon: const Icon(Icons.save_alt))
                                     : const Icon(Icons.cancel);
