@@ -139,6 +139,9 @@ class _FeedPageState extends State<FeedPage>
             .then((articles) {
           setState(() {
             newsArticles = newsArticles.toSet().union(articles).toList();
+            newsArticles.sort(
+              (a, b) => a!.publishedAt.key.compareTo(b!.publishedAt.key),
+            );
             filteredArticles = List.from(newsArticles);
             isLoading = false;
           });
