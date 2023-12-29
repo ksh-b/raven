@@ -16,6 +16,9 @@ class AlJazeera extends Publisher {
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
+  @override
+  bool get hasSearchSupport => false;
+
   Future<Map<String, String>> extractCategories() async {
     return {
       "Features": "features",

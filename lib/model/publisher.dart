@@ -23,30 +23,30 @@ abstract class Publisher {
 
   String get homePage;
 
-  String get iconUrl;
+  bool get hasSearchSupport => true;
+
+  String get iconUrl => "$homePage/favicon.ico";
 
   Future<Map<String, String>> get categories;
 
-  String get searchEndpoint;
 
   Future<Set<NewsArticle?>> articles({String category = "All", int page = 1}) {
     return category.startsWith("#")
         ? searchedArticles(searchQuery: getAsSearchQuery(category), page: page)
         : categoryArticles(category: category, page: page);
   }
+
   Future<Set<NewsArticle?>> categoryArticles({String category = "All", int page = 1});
+
   Future<Set<NewsArticle?>> searchedArticles({required String searchQuery, int page = 1});
 
   Future<NewsArticle?> article(String url);
-
-
 
   Map<String, dynamic> toJson() {
     return {
       'homePage': homePage,
       'iconUrl': iconUrl,
       'categories': categories,
-      'searchEndpoint': searchEndpoint,
     };
   }
 

@@ -18,9 +18,6 @@ class TheWire extends Publisher {
   @override
   String get iconUrl => "$homePage/favicon-32x32.png";
 
-  @override
-  String get searchEndpoint => "/search";
-
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await http.get(Uri.parse(homePage));
@@ -125,7 +122,7 @@ class TheWire extends Publisher {
   @override
   Future<Set<NewsArticle?>> searchedArticles(
       {required String searchQuery, int page = 1}) {
-    String apiUrl = '$homePage/wp-json/thewire/v2/posts$searchEndpoint';
+    String apiUrl = '$homePage/wp-json/thewire/v2/posts/search';
     Map<String, String> params = {
       'keyword': searchQuery,
       'orderby': 'rel',
