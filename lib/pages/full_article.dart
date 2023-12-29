@@ -34,57 +34,64 @@ class _ArticlePageState extends State<ArticlePage> {
 
   @override
   Widget build(BuildContext context) {
-    String fullUrl = "${widget.article.publisher.homePage}${widget.article.url}";
-    String altUrl = "${Store.ladderUrl}/$fullUrl";
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.article.publisher.name),
-        actions: [
-          InkWell(
-            onLongPress: () {
-              Share.shareUri(Uri.parse(altUrl));
-            },
-            onTap: () {
-              Share.shareUri(Uri.parse(fullUrl));
-            },
-            child: Icon(Icons.share),
-          ),
-          InkWell(
-            onLongPress: () {
-              launchUrl(Uri.parse(altUrl));
-            },
-            onTap: () {
-              launchUrl(Uri.parse(fullUrl));
-            },
-            child: Icon(Icons.open_in_browser),
-          ),
-        ],
-      ),
-      body: FutureBuilder<NewsArticle?>(
-        initialData: widget.article,
-        future: widget.article.publisher.article(widget.article.url),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView(
-                children: [
-                  textWidget("", snapshot.data!.title, titleStyle),
-                  textWidget("Author", snapshot.data!.author, metadataStyle),
-                  textWidget("Published", snapshot.data!.publishedAt.value,
-                      metadataStyle),
-                  if (Network.shouldLoadImage(snapshot.data!.thumbnail)) image(snapshot),
-                  textWidget("", snapshot.data!.excerpt, excerptStyle),
-                  HtmlWidget(snapshot.data!.content),
-                ],
+
+    return FutureBuilder<NewsArticle?>(
+      initialData: widget.article,
+      future: widget.article.publisher.article(widget.article.url),
+      builder: (context, snapshot) {
+        String fullUrl =
+            "${widget.article.publisher.homePage}${snapshot.data!.url}";
+        String altUrl = "${Store.ladderUrl}/$fullUrl";
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(widget.article.publisher.name),
+            actions: [
+              InkWell(
+                onLongPress: () {
+                  Share.shareUri(Uri.parse(altUrl));
+                },
+                child: IconButton(
+                  icon: Icon(Icons.share),
+                  onPressed: () {
+                    Share.shareUri(Uri.parse(fullUrl));
+                  },
+                ),
               ),
-            );
-          } else if (snapshot.hasError) {
-            throw snapshot.error!;
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
-      ),
+              InkWell(
+                onLongPress: () {
+                  launchUrl(Uri.parse(altUrl));
+                },
+                child: IconButton(
+                  icon: Icon(Icons.open_in_browser),
+                  onPressed: () {
+                    launchUrl(Uri.parse(fullUrl));
+                  },
+                ),
+              ),
+            ],
+          ),
+          body: snapshot.connectionState == ConnectionState.done
+              ? snapshot.hasData
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView(
+                        children: [
+                          textWidget("", snapshot.data!.title, titleStyle),
+                          textWidget(
+                              "Author", snapshot.data!.author, metadataStyle),
+                          textWidget("Published",
+                              snapshot.data!.publishedAt.value, metadataStyle),
+                          if (Network.shouldLoadImage(snapshot.data!.thumbnail))
+                            image(snapshot),
+                          textWidget("", snapshot.data!.excerpt, excerptStyle),
+                          HtmlWidget(snapshot.data!.content),
+                        ],
+                      ),
+                    )
+                  : const Center(child: Text("Error loading data"))
+              : const Center(child: CircularProgressIndicator()),
+        );
+      },
     );
   }
 
@@ -114,7 +121,7 @@ class _ArticlePageState extends State<ArticlePage> {
   ) {
     return value.isNotEmpty
         ? Padding(
-            padding: const EdgeInsets.only(left: 8.0, right:8.0, bottom: 8.0),
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
             child: Text(
               label.isNotEmpty ? '$label: $value' : value,
               style: style,
@@ -150,17 +157,19 @@ class HtmlWidget extends StatelessWidget {
             var src = extensionContext.attributes.containsKey("data-lazy-src")
                 ? "data-lazy-src"
                 : "src";
-            return Network.shouldLoadImage(extensionContext.attributes[src]!)? CachedNetworkImage(
-              imageUrl: extensionContext.attributes[src]!,
-              progressIndicatorBuilder: (context, url, downloadProgress) {
-                return CircularProgressIndicator(
-                  value: downloadProgress.progress,
-                );
-              },
-              errorWidget: (context, url, error) {
-                return const Icon(Icons.error);
-              },
-            ):SizedBox.shrink();
+            return Network.shouldLoadImage(extensionContext.attributes[src]!)
+                ? CachedNetworkImage(
+                    imageUrl: extensionContext.attributes[src]!,
+                    progressIndicatorBuilder: (context, url, downloadProgress) {
+                      return CircularProgressIndicator(
+                        value: downloadProgress.progress,
+                      );
+                    },
+                    errorWidget: (context, url, error) {
+                      return const Icon(Icons.error);
+                    },
+                  )
+                : SizedBox.shrink();
           },
         ),
       ],
