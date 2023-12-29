@@ -34,8 +34,8 @@ class _ArticlePageState extends State<ArticlePage> {
 
   @override
   Widget build(BuildContext context) {
-    String fullUrl = "${widget.article.publisher.homePage}/${widget.article.url}";
-    String altUrl = "${Store.ladderSetting}/$fullUrl";
+    String fullUrl = "${widget.article.publisher.homePage}${widget.article.url}";
+    String altUrl = "${Store.ladderUrl}/$fullUrl";
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.article.publisher.name),
