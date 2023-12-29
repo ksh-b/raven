@@ -92,7 +92,7 @@ class _FeedPageState extends State<FeedPage>
                         const Icon(Icons.error),
                       ),
                       subtitle: Text(
-                        "${article.author} - ${article.publishedAt.value}",
+                        "${article.publishedAt.value}",
                       ),
                       onTap: () {
                         Navigator.push(
@@ -135,10 +135,7 @@ class _FeedPageState extends State<FeedPage>
             .articles(page: page, category: subscription.category)
             .then((articles) {
           setState(() {
-            newsArticles = newsArticles.toSet().union(articles).toList()
-              ..sort(
-                (a, b) => a?.publishedAt.key.compareTo(b?.publishedAt.key),
-              );
+            newsArticles = newsArticles.toSet().union(articles).toList();
             filteredArticles = List.from(newsArticles);
             isLoading = false;
           });
