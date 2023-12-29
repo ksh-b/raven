@@ -71,10 +71,9 @@ class TheWire extends Publisher {
     return super.articles(category: category, page: page);
   }
 
-  Future<Set<NewsArticle?>> extract(
-      String apiUrl, Map<String, String> params, bool isSearch) async {
+  Future<Set<NewsArticle?>> extract(String apiUrl, bool isSearch) async {
     Set<NewsArticle?> articles = {};
-    final response = await http.get(Uri.parse(apiUrl), headers: params);
+    final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       List data;
       if (isSearch) {
@@ -110,13 +109,8 @@ class TheWire extends Publisher {
     if (category == '/') {
       category = 'home';
     }
-    String apiUrl =
-        '$homePage/wp-json/thewire/v2/posts/$category/recent-stories';
-    Map<String, String> params = {
-      'per_page': '10',
-      'page': '$page',
-    };
-    return extract(apiUrl, params, false);
+    String apiUrl = '$homePage/wp-json/thewire/v2/posts/$category/recent-stories?page=$page&per_page=10';
+    return extract(apiUrl, false);
   }
 
   @override
@@ -126,10 +120,12 @@ class TheWire extends Publisher {
     Map<String, String> params = {
       'keyword': searchQuery,
       'orderby': 'rel',
-      'per_page': '5',
-      'page': '1',
+      'per_page': '10',
+      'page': '$page',
       'type': 'opinion',
     };
-    return extract(apiUrl, params, true);
+    Uri uri = Uri.parse(apiUrl).replace(queryParameters: params);
+    String fullUrl = uri.toString();
+    return extract(fullUrl, true);
   }
 }
