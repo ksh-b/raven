@@ -1,4 +1,6 @@
 import 'package:whapp/extractor/general/national/india/thewire.dart';
+import 'package:whapp/extractor/general/world/aljazeera.dart';
+import 'package:whapp/extractor/general/world/bbc.dart';
 import 'package:whapp/extractor/general/world/reuters.dart';
 import 'package:whapp/extractor/technology/theverge.dart';
 import 'package:whapp/extractor/technology/torrentfreak.dart';
@@ -8,6 +10,8 @@ import 'package:whapp/utils/string.dart';
 
 
 Map<String, Publisher> publishers = {
+  "Al Jazeera": AlJazeera(),
+  "BBC": BBC(),
   "Reuters": Reuters(),
   "The Verge": TheVerge(),
   "The Wire": TheWire(),
