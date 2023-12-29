@@ -56,19 +56,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'Network',
+                  'Article',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 ListTile(
-                  title: Text('Load article images'),
+                  title: Text('Load images'),
                   trailing: DropdownButton<String>(
-                    value: box.get("loadImages", defaultValue: "Always"),
+                    value: Store.loadImagesSetting,
                     onChanged: (String? option) {
                       if(option!=null) {
-                        box.put("loadImages", option);
+                        Store.loadImagesSetting = option;
                       }
                     },
-                    items: loadImagesValues.map<DropdownMenuItem<String>>((String option) {
+                    items: Store.loadImagesValues.map<DropdownMenuItem<String>>((String option) {
                       return DropdownMenuItem<String>(
                         value: option,
                         child: Text(option),
@@ -76,7 +76,24 @@ class _SettingsPageState extends State<SettingsPage> {
                     }).toList(),
                   ),
                 ),
-                SizedBox(height: 20),
+                ListTile(
+                  title: Text('Redirection'),
+                  subtitle: Text('Alternate URLs (Long tap)'),
+                  trailing: DropdownButton<String>(
+                    value: Store.ladderSetting,
+                    onChanged: (String? option) {
+                      if(option!=null) {
+                        Store.ladderSetting = option;
+                      }
+                    },
+                    items: Store.ladders.keys.map<DropdownMenuItem<String>>((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ],
             );
           },
