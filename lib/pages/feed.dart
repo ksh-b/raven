@@ -6,6 +6,7 @@ import 'package:whapp/model/publisher.dart';
 import 'package:whapp/model/user_subscription.dart';
 
 import 'package:whapp/pages/full_article.dart';
+import 'package:whapp/utils/store.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -46,9 +47,9 @@ class _FeedPageState extends State<FeedPage>
             _loadMoreItems();
           },
           child:ValueListenableBuilder(
-            valueListenable: Hive.box('subscriptions').listenable(),
+            valueListenable: Store.subscriptions.listenable(),
             builder: (BuildContext context, box, Widget? child) {
-              if(box.get("selected")!=null && box.get("selected").isNotEmpty) {
+              if(Store.selectedSubscriptions.isNotEmpty) {
                 return ListView.builder(
                 itemCount: filteredArticles.length + 2,
                 itemBuilder: (context, index) {
@@ -127,8 +128,7 @@ class _FeedPageState extends State<FeedPage>
         isLoading = true;
       });
 
-      List subscriptions = Hive.box("subscriptions").get("selected") ??
-          List<UserSubscription>.empty(growable: true);
+      List subscriptions = Store.selectedSubscriptions;
       for (var subscription in subscriptions) {
         Publisher publisher = publishers[subscription.publisher]!;
         publisher

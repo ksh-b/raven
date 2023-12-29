@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:hive/hive.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whapp/model/article.dart';
+import 'package:whapp/utils/store.dart';
 
 class ArticlePage extends StatefulWidget {
   final NewsArticle article;
@@ -34,18 +34,29 @@ class _ArticlePageState extends State<ArticlePage> {
   @override
   Widget build(BuildContext context) {
     String fullUrl = "${widget.article.publisher.homePage}/${widget.article.url}";
+    String altUrl = "${Store.ladderSetting}/$fullUrl";
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.article.publisher.name),
         actions: [
           InkWell(
-            child: IconButton(
-                onPressed: ()  {
-                  Share.shareUri(Uri.parse(fullUrl));
-                },
-                icon: Icon(Icons.share),
-            ),
-          )
+            onLongPress: () {
+              Share.shareUri(Uri.parse(altUrl));
+            },
+            onTap: () {
+              Share.shareUri(Uri.parse(fullUrl));
+            },
+            child: Icon(Icons.share),
+          ),
+          InkWell(
+            onLongPress: () {
+              launchUrl(Uri.parse(altUrl));
+            },
+            onTap: () {
+              launchUrl(Uri.parse(fullUrl));
+            },
+            child: Icon(Icons.open_in_browser),
+          ),
         ],
       ),
       body: FutureBuilder<NewsArticle?>(
@@ -114,8 +125,7 @@ class _ArticlePageState extends State<ArticlePage> {
   bool shouldLoadImage(AsyncSnapshot<NewsArticle?> snapshot) {
     return snapshot.data!.thumbnail.isNotEmpty &&
         snapshot.data!.thumbnail.startsWith("https") &&
-        Hive.box("settings").get("loadImages", defaultValue: "Always") ==
-            "Always";
+        Store.loadImagesSetting == "Always";
   }
 }
 

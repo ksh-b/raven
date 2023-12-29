@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:whapp/utils/store.dart';
 import 'package:whapp/utils/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -11,7 +11,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  List<String> loadImagesValues = ["Always", "Never", "Auto"];
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ValueListenableBuilder(
-          valueListenable: Hive.box("settings").listenable(),
+          valueListenable: Store.settings.listenable(),
           builder: (context, box, child) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,20 +32,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 SwitchListTile(
                   title: Text('Dark Mode'),
-                  value: box.get("darkMode", defaultValue: false),
+                  value: Store.darkThemeSetting,
                   onChanged: (value) {
-                    setState(() {
-                      box.put("darkMode", value);
-                    });
+                    Store.darkThemeSetting = value;
                   },
                 ),
                 ListTile(
                   title: Text('Color'),
                   trailing: DropdownButton<String>(
-                    value: box.get("themeColor", defaultValue: ThemeProvider.defaultColor),
+                    value: Store.themeColorSetting,
                     onChanged: (String? color) {
                       if(color!=null) {
-                        box.put("themeColor", color);
+                        Store.themeColorSetting = color;
                       }
                     },
                     items: ThemeProvider.colors.keys.map<DropdownMenuItem<String>>((String color) {

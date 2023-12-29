@@ -1,9 +1,9 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:whapp/model/publisher.dart';
 import 'package:whapp/model/user_subscription.dart';
+import 'package:whapp/utils/store.dart';
 
 class SubscriptionsPage extends StatefulWidget {
   const SubscriptionsPage({super.key});
@@ -85,7 +85,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
   }
 
   String getSelectedCategories(String newsSource) {
-    var categories = (Hive.box("subscriptions").get("selected", defaultValue: []))
+    var categories = Store.selectedSubscriptions
         .where((element) => element.publisher==newsSource)
         .map((e) => e.category)
         .join(", ");
@@ -116,10 +116,8 @@ class _CategoryPopupState extends State<CategoryPopup> {
   @override
   void initState() {
     setState(() {
-      selectedSubscriptions = Hive.box("subscriptions").get("selected") ??
-          List<UserSubscription>.empty(growable: true);
-      customSubscriptions = Hive.box("subscriptions").get("custom") ??
-          List<UserSubscription>.empty(growable: true);
+      selectedSubscriptions = Store.selectedSubscriptions;
+      customSubscriptions = Store.customSubscriptions;
     });
     super.initState();
   }
@@ -212,9 +210,8 @@ class _CategoryPopupState extends State<CategoryPopup> {
                             customSubscriptions.remove(subscription);
                             selectedSubscriptions.remove(subscription);
                           });
-
-                          Hive.box("subscriptions").put("custom", customSubscriptions);
-                          Hive.box("subscriptions").put("selected", selectedSubscriptions);
+                          Store.customSubscriptions = customSubscriptions;
+                          Store.selectedSubscriptions = selectedSubscriptions;
                         }),
                         title: Text(convertString((customSubscriptions[index] as UserSubscription).category)),
                         value: selectedSubscriptions.contains(customSubscriptions[index]),
@@ -259,10 +256,7 @@ class _CategoryPopupState extends State<CategoryPopup> {
                                               customCategory,
                                             ));
                                           });
-                                          Hive.box("subscriptions").put(
-                                            "custom",
-                                            customSubscriptions,
-                                          );
+                                          Store.customSubscriptions = customSubscriptions;
                                         },
                                         icon: const Icon(Icons.save_alt))
                                     : const Icon(Icons.cancel);
@@ -279,8 +273,7 @@ class _CategoryPopupState extends State<CategoryPopup> {
                     padding: const EdgeInsets.all(8.0),
                     child: FilledButton(
                       onPressed: () {
-                        Hive.box("subscriptions")
-                            .put("selected", selectedSubscriptions);
+                        Store.selectedSubscriptions = selectedSubscriptions;
                         Navigator.of(context).pop();
                         widget.callback();
                       },
