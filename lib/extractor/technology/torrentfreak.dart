@@ -16,12 +16,6 @@ class TorrentFreak extends Publisher {
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
-  @override
-  String get iconUrl => "$homePage/favicon-32x32.png";
-
-  @override
-  String get searchEndpoint => "/page/{page}/?s={query}";
-
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await http.get(Uri.parse(homePage));
@@ -134,6 +128,6 @@ class TorrentFreak extends Publisher {
 
   @override
   Future<Set<NewsArticle?>> searchedArticles({required String searchQuery, int page = 1}) {
-    return extract("$homePage${searchEndpoint.replaceFirst("{page}", "$page").replaceFirst("{query}", searchQuery)}");
+    return extract("$homePage/page/$page/?s=$searchQuery");
   }
 }

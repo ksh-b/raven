@@ -16,11 +16,6 @@ class Reuters extends Publisher {
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
-  @override
-  String get iconUrl => "$homePage/favicon.ico";
-
-  @override
-  String get searchEndpoint => "";
 
   Future<Map<String, String>> extractCategories() async {
     return {

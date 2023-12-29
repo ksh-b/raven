@@ -15,12 +15,6 @@ class TheVerge extends Publisher {
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
-  @override
-  String get iconUrl => "$homePage/icons/favicon_32x32.png";
-
-  @override
-  String get searchEndpoint => "/api/search";
-
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await http.get(Uri.parse(homePage));
@@ -117,7 +111,7 @@ class TheVerge extends Publisher {
   Future<Set<NewsArticle?>> extractSearchArticles(String searchQuery, int page) async {
     Set<NewsArticle?> articles = {};
     var response = await http.get(
-      Uri.parse("$homePage$searchEndpoint"),
+      Uri.parse("$homePage/api/search"),
       headers: {
         "q": searchQuery,
         "page": (page-1).toString(),

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:whapp/model/article.dart';
 import 'package:whapp/model/publisher.dart';
-import 'package:whapp/model/user_subscription.dart';
 
 import 'package:whapp/pages/full_article.dart';
+import 'package:whapp/utils/store.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -45,75 +45,79 @@ class _FeedPageState extends State<FeedPage>
             });
             _loadMoreItems();
           },
-          child:ValueListenableBuilder(
-            valueListenable: Hive.box('subscriptions').listenable(),
+          child: ValueListenableBuilder(
+            valueListenable: Store.subscriptions.listenable(),
             builder: (BuildContext context, box, Widget? child) {
-              if(box.get("selected")!=null && box.get("selected").isNotEmpty) {
+              if (Store.selectedSubscriptions.isNotEmpty) {
                 return ListView.builder(
-                itemCount: filteredArticles.length + 2,
-                itemBuilder: (context, index) {
-                  if(index==0){
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: (value) {
-                          setState(() {
-                            filteredArticles = newsArticles
-                                .where((article) =>
-                                article!.title.toLowerCase().contains(value.toLowerCase()))
-                                .toList();
-                          });
-                        },
-                        decoration: const InputDecoration(
-                          labelText: 'Search feed',
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(30.0), // Adjust the value as needed
+                  itemCount: filteredArticles.length + 2,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: searchController,
+                          onChanged: (value) {
+                            setState(() {
+                              filteredArticles = newsArticles
+                                  .where((article) => article!.title
+                                      .toLowerCase()
+                                      .contains(value.toLowerCase()))
+                                  .toList();
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Search feed',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                    30.0), // Adjust the value as needed
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }
-                  else if (index-1 < filteredArticles.length) {
-                    var article = filteredArticles[index-1];
-                    return ListTile(
-                      title: Text(article!.title),
-                      leading: CachedNetworkImage(
-                        imageUrl: article.publisher.iconUrl,
-                        progressIndicatorBuilder:
-                            (context, url, downloadProgress) {
-                          return CircularProgressIndicator(
-                              value: downloadProgress.progress);
+                      );
+                    } else if (index - 1 < filteredArticles.length) {
+                      var article = filteredArticles[index - 1];
+                      return ListTile(
+                        title: Text(article!.title),
+                        leading: CachedNetworkImage(
+                          imageUrl: article.publisher.iconUrl,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) {
+                            return CircularProgressIndicator(
+                                value: downloadProgress.progress);
+                          },
+                          height: 24,
+                          width: 24,
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        ),
+                        subtitle: Text(
+                          article.publishedAt.value,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ArticlePage(article: article)),
+                          );
                         },
-                        errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                      ),
-                      subtitle: Text(
-                        "${article.author} - ${article.publishedAt.value}",
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  ArticlePage(article: article)),
-                        );
-                      },
-                    );
-                  } else {
-                    return ElevatedButton(
-                      onPressed: () {
-                        _loadMoreItems();
-                      },
-                      child: const Text("Load more"),
-                    );
-                  }
-                },
-              );
-              } return Center(child: Text("Select some subscriptions"));
+                      );
+                    } else {
+                      return ElevatedButton(
+                        onPressed: () {
+                          _loadMoreItems();
+                        },
+                        child: const Text("Load more"),
+                      );
+                    }
+                  },
+                );
+              }
+              return Center(child: Text("Select some subscriptions"));
             },
           ),
         ),
@@ -127,18 +131,17 @@ class _FeedPageState extends State<FeedPage>
         isLoading = true;
       });
 
-      List subscriptions = Hive.box("subscriptions").get("selected") ??
-          List<UserSubscription>.empty(growable: true);
+      List subscriptions = Store.selectedSubscriptions;
       for (var subscription in subscriptions) {
         Publisher publisher = publishers[subscription.publisher]!;
         publisher
             .articles(page: page, category: subscription.category)
             .then((articles) {
           setState(() {
-            newsArticles = newsArticles.toSet().union(articles).toList()
-              ..sort(
-                (a, b) => a?.publishedAt.key.compareTo(b?.publishedAt.key),
-              );
+            newsArticles = newsArticles.toSet().union(articles).toList();
+            newsArticles.sort(
+              (a, b) => a!.publishedAt.key.compareTo(b!.publishedAt.key),
+            );
             filteredArticles = List.from(newsArticles);
             isLoading = false;
           });
