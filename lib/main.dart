@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:whapp/model/user_subscription.dart';
 import 'package:whapp/pages/home.dart';
-
+import 'package:whapp/utils/store.dart';
+import 'package:whapp/utils/theme_provider.dart';
 
 Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UserSubscriptionAdapter());
   await Hive.openBox('subscriptions');
+  await Hive.openBox('settings');
   runApp(const MyApp());
 }
 
@@ -16,9 +18,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner:false,
-      home: MyHomePage(),
+    return ValueListenableBuilder(
+      valueListenable: Store.settings.listenable(),
+      builder: (context, box, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: MyHomePage(),
+          theme: ThemeProvider.get(
+            ThemeProvider.colors[Store.themeColorSetting]!,
+            Store.darkThemeSetting,
+          ),
+        );
+      },
     );
   }
 }

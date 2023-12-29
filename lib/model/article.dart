@@ -8,7 +8,7 @@ class NewsArticle {
   String author;
   String url;
   String thumbnail;
-  MapEntry publishedAt;
+  MapEntry<int, String> publishedAt;
 
   NewsArticle(
     this.publisher,
@@ -32,6 +32,11 @@ class NewsArticle {
       'thumbnail': thumbnail,
       'publishedAt': publishedAt,
     };
+  }
+
+  @override
+  String toString() {
+    return toJson().toString();
   }
 
   @override

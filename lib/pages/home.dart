@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:whapp/pages/feed.dart';
+import 'package:whapp/pages/settings.dart';
 import 'package:whapp/pages/subscription.dart';
 
 
@@ -34,6 +35,11 @@ class _MyHomePageState extends State<MyHomePage> {
             selectedIcon: Icon(Icons.favorite_rounded),
             label: 'Subscriptions',
           ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
       body: IndexedStack(
@@ -41,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           const FeedPage(),
           const SubscriptionsPage(),
+          const SettingsPage(),
         ],
       ),
     );

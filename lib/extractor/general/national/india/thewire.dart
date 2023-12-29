@@ -18,9 +18,6 @@ class TheWire extends Publisher {
   @override
   String get iconUrl => "$homePage/favicon-32x32.png";
 
-  @override
-  String get searchEndpoint => "/search";
-
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await http.get(Uri.parse(homePage));
@@ -44,7 +41,7 @@ class TheWire extends Publisher {
   @override
   Future<NewsArticle?> article(String url) async {
     var response = await http
-        .get(Uri.parse('$homePage/wp-json/thewire/v2/posts/detail/$url'));
+        .get(Uri.parse('$homePage$url'));
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       var postDetail = data["post-detail"][0];
@@ -74,10 +71,9 @@ class TheWire extends Publisher {
     return super.articles(category: category, page: page);
   }
 
-  Future<Set<NewsArticle?>> extract(
-      String apiUrl, Map<String, String> params, bool isSearch) async {
+  Future<Set<NewsArticle?>> extract(String apiUrl, bool isSearch) async {
     Set<NewsArticle?> articles = {};
-    final response = await http.get(Uri.parse(apiUrl), headers: params);
+    final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       List data;
       if (isSearch) {
@@ -90,7 +86,7 @@ class TheWire extends Publisher {
         var author = element['post_author_name'][0]["author_name"];
         var thumbnail = element['hero_image'][0]; //element['thumbnail']['url'];
         var time = element["post_date_gmt"];
-        var articleUrl = '${element['post_name']}';
+        var articleUrl = '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
         var excerpt = element['post_excerpt'];
         articles.add(NewsArticle(
           this,
@@ -113,26 +109,23 @@ class TheWire extends Publisher {
     if (category == '/') {
       category = 'home';
     }
-    String apiUrl =
-        '$homePage/wp-json/thewire/v2/posts/$category/recent-stories';
-    Map<String, String> params = {
-      'per_page': '10',
-      'page': '$page',
-    };
-    return extract(apiUrl, params, false);
+    String apiUrl = '$homePage/wp-json/thewire/v2/posts/$category/recent-stories?page=$page&per_page=10';
+    return extract(apiUrl, false);
   }
 
   @override
   Future<Set<NewsArticle?>> searchedArticles(
       {required String searchQuery, int page = 1}) {
-    String apiUrl = '$homePage/wp-json/thewire/v2/posts$searchEndpoint';
+    String apiUrl = '$homePage/wp-json/thewire/v2/posts/search';
     Map<String, String> params = {
       'keyword': searchQuery,
       'orderby': 'rel',
-      'per_page': '5',
-      'page': '1',
+      'per_page': '10',
+      'page': '$page',
       'type': 'opinion',
     };
-    return extract(apiUrl, params, true);
+    Uri uri = Uri.parse(apiUrl).replace(queryParameters: params);
+    String fullUrl = uri.toString();
+    return extract(fullUrl, true);
   }
 }
