@@ -95,7 +95,7 @@ class _FeedPageState extends State<FeedPage>
                               const Icon(Icons.error),
                         ),
                         subtitle: Text(
-                          "${article.publishedAt.value}",
+                          article.publishedAt.value,
                         ),
                         onTap: () {
                           Navigator.push(
