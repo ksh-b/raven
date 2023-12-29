@@ -36,8 +36,8 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Subscriptions',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings),
-            selectedIcon: Icon(Icons.settings_outlined),
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
             label: 'Settings',
           ),
         ],
