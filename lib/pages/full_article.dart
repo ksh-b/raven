@@ -4,6 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whapp/model/article.dart';
+import 'package:whapp/utils/network.dart';
 import 'package:whapp/utils/store.dart';
 
 class ArticlePage extends StatefulWidget {
@@ -72,7 +73,7 @@ class _ArticlePageState extends State<ArticlePage> {
                   textWidget("Author", snapshot.data!.author, metadataStyle),
                   textWidget("Published", snapshot.data!.publishedAt.value,
                       metadataStyle),
-                  if (shouldLoadImage(snapshot)) image(snapshot),
+                  if (Network.shouldLoadImage(snapshot.data!.thumbnail)) image(snapshot),
                   textWidget("", snapshot.data!.excerpt, excerptStyle),
                   HtmlWidget(snapshot.data!.content),
                 ],
@@ -121,12 +122,6 @@ class _ArticlePageState extends State<ArticlePage> {
           )
         : SizedBox.shrink();
   }
-
-  bool shouldLoadImage(AsyncSnapshot<NewsArticle?> snapshot) {
-    return snapshot.data!.thumbnail.isNotEmpty &&
-        snapshot.data!.thumbnail.startsWith("https") &&
-        Store.loadImagesSetting == "Always";
-  }
 }
 
 class HtmlWidget extends StatelessWidget {
@@ -155,7 +150,7 @@ class HtmlWidget extends StatelessWidget {
             var src = extensionContext.attributes.containsKey("data-lazy-src")
                 ? "data-lazy-src"
                 : "src";
-            return CachedNetworkImage(
+            return Network.shouldLoadImage(extensionContext.attributes[src]!)? CachedNetworkImage(
               imageUrl: extensionContext.attributes[src]!,
               progressIndicatorBuilder: (context, url, downloadProgress) {
                 return CircularProgressIndicator(
@@ -165,7 +160,7 @@ class HtmlWidget extends StatelessWidget {
               errorWidget: (context, url, error) {
                 return const Icon(Icons.error);
               },
-            );
+            ):SizedBox.shrink();
           },
         ),
       ],
