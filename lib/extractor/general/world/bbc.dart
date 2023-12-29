@@ -116,7 +116,7 @@ class BBC extends Publisher {
           author ?? "",
           articleUrl,
           thumbnail ?? "",
-          parseDateString(time ?? ""),
+          parseDateString(time),
         ));
       }
     }

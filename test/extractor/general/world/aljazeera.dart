@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whapp/extractor/general/world/aljazeera.dart';
-import 'package:whapp/extractor/general/world/reuters.dart';
 import 'package:whapp/model/article.dart';
 
 void main() {
