@@ -41,7 +41,7 @@ class TheWire extends Publisher {
   @override
   Future<NewsArticle?> article(String url) async {
     var response = await http
-        .get(Uri.parse('$homePage/wp-json/thewire/v2/posts/detail/$url'));
+        .get(Uri.parse('$homePage$url'));
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       var postDetail = data["post-detail"][0];
@@ -86,7 +86,7 @@ class TheWire extends Publisher {
         var author = element['post_author_name'][0]["author_name"];
         var thumbnail = element['hero_image'][0]; //element['thumbnail']['url'];
         var time = element["post_date_gmt"];
-        var articleUrl = '${element['post_name']}';
+        var articleUrl = '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
         var excerpt = element['post_excerpt'];
         articles.add(NewsArticle(
           this,
