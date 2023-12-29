@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:hive/hive.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whapp/model/article.dart';
 
@@ -14,68 +16,54 @@ class ArticlePage extends StatefulWidget {
 }
 
 class _ArticlePageState extends State<ArticlePage> {
+  TextStyle metadataStyle = const TextStyle(
+    fontStyle: FontStyle.italic,
+    color: Colors.grey,
+  );
+
+  TextStyle titleStyle = const TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  );
+
+  TextStyle excerptStyle = TextStyle(
+    fontSize: 16,
+    color: Colors.grey[700],
+  );
+
   @override
   Widget build(BuildContext context) {
+    String fullUrl = "${widget.article.publisher.homePage}/${widget.article.url}";
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(widget.article.publisher.name),
+        actions: [
+          InkWell(
+            child: IconButton(
+                onPressed: ()  {
+                  Share.shareUri(Uri.parse(fullUrl));
+                },
+                icon: Icon(Icons.share),
+            ),
+          )
+        ],
+      ),
       body: FutureBuilder<NewsArticle?>(
         initialData: widget.article,
         future: widget.article.publisher.article(widget.article.url),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(8.0),
               child: ListView(
                 children: [
-                  Text(
-                    snapshot.data!.title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Author: ${snapshot.data!.author}',
-                    style: const TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Published: ${snapshot.data!.publishedAt.value}',
-                    style: const TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  if (snapshot.data!.thumbnail.isNotEmpty &&
-                      snapshot.data!.thumbnail.startsWith("https"))
-                    CachedNetworkImage(
-                      imageUrl: snapshot.data!.thumbnail,
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) {
-                        return CircularProgressIndicator(
-                            value: downloadProgress.progress);
-                      },
-                      errorWidget: (context, url, error) {
-                        return const Icon(Icons.error);
-                      },
-                    ),
-                  const SizedBox(height: 16),
-                  Text(
-                    snapshot.data!.excerpt,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  HtmlWidget(
-                    snapshot.data!.content,
-                  ),
+                  textWidget("", snapshot.data!.title, titleStyle),
+                  textWidget("Author", snapshot.data!.author, metadataStyle),
+                  textWidget("Published", snapshot.data!.publishedAt.value,
+                      metadataStyle),
+                  if (shouldLoadImage(snapshot)) image(snapshot),
+                  textWidget("", snapshot.data!.excerpt, excerptStyle),
+                  HtmlWidget(snapshot.data!.content),
                 ],
               ),
             );
@@ -86,6 +74,48 @@ class _ArticlePageState extends State<ArticlePage> {
         },
       ),
     );
+  }
+
+  Padding image(AsyncSnapshot<NewsArticle?> snapshot) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: CachedNetworkImage(
+        imageUrl: snapshot.data!.thumbnail,
+        progressIndicatorBuilder: (context, url, downloadProgress) {
+          return Center(
+            child: LinearProgressIndicator(
+              value: downloadProgress.progress,
+            ),
+          );
+        },
+        errorWidget: (context, url, error) {
+          return const Icon(Icons.error);
+        },
+      ),
+    );
+  }
+
+  Widget textWidget(
+    String label,
+    String value,
+    TextStyle style,
+  ) {
+    return value.isNotEmpty
+        ? Padding(
+            padding: const EdgeInsets.only(left: 8.0, right:8.0, bottom: 8.0),
+            child: Text(
+              label.isNotEmpty ? '$label: $value' : value,
+              style: style,
+            ),
+          )
+        : SizedBox.shrink();
+  }
+
+  bool shouldLoadImage(AsyncSnapshot<NewsArticle?> snapshot) {
+    return snapshot.data!.thumbnail.isNotEmpty &&
+        snapshot.data!.thumbnail.startsWith("https") &&
+        Hive.box("settings").get("loadImages", defaultValue: "Always") ==
+            "Always";
   }
 }
 
