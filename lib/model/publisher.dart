@@ -1,17 +1,23 @@
 import 'package:whapp/extractor/general/national/india/thewire.dart';
 import 'package:whapp/extractor/general/world/aljazeera.dart';
 import 'package:whapp/extractor/general/world/bbc.dart';
+import 'package:whapp/extractor/general/world/nitter.dart';
 import 'package:whapp/extractor/general/world/reuters.dart';
+import 'package:whapp/extractor/technology/arstechnica.dart';
+import 'package:whapp/extractor/technology/bleepingcomputer.dart';
+import 'package:whapp/extractor/technology/engadget.dart';
 import 'package:whapp/extractor/technology/theverge.dart';
 import 'package:whapp/extractor/technology/torrentfreak.dart';
 import 'package:whapp/model/article.dart';
 import 'package:whapp/utils/string.dart';
 
-
-
 Map<String, Publisher> publishers = {
   "Al Jazeera": AlJazeera(),
+  "Ars Technica": ArsTechnica(),
   "BBC": BBC(),
+  "BleepingComputer": BleepingComputer(),
+  "Engadget": Engadget(),
+  "Nitter": Nitter(),
   "Reuters": Reuters(),
   "The Verge": TheVerge(),
   "The Wire": TheWire(),
@@ -28,7 +34,6 @@ abstract class Publisher {
   String get iconUrl => "$homePage/favicon.ico";
 
   Future<Map<String, String>> get categories;
-
 
   Future<Set<NewsArticle?>> articles({String category = "All", int page = 1}) {
     return category.startsWith("#")
