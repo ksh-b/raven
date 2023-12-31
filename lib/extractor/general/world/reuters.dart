@@ -33,29 +33,14 @@ class Reuters extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(String url) async {
-    var response = await http.get(Uri.parse('https://neuters.de$url'));
+  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+    var response = await http.get(Uri.parse('https://neuters.de${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
-
-      var titleElement = document.querySelector('h1');
       var articleElement = document.querySelectorAll('p:not(.byline)');
-      var timeAuthorElement = document.querySelector('.byline');
-      var title = titleElement?.text;
-      var article = articleElement.map((e) => e.text).join("\n");
-      var author = timeAuthorElement?.text.split(" - ")[1];
-      var excerpt = "";
-      var thumbnail = "";
-      var time = timeAuthorElement?.text.split(" - ")[0];
-      return NewsArticle(
-        this,
-        title ?? "",
-        article,
-        excerpt,
-        author ?? "",
-        url,
-        thumbnail,
-        parseDateString(time?.trim() ?? ""),
+      var content = articleElement.map((e) => e.text).join("\n");
+      return newsArticle.fill(
+        content: content,
       );
     }
     return null;

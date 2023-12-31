@@ -37,7 +37,7 @@ class _ArticlePageState extends State<ArticlePage> {
 
     return FutureBuilder<NewsArticle?>(
       initialData: widget.article,
-      future: widget.article.publisher.article(widget.article.url),
+      future: widget.article.publisher.article(widget.article),
       builder: (context, snapshot) {
         String fullUrl =
             "${widget.article.publisher.homePage}${snapshot.data!.url}";

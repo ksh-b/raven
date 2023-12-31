@@ -37,33 +37,21 @@ class TorrentFreak extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(String url) async {
-    var response = await http.get(Uri.parse('$homePage$url'));
+  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+    var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
 
-      var titleElement = document.querySelector('.hero__title');
       var articleElement = document.querySelector('.article__body');
-      var authorElement = document.querySelector('.hero__published a');
       var excerptElement = document.querySelector('.article__excerpt');
       var thumbnailElement = document.querySelector('section[data-bg]');
-      var timeElement = document.querySelector('time');
-      var title = titleElement?.text;
-      var article = articleElement?.innerHtml;
-      var author = authorElement?.text;
+      var content = articleElement?.innerHtml;
       var excerpt = excerptElement?.text;
       var thumbnail = thumbnailElement?.attributes["data-bg"];
-      var time = timeElement?.text;
-
-      return NewsArticle(
-        this,
-        title ?? "",
-        article ?? "",
-        excerpt ?? "",
-        author ?? "",
-        url,
-        thumbnail ?? "",
-        parseDateString(time?.trim() ?? ""),
+      return newsArticle.fill(
+        content: content,
+        excerpt: excerpt,
+        thumbnail: thumbnail,
       );
     }
     return null;

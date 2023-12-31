@@ -36,32 +36,24 @@ class TheVerge extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(String url) async {
-    var response = await http.get(Uri.parse('$homePage$url'));
+  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+    var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
 
-      var titleElement = document.querySelector('h1') ?? document.querySelector("div.inline");
       var articleElement = document.querySelector('.duet--article--article-body-component-container') ?? document.querySelector(".flex-1");
       var authorElement = document.querySelector('span.font-medium > a') ?? document.querySelector("a[href*=authors]");
-      var excerptElement = document.querySelector('span h2.inline');
       var thumbnailElement = document.querySelector('.duet--article--lede-image img');
       var timeElement = document.querySelector('time');
-      var title = titleElement?.text;
-      var article = articleElement?.innerHtml;
+      var content = articleElement?.innerHtml;
       var author = authorElement?.text;
-      var excerpt = excerptElement?.text;
       var thumbnail = thumbnailElement!=null?thumbnailElement.attributes["src"]:"";
       var time = timeElement?.attributes["datetime"];
-      return NewsArticle(
-        this,
-        title ?? "",
-        article ?? "",
-        excerpt ?? "",
-        author ?? "",
-        url,
-        thumbnail ?? "",
-        parseDateString(time?.trim() ?? ""),
+      return newsArticle.fill(
+        content: content,
+        author: author,
+        thumbnail: thumbnail,
+        publishedAt: parseDateString(time?.trim() ?? ""),
       );
     }
     return null;
@@ -111,11 +103,7 @@ class TheVerge extends Publisher {
   Future<Set<NewsArticle?>> extractSearchArticles(String searchQuery, int page) async {
     Set<NewsArticle?> articles = {};
     var response = await http.get(
-      Uri.parse("$homePage/api/search"),
-      headers: {
-        "q": searchQuery,
-        "page": (page-1).toString(),
-      }
+      Uri.parse('$homePage/api/search?q=$searchQuery&page=$page')
     );
 
     if (response.statusCode == 200) {
@@ -126,7 +114,7 @@ class TheVerge extends Publisher {
         var title = element["title"];
         var url = element["link"];
         var excerpt = element["htmlSnippet"];
-        var thumbnail = element["pagemap"]["cse_image"][0];
+        var thumbnail = element["pagemap"]["cse_image"][0]["src"];
         var time = element["snippet"].split("...")[0];
         articles.add(NewsArticle(
           this,

@@ -40,7 +40,7 @@ abstract class Publisher {
 
   Future<Set<NewsArticle?>> searchedArticles({required String searchQuery, int page = 1});
 
-  Future<NewsArticle?> article(String url);
+  Future<NewsArticle?> article(NewsArticle newsArticle);
 
   Map<String, dynamic> toJson() {
     return {
