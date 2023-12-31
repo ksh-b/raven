@@ -21,6 +21,27 @@ class NewsArticle {
     this.publishedAt,
   );
 
+  NewsArticle fill({
+    String? title,
+    String? content,
+    String? excerpt,
+    String? author,
+    String? url,
+    String? thumbnail,
+    MapEntry<int, String>? publishedAt,
+  }) {
+    return NewsArticle(
+      publisher,
+      title ?? this.title,
+      content ?? this.content,
+      excerpt ?? this.excerpt,
+      author ?? this.author,
+      url ?? this.url,
+      thumbnail ?? this.thumbnail,
+      publishedAt ?? this.publishedAt,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'publisher': publisher.toJson(),
