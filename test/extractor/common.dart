@@ -23,14 +23,16 @@ class ExtractorTest {
   }
 
   static Future<void> searchedArticlesTest(Publisher publisher, String query) async {
-    final searchArticles =
-    await publisher.searchedArticles(searchQuery: 'world', page: 1);
+    if (publisher.hasSearchSupport) {
+      final searchArticles =
+      await publisher.searchedArticles(searchQuery: query, page: 1);
 
-    expect(searchArticles, isNotEmpty);
+      expect(searchArticles, isNotEmpty);
 
-    var article = searchArticles.first;
-    expect(article, isA<NewsArticle>());
-    expect(article?.title, isNotEmpty);
-    expect(article?.publishedAt.value, isNot(0));
+      var article = searchArticles.first;
+      expect(article, isA<NewsArticle>());
+      expect(article?.title, isNotEmpty);
+      expect(article?.publishedAt.value, isNot(0));
+    }
   }
 }
