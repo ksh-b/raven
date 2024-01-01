@@ -157,7 +157,7 @@ class HtmlWidget extends StatelessWidget {
             var src = extensionContext.attributes.containsKey("data-lazy-src")
                 ? "data-lazy-src"
                 : "src";
-            return Network.shouldLoadImage(extensionContext.attributes[src]!)
+            return extensionContext.attributes[src]!=null && Network.shouldLoadImage(extensionContext.attributes[src]!)
                 ? CachedNetworkImage(
                     imageUrl: extensionContext.attributes[src]!,
                     progressIndicatorBuilder: (context, url, downloadProgress) {
