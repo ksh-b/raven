@@ -39,27 +39,16 @@ class TheWire extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(String url) async {
-    var response = await http
-        .get(Uri.parse('$homePage$url'));
+  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+    var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       var postDetail = data["post-detail"][0];
-      var title = postDetail["post_title"];
-      var article = postDetail["post_content"];
-      var author = postDetail["post_author_name"][0]["author_name"];
-      var excerpt = postDetail["post_excerpt"];
+      var content = postDetail["post_content"];
       var thumbnail = postDetail["featured_image"][0];
-      var time = postDetail["post_date_gmt"];
-      return NewsArticle(
-        this,
-        title ?? "",
-        article ?? "",
-        excerpt ?? "",
-        author ?? "",
-        url,
-        thumbnail ?? "",
-        parseDateString(time?.trim() ?? ""),
+      return newsArticle.fill(
+        content: content,
+        thumbnail: thumbnail,
       );
     }
     return null;
@@ -84,9 +73,10 @@ class TheWire extends Publisher {
       for (var element in data) {
         var title = element['post_title'];
         var author = element['post_author_name'][0]["author_name"];
-        var thumbnail = element['hero_image'][0]; //element['thumbnail']['url'];
+        var thumbnail = element['hero_image'][0];
         var time = element["post_date_gmt"];
-        var articleUrl = '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
+        var articleUrl =
+            '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
         var excerpt = element['post_excerpt'];
         articles.add(NewsArticle(
           this,
@@ -109,7 +99,8 @@ class TheWire extends Publisher {
     if (category == '/') {
       category = 'home';
     }
-    String apiUrl = '$homePage/wp-json/thewire/v2/posts/$category/recent-stories?page=$page&per_page=10';
+    String apiUrl =
+        '$homePage/wp-json/thewire/v2/posts/$category/recent-stories?page=$page&per_page=10';
     return extract(apiUrl, false);
   }
 

@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:whapp/extractor/general/world/bbc.dart';
+import 'package:whapp/extractor/technology/arstechnica.dart';
 import 'package:whapp/model/publisher.dart';
 
-import '../../common.dart';
+import '../common.dart';
 
 void main() {
-  Publisher publisher = BBC();
+  Publisher publisher = ArsTechnica();
 
   test('Extract Categories Test', () async {
     await ExtractorTest.categoriesTest(publisher);
@@ -16,6 +16,6 @@ void main() {
   });
 
   test('Search Articles Test', () async {
-    await ExtractorTest.searchedArticlesTest(publisher, 'world');
+    await ExtractorTest.searchedArticlesTest(publisher, 'tech');
   });
 }

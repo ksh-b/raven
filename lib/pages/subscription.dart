@@ -100,7 +100,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
   String getSelectedCategories(String newsSource) {
     var categories = Store.selectedSubscriptions
         .where((element) => element.publisher==newsSource)
-        .map((e) => e.category)
+        .map((e) => e.category!="/"?e.category.split("/").last:e.category)
         .join(", ");
     return categories;
   }

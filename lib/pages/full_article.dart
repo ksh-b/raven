@@ -37,7 +37,7 @@ class _ArticlePageState extends State<ArticlePage> {
 
     return FutureBuilder<NewsArticle?>(
       initialData: widget.article,
-      future: widget.article.publisher.article(widget.article.url),
+      future: widget.article.publisher.article(widget.article),
       builder: (context, snapshot) {
         String fullUrl =
             "${widget.article.publisher.homePage}${snapshot.data!.url}";
@@ -157,7 +157,7 @@ class HtmlWidget extends StatelessWidget {
             var src = extensionContext.attributes.containsKey("data-lazy-src")
                 ? "data-lazy-src"
                 : "src";
-            return Network.shouldLoadImage(extensionContext.attributes[src]!)
+            return extensionContext.attributes[src]!=null && Network.shouldLoadImage(extensionContext.attributes[src]!)
                 ? CachedNetworkImage(
                     imageUrl: extensionContext.attributes[src]!,
                     progressIndicatorBuilder: (context, url, downloadProgress) {

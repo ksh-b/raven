@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:whapp/model/article.dart';
 import 'package:whapp/model/publisher.dart';
 import 'dart:convert';
@@ -30,38 +29,19 @@ class AlJazeera extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(String url) async {
-    var response = await http.get(Uri.parse('$homePage$url'));
+  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+    var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
 
       var article = document.getElementById("main-content-area");
-
-      var titleElement = article?.querySelector('h1');
-      var excerptElement = article?.querySelector('em');
       var thumbnailElement = article?.querySelector('img');
       var articleElement = article?.querySelector('.wysiwyg');
-      var authorElement = article?.querySelector('.author-link');
-      var timeElement = article?.querySelector('.date-simple span[aria-hidden]');
-      var title = titleElement?.text;
       var content = articleElement?.text;
-      var author = authorElement?.text;
-      var excerpt = excerptElement?.text;
       var thumbnail = "$homePage${thumbnailElement?.attributes["src"]}";
-      var time = timeElement?.text;
-
-      if (time!=null) {
-        time = DateFormat('d MMM yyyy').parse(time).toString();
-      }
-      return NewsArticle(
-        this,
-        title ?? "",
-        content ?? "",
-        excerpt ?? "",
-        author ?? "",
-        url,
-        thumbnail,
-        parseDateString(time?.trim() ?? ""),
+      return newsArticle.fill(
+        content: content,
+        thumbnail: thumbnail,
       );
     }
     return null;

@@ -157,30 +157,31 @@ class BBC extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(String url) async {
-    var response = await http.get(Uri.parse("$homePage$url"));
+  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
 
-      var titleElement = document.querySelector('article h1');
-      var articleElement = document.querySelectorAll('article p');
-      var excerptElement = document.querySelector('article div b');
-      var timeElement = document.querySelector('article time');
-      var thumbnailElement = document.querySelector('article img');
-      var authorElement = document.querySelector("article div[class*=TextContributorName]");
+      var article = document.querySelector('.article__main:nth-child(1)');
+      var titleElement = article?.querySelector('h1');
+      var excerptElement = article?.querySelector('div b');
+      var timeElement = article?.querySelector('time');
+      var thumbnailElement = article?.querySelector('img');
+      var authorElement = article?.querySelector("div[class*=TextContributorName]");
       var title = titleElement?.text;
-      var article = articleElement.sublist(1).map((e) => "<p>${e.text}</p>").join();
+      var content = article?.innerHtml;
       var author = authorElement?.text.replaceFirst("By ", "");
       var excerpt = excerptElement?.text;
       var thumbnail = thumbnailElement?.attributes["src"];
       var time = timeElement?.attributes["datetime"];
+      
       return NewsArticle(
         this,
         title ?? "",
-        article,
+        content ?? "",
         excerpt ?? "",
         author ?? "",
-        url,
+        newsArticle.url,
         thumbnail ?? "",
         parseDateString(time?.trim() ?? ""),
       );
