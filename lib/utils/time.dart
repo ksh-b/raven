@@ -41,7 +41,11 @@ MapEntry<int, String> parseDateString(String timestamp) {
 }
 
 String convertToIso8601(String inputTime, String inputFormatString) {
-  DateFormat inputFormat = DateFormat(inputFormatString);
-  DateTime parsedTime = inputFormat.parse(inputTime);
-  return parsedTime.toString();
+  try {
+    DateFormat inputFormat = DateFormat(inputFormatString);
+    DateTime parsedTime = inputFormat.parse(inputTime);
+    return parsedTime.toString();
+  } catch (e) {
+    return inputTime;
+  }
 }
