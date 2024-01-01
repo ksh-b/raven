@@ -15,13 +15,11 @@ class ArsTechnica extends Publisher {
 
   @override
   Future<NewsArticle?> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await http.get(Uri.parse(newsArticle.url));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      Element? articleElement = document.querySelector("article");
-      String? thumbnail = articleElement
-          ?.querySelector("p img")
-          ?.attributes["src"];
+      Element? articleElement = document.querySelector(".article-content");
+      String? thumbnail = "";
       String? content = articleElement?.innerHtml;
       return newsArticle.fill(content: content, thumbnail: thumbnail);
     }
@@ -30,7 +28,7 @@ class ArsTechnica extends Publisher {
 
   @override
   Future<Map<String, String>> get categories async => {
-    "News": "news",
+    "News": "",
     "Reviews": "reviews",
     "Guides": "guides",
     "Gaming": "gaming",
@@ -65,7 +63,7 @@ class ArsTechnica extends Publisher {
             .querySelector("figure div")
             ?.attributes["style"];
 
-        NewsArticle(
+        articles.add(NewsArticle(
           this,
           title ?? "",
           "",
@@ -74,7 +72,7 @@ class ArsTechnica extends Publisher {
           url ?? "",
           extractUrl(thumbnail),
           parseDateString(date),
-        );
+        ));
       }
     }
     return articles;

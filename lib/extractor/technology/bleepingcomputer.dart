@@ -15,13 +15,11 @@ class BleepingComputer extends Publisher {
 
   @override
   Future<NewsArticle?> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await http.get(Uri.parse(newsArticle.url));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      Element? articleElement = document.querySelector(".article_section");
-      String? thumbnail = articleElement
-          ?.querySelector("p img")
-          ?.attributes["src"];
+      Element? articleElement = document.querySelector(".articleBody");
+      String? thumbnail = "";
       String? content = articleElement?.innerHtml;
       return newsArticle.fill(content: content, thumbnail: thumbnail,);
     }
@@ -37,7 +35,7 @@ class BleepingComputer extends Publisher {
   @override
   Future<Set<NewsArticle?>> categoryArticles({String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse("$homePage/news/page/$page"));
+    var response = await http.get(Uri.parse(page!=1?"$homePage/news/page/$page":"$homePage/news/"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       List<Element> articleElements =
@@ -55,7 +53,7 @@ class BleepingComputer extends Publisher {
         String? time = articleElement.querySelector(".bc_news_time")?.text;
         String parsedTime = convertToIso8601("$date $time", "MMMM dd, yyyy hh:mm a");
 
-        NewsArticle(
+        articles.add(NewsArticle(
           this,
           title ?? "",
           content,
@@ -64,7 +62,7 @@ class BleepingComputer extends Publisher {
           url ?? "",
           thumbnail ?? "",
           parseDateString(parsedTime),
-        );
+        ));
       }
     }
     return articles;

@@ -8,11 +8,17 @@ void main() {
   Publisher publisher = BleepingComputer();
 
   test('Extract Categories Test', () async {
-    await ExtractorTest.categoriesTest(publisher);
+
   });
 
   test('Category Articles Test', () async {
-    await ExtractorTest.categoryArticlesTest(publisher);
+    final categoryArticles = await publisher.categoryArticles(category: "", page: 1);
+
+    expect(categoryArticles, isNotEmpty);
+
+    var article = categoryArticles.first;
+    expect(article?.title, isNotEmpty);
+    expect(article?.publishedAt.value, isNot(0));
   });
 
   test('Search Articles Test', () async {

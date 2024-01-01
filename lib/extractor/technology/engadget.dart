@@ -18,7 +18,7 @@ class Engadget extends Publisher {
     var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      Element? articleElement = document.querySelector(".article_section");
+      Element? articleElement = document.querySelector(".caas-body");
       String? thumbnail = articleElement
           ?.querySelector("p img")
           ?.attributes["src"];
@@ -43,7 +43,8 @@ class Engadget extends Publisher {
   @override
   Future<Set<NewsArticle?>> categoryArticles({String category = "news", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse("$homePage/$category/page/$page"));
+    if(category=="/") category = "/news";
+    var response = await http.get(Uri.parse("$homePage$category/page/$page"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       List<Element> articleElements =
@@ -53,14 +54,14 @@ class Engadget extends Publisher {
         String? excerpt = articleElement.querySelector("h2+div")?.text;
         String? authorTime = articleElement.querySelector("div[class*=engadgetFontDarkGray]")?.text;
         String? author = authorTime?.split(",")[0].replaceFirst("By ", "");
-        String? date = authorTime?.split(",")[1];
+        String? date = authorTime?.split(",").last.trim();
         String? url = articleElement.querySelector("h2 a")?.attributes["href"];
         String? thumbnail = articleElement
                 .querySelector("img[width]")
                 ?.attributes["src"];
         String parsedTime = convertToIso8601("$date", "MM.dd.yyyy");
 
-        NewsArticle(
+        articles.add(NewsArticle(
           this,
           title ?? "",
           "",
@@ -69,7 +70,7 @@ class Engadget extends Publisher {
           url ?? "",
           thumbnail ?? "",
           parseDateString(parsedTime),
-        );
+        ));
       }
     }
     return articles;
@@ -94,7 +95,7 @@ class Engadget extends Publisher {
             ?.attributes["src"];
         String parsedTime = convertToIso8601("$date", "MM.dd.yyyy");
 
-        NewsArticle(
+        articles.add(NewsArticle(
           this,
           title ?? "",
           "",
@@ -103,7 +104,7 @@ class Engadget extends Publisher {
           url ?? "",
           thumbnail ?? "",
           parseDateString(parsedTime),
-        );
+        ));
       }
     }
     return articles;
