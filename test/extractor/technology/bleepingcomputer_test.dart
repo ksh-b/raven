@@ -12,13 +12,7 @@ void main() {
   });
 
   test('Category Articles Test', () async {
-    final categoryArticles = await publisher.categoryArticles(category: "", page: 1);
-
-    expect(categoryArticles, isNotEmpty);
-
-    var article = categoryArticles.first;
-    expect(article?.title, isNotEmpty);
-    expect(article?.publishedAt.value, isNot(0));
+    await ExtractorTest.categoryArticlesTest(publisher, category: '');
   });
 
   test('Search Articles Test', () async {

@@ -10,9 +10,13 @@ class ExtractorTest {
     expect(categories.isNotEmpty, true);
   }
 
-  static Future<void> categoryArticlesTest(Publisher publisher) async {
-    final Map<String, String> categories = await publisher.categories;
-    final categoryArticles = await publisher.categoryArticles(category: categories.entries.first.value, page: 1);
+  static Future<void> categoryArticlesTest(Publisher publisher, {String? category}) async {
+    if(category==null) {
+      final Map<String, String> categories = await publisher.categories;
+      category = categories.entries.first.value;
+    }
+    expect(category, isNotNull);
+    final categoryArticles = await publisher.categoryArticles(category: category!, page: 1);
 
     expect(categoryArticles, isNotEmpty);
 
