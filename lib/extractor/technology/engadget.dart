@@ -41,9 +41,9 @@ class Engadget extends Publisher {
   };
 
   @override
-  Future<Set<NewsArticle?>> categoryArticles({String category = "news", int page = 1}) async {
+  Future<Set<NewsArticle?>> categoryArticles({String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    if(category=="/") category = "/news";
+    if(category=="/" || category.isEmpty) category = "/news";
     var response = await http.get(Uri.parse("$homePage$category/page/$page"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
