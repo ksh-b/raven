@@ -2,6 +2,9 @@ import 'package:intl/intl.dart';
 
 MapEntry<int, String> parseDateString(String timestamp) {
   try {
+    if(timestamp.contains("ago")) {
+      return MapEntry(convertTimeStringToSeconds(timestamp), timestamp);
+    }
     DateTime dateTime = DateTime.parse(timestamp);
     DateTime now = DateTime.now();
     int differenceInSeconds = now.difference(dateTime).inSeconds;
@@ -35,9 +38,34 @@ MapEntry<int, String> parseDateString(String timestamp) {
           '$months ${(months == 1) ? 'month' : 'months'} ago');
     }
   } catch (e) {
-    return MapEntry(
-        0, timestamp); // Return 0 differenceInSeconds in case of an error.
+    return MapEntry(0, timestamp); // Return 0 differenceInSeconds in case of an error.
   }
+}
+
+int convertTimeStringToSeconds(String timeString) {
+  List<String> words = timeString.split(' ');
+  int value = int.parse(words[0]);
+  String unit = words[1].toLowerCase();
+  int seconds;
+  switch (unit) {
+    case 'second':
+    case 'seconds':
+      seconds = value;
+      break;
+    case 'minute':
+    case 'minutes':
+      seconds = value * 60;
+      break;
+    case 'hour':
+    case 'hours':
+      seconds = value * 3600;
+      break;
+
+    default:
+      seconds = 0;
+  }
+
+  return seconds;
 }
 
 String convertToIso8601(String inputTime, String inputFormatString) {
