@@ -16,14 +16,14 @@ class ExtractorTest {
       category = categories.entries.first.value;
     }
     expect(category, isNotNull);
-    final categoryArticles = await publisher.categoryArticles(category: category!, page: 1);
+    final categoryArticles = await publisher.categoryArticles(category: category, page: 1);
 
     expect(categoryArticles, isNotEmpty);
 
     var article = categoryArticles.first;
     expect(article, isA<NewsArticle>());
     expect(article?.title, isNotEmpty);
-    expect(article?.publishedAt.value, isNot(0));
+    expect(article?.publishedAt.key, isNot(0), reason: article?.publishedAt.value);
   }
 
   static Future<void> searchedArticlesTest(Publisher publisher, String query) async {
@@ -36,7 +36,7 @@ class ExtractorTest {
       var article = searchArticles.first;
       expect(article, isA<NewsArticle>());
       expect(article?.title, isNotEmpty);
-      expect(article?.publishedAt.value, isNot(0));
+      expect(article?.publishedAt.key, isNot(0), reason: article?.publishedAt.value);
     }
   }
 }
