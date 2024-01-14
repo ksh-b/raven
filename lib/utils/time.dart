@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 MapEntry<int, String> parseDateString(String timestamp) {
   try {
     if(timestamp.contains("ago")) {
+      if(timestamp.startsWith("a ")) {
+        timestamp = timestamp.replaceFirst("a ", "1 ");
+      }
       return MapEntry(convertTimeStringToSeconds(timestamp), timestamp);
     }
     DateTime dateTime = DateTime.parse(timestamp);
