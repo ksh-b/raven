@@ -8,7 +8,13 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:whapp/utils/time.dart';
 
 class Nitter extends Publisher {
-  Map nextCursor = {};
+
+  Map<String,String> headers = {
+    'Host': 'nitter.net',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:121.0) Gecko/20100101 Firefox/121.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+  };
 
   @override
   String get homePage => "https://nitter.net";
@@ -26,16 +32,11 @@ class Nitter extends Publisher {
     var response = await http.get(
       Uri.parse(
           "$homePage/$category/search?f=tweets&q=$query&since=${dates[0]}&until=${dates[1]}"),
-      headers: {
-        'Host': 'nitter.net',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:121.0) Gecko/20100101 Firefox/121.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-      },
+      headers: headers
     );
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      List<Element> articleElements = document.querySelectorAll(".tweet-body");
+      List<Element> articleElements = document.querySelectorAll(".timeline-item");
       for (Element articleElement in articleElements) {
         String? title = articleElement
             .querySelector(".tweet-content")
@@ -86,7 +87,8 @@ class Nitter extends Publisher {
 
   @override
   Future<NewsArticle?> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse(newsArticle.url));
+    var response = await http.get(Uri.parse(newsArticle.url),
+        headers: headers);
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       return newsArticle.fill(

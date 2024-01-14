@@ -162,14 +162,15 @@ class BBC extends Publisher {
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
 
-      var article = document.querySelector('.article__main:nth-child(1)');
+      var article = document.querySelector('article');
       var titleElement = article?.querySelector('h1');
       var excerptElement = article?.querySelector('div b');
       var timeElement = article?.querySelector('time');
       var thumbnailElement = article?.querySelector('img');
       var authorElement = article?.querySelector("div[class*=TextContributorName]");
       var title = titleElement?.text;
-      var content = article?.innerHtml;
+      var content = article?.querySelectorAll(".ep2nwvo0")
+          .map((e) => e.innerHtml).toList().sublist(1).join();
       var author = authorElement?.text.replaceFirst("By ", "");
       var excerpt = excerptElement?.text;
       var thumbnail = thumbnailElement?.attributes["src"];
@@ -221,7 +222,7 @@ class BBC extends Publisher {
     int page = 1,
   }) async {
     Set<NewsArticle?> articles = {};
-    var response = await http.get(Uri.parse("https://www.bbc.co.uk/search?q=$searchQuery&page=$page"));
+    var response = await http.get(Uri.parse("https://www.bbc.co.uk/search?q=$searchQuery&page=$page&d=news_gnl"));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
 
@@ -249,7 +250,7 @@ class BBC extends Publisher {
           "",
           excerpt ?? "",
           author,
-          articleUrl?.replaceFirst(homePage, "") ?? "",
+          articleUrl?.replaceFirst("https://www.bbc.co.uk", "") ?? "",
           thumbnail ?? "",
           parseDateString(time?.trim() ?? ""),
         ));

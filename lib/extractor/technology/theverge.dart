@@ -112,7 +112,7 @@ class TheVerge extends Publisher {
       var articleElements = document["items"];
       for (var element in articleElements) {
         var title = element["title"];
-        var url = element["link"];
+        var url = Uri.parse(element["link"]).path;
         var excerpt = element["htmlSnippet"];
         var thumbnail = element["pagemap"]["cse_image"][0]["src"];
         var time = element["snippet"].split("...")[0];

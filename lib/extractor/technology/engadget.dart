@@ -59,7 +59,7 @@ class Engadget extends Publisher {
         String? thumbnail = articleElement
                 .querySelector("img[width]")
                 ?.attributes["src"];
-        String parsedTime = convertToIso8601("$date", "MM.dd.yyyy");
+        String parsedTime = convertToIso8601(date!, "MM.dd.yyyy");
 
         articles.add(NewsArticle(
           this,
@@ -101,7 +101,7 @@ class Engadget extends Publisher {
           "",
           excerpt ?? "",
           author ?? "",
-          url ?? "",
+          Uri.parse(url!).path??"",
           thumbnail ?? "",
           parseDateString(parsedTime),
         ));
