@@ -32,64 +32,84 @@ class _ArticlePageState extends State<ArticlePage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<NewsArticle?>(
-        initialData: widget.article,
-        future: widget.article.publisher.article(widget.article),
-        builder: (context, snapshot) {
+      initialData: widget.article,
+      future: widget.article.publisher.article(widget.article),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
           String fullUrl =
               "${widget.article.publisher.homePage}${snapshot.data!.url}";
           String altUrl = "${Store.ladderUrl}/$fullUrl";
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.hasData) {
-            return Scaffold(
-                appBar: AppBar(
-                  title: Text(widget.article.publisher.name),
-                  actions: [
-                    InkWell(
-                      onLongPress: () {
-                        Share.shareUri(Uri.parse(altUrl));
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(widget.article.publisher.name),
+              actions: [
+                InkWell(
+                  onLongPress: () {
+                    Share.shareUri(Uri.parse(altUrl));
+                  },
+                  child: IconButton(
+                    icon: Icon(Icons.share),
+                    onPressed: () {
+                      Share.shareUri(Uri.parse(fullUrl));
+                    },
+                  ),
+                ),
+                InkWell(
+                  onLongPress: () {
+                    launchUrl(Uri.parse(altUrl));
+                  },
+                  child: IconButton(
+                    icon: Icon(Icons.open_in_browser),
+                    onPressed: () {
+                      launchUrl(Uri.parse(fullUrl));
+                    },
+                  ),
+                ),
+              ],
+            ),
+            body: Padding(
+              padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+              child: ListView(
+                children: [
+                  textWidget("", snapshot.data!.title, titleStyle),
+                  textWidget("Author", snapshot.data!.author, metadataStyle),
+                  textWidget("Published", snapshot.data!.publishedAt.value,
+                      metadataStyle),
+                  if (Network.shouldLoadImage(snapshot.data!.thumbnail))
+                    image(snapshot),
+                  textWidget("", snapshot.data!.excerpt, excerptStyle),
+                  HtmlWidget(snapshot.data!.content),
+                ],
+              ),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          String fallbackUrl =
+              "${widget.article.publisher.homePage}${widget.article.url}";
+          return Scaffold(
+            appBar: AppBar(),
+            body: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Error loading article\n$fallbackUrl"),
+                    IconButton(
+                      onPressed: () {
+                        launchUrl(Uri.parse(fallbackUrl));
                       },
-                      child: IconButton(
-                        icon: Icon(Icons.share),
-                        onPressed: () {
-                          Share.shareUri(Uri.parse(fullUrl));
-                        },
-                      ),
-                    ),
-                    InkWell(
-                      onLongPress: () {
-                        launchUrl(Uri.parse(altUrl));
-                      },
-                      child: IconButton(
-                        icon: Icon(Icons.open_in_browser),
-                        onPressed: () {
-                          launchUrl(Uri.parse(fullUrl));
-                        },
-                      ),
+                      icon: Icon(Icons.open_in_browser),
                     ),
                   ],
                 ),
-                body: Padding(
-                  padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-                  child: ListView(
-                    children: [
-                      textWidget("", snapshot.data!.title, titleStyle),
-                      textWidget(
-                          "Author", snapshot.data!.author, metadataStyle),
-                      textWidget("Published", snapshot.data!.publishedAt.value,
-                          metadataStyle),
-                      if (Network.shouldLoadImage(snapshot.data!.thumbnail))
-                        image(snapshot),
-                      textWidget("", snapshot.data!.excerpt, excerptStyle),
-                      HtmlWidget(snapshot.data!.content),
-                    ],
-                  ),
-                ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error loading data"));
-          }
-          return Center(child: CircularProgressIndicator());
-        },
+              ),
+            ),
+          );
+        }
+        return Center(child: CircularProgressIndicator());
+      },
     );
   }
 
