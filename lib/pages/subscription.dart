@@ -68,14 +68,18 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
                     progressIndicatorBuilder:
                         (context, url, downloadProgress) {
                       return CircularProgressIndicator(
-                          value: downloadProgress.progress);
+                          value: downloadProgress.progress,
+                      );
                     },
                     height: 24,
                     width: 24,
                     errorWidget: (context, url, error) =>
                     const Icon(Icons.error),
                   ),
-                  subtitle: categories.isEmpty? null:Text(categories),
+                  subtitle: Text(
+                      publishers[newsSource]!.mainCategory,
+                  ),
+                  trailing: categories.isEmpty?SizedBox.shrink():Icon(Icons.check_circle),
                   onTap: () {
                     showDialog(
                       context: context,
