@@ -17,10 +17,10 @@ class FeedPage extends StatefulWidget {
 class _FeedPageState extends State<FeedPage>
     with AutomaticKeepAliveClientMixin {
   List<NewsArticle?> newsArticles = [];
-  List<NewsArticle?> filteredArticles = [];
   TextEditingController searchController = TextEditingController();
   bool isLoading = false;
   int page = 1;
+  bool _isSearching = false;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
@@ -35,6 +35,19 @@ class _FeedPageState extends State<FeedPage>
     super.build(context);
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: _isSearching ? TextField() : Text('What\'s happening?'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon( _isSearching ? Icons.close: Icons.search),
+              onPressed: () {
+                setState(() {
+                  _isSearching = !_isSearching;
+                });
+              },
+            ),
+          ],
+        ),
         body: RefreshIndicator(
           key: _refreshIndicatorKey,
           strokeWidth: 4.0,
@@ -50,36 +63,10 @@ class _FeedPageState extends State<FeedPage>
             builder: (BuildContext context, box, Widget? child) {
               if (Store.selectedSubscriptions.isNotEmpty) {
                 return ListView.builder(
-                  itemCount: filteredArticles.length + 2,
+                  itemCount: newsArticles.length + 1,
                   itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          controller: searchController,
-                          onChanged: (value) {
-                            setState(() {
-                              filteredArticles = newsArticles
-                                  .where((article) => article!.title
-                                      .toLowerCase()
-                                      .contains(value.toLowerCase()))
-                                  .toList();
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Search feed',
-                            prefixIcon: Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(
-                                    30.0), // Adjust the value as needed
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    } else if (index - 1 < filteredArticles.length) {
-                      var article = filteredArticles[index - 1];
+                    if (index < newsArticles.length) {
+                      var article = newsArticles[index];
                       return ListTile(
                         title: Text(article!.title),
                         leading: CachedNetworkImage(
@@ -139,10 +126,6 @@ class _FeedPageState extends State<FeedPage>
             .then((articles) {
           setState(() {
             newsArticles = newsArticles.toSet().union(articles).toList();
-            newsArticles.sort(
-              (a, b) => a!.publishedAt.key.compareTo(b!.publishedAt.key),
-            );
-            filteredArticles = List.from(newsArticles);
             isLoading = false;
           });
         });

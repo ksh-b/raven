@@ -17,6 +17,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
   List<String> newsSources = publishers.keys.toList();
   List<String> filteredNewsSources = [];
   TextEditingController searchController = TextEditingController();
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -28,33 +29,32 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
+      appBar: AppBar(
+        title: _isSearching ? TextField(
+          controller: searchController,
+          onChanged: (value) {
+            setState(() {
+              filteredNewsSources = newsSources
+                  .where((source) {
+                return source.toLowerCase().contains(value.toLowerCase());
+              })
+                  .toList();
+            });
+          },
+        )  : Text('Subscriptions'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon( _isSearching ? Icons.close: Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+              });
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
-          SizedBox(height: 32,),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: searchController,
-              onChanged: (value) {
-                setState(() {
-                  filteredNewsSources = newsSources
-                      .where((source) {
-                        return source.toLowerCase().contains(value.toLowerCase());
-                      })
-                      .toList();
-                });
-              },
-              decoration: const InputDecoration(
-                labelText: 'Search subscriptions',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(30.0), // Adjust the value as needed
-                  ),
-                ),
-              ),
-            ),
-          ),
           Expanded(
             child: ListView.builder(
               itemCount: filteredNewsSources.length,
