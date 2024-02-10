@@ -35,8 +35,7 @@ class _ArticlePageState extends State<ArticlePage> {
       initialData: widget.article,
       future: widget.article.publisher.article(widget.article),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
+        if (snapshot.connectionState != ConnectionState.none) {
           String fullUrl =
               "${widget.article.publisher.homePage}${snapshot.data!.url}";
           String altUrl = "${Store.ladderUrl}/$fullUrl";
@@ -68,7 +67,8 @@ class _ArticlePageState extends State<ArticlePage> {
                 ),
               ],
             ),
-            body: Padding(
+            body: (snapshot.connectionState == ConnectionState.done &&
+          snapshot.hasData) ? Padding(
               padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
               child: ListView(
                 children: [
@@ -82,9 +82,25 @@ class _ArticlePageState extends State<ArticlePage> {
                   HtmlWidget(snapshot.data!.content),
                 ],
               ),
+            ): Padding(
+              padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+              child: ListView(
+                children: [
+                  textWidget("", widget.article.title, titleStyle),
+                  textWidget("Author", widget.article.author, metadataStyle),
+                  textWidget("Published", widget.article.publishedAt.value,
+                      metadataStyle),
+                  LinearProgressIndicator(),
+                  textWidget("", widget.article.excerpt, excerptStyle),
+                  widget.article.content.isNotEmpty?
+                  HtmlWidget(widget.article.content):
+                  LinearProgressIndicator(),
+                ],
+              ),
             ),
           );
-        } else if (snapshot.hasError) {
+        }
+        else if (snapshot.hasError) {
           String fallbackUrl =
               "${widget.article.publisher.homePage}${widget.article.url}";
           return Scaffold(
