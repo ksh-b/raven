@@ -94,11 +94,14 @@ class _FeedPageState extends State<FeedPage>
                         },
                       );
                     } else {
-                      return ElevatedButton(
-                        onPressed: () {
-                          _loadMoreItems();
-                        },
-                        child: const Text("Load more"),
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 16),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _loadMoreItems();
+                          },
+                          child: const Text("Load more"),
+                        ),
                       );
                     }
                   },
