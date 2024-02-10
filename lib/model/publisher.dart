@@ -1,3 +1,4 @@
+import 'package:whapp/extractor/general/national/india/thequint.dart';
 import 'package:whapp/extractor/general/national/india/thewire.dart';
 import 'package:whapp/extractor/general/world/aljazeera.dart';
 import 'package:whapp/extractor/general/world/bbc.dart';
@@ -35,6 +36,8 @@ abstract class Publisher {
   String get iconUrl => "$homePage/favicon.ico";
 
   Future<Map<String, String>> get categories;
+
+  String get mainCategory;
 
   Future<Set<NewsArticle?>> articles({String category = "All", int page = 1}) {
     return category.startsWith("#")

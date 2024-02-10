@@ -15,6 +15,9 @@ class TheVerge extends Publisher {
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
+  @override
+  String get mainCategory => "Technology";
+
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await http.get(Uri.parse(homePage));
@@ -86,15 +89,16 @@ class TheVerge extends Publisher {
         var time = timeElement?.attributes["datetime"];
         var articleUrl = articleUrlElement?.attributes["href"];
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          "",
-          author ?? "",
-          articleUrl?.replaceFirst(homePage, "") ?? "",
-          thumbnail ?? "",
-          parseDateString(time?.trim() ?? ""),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: "",
+          author: author ?? "",
+          url: articleUrl?.replaceFirst(homePage, "") ?? "",
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(time?.trim() ?? ""),
         ));
+
       }
     }
     return articles;
@@ -118,15 +122,16 @@ class TheVerge extends Publisher {
         var time = element["snippet"].split("...")[0];
         var dateEntry = parseDateString(convertToIso8601(time, 'MMM dd, yyyy'));
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          excerpt,
-          "",
-          url,
-          thumbnail,
-          dateEntry,
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt,
+          author: "", // Specify author or use default value
+          url: url.replaceFirst(homePage, ""),
+          thumbnail: thumbnail,
+          publishedAt: dateEntry,
         ));
+
       }
     }
     return articles;

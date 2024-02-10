@@ -16,6 +16,8 @@ class Reuters extends Publisher {
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
+  @override
+  String get mainCategory => "World";
 
   Future<Map<String, String>> extractCategories() async {
     return {
@@ -75,15 +77,16 @@ class Reuters extends Publisher {
         var articleUrl = '${element['canonical_url']}';
         var excerpt = element['description'];
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          excerpt,
-          author ?? "",
-          articleUrl,
-          thumbnail ?? "",
-          parseDateString(time?.trim() ?? ""),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt,
+          author: author ?? "",
+          url: articleUrl,
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(time?.trim() ?? ""),
         ));
+
       }
     }
     return articles;

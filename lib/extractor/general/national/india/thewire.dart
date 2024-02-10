@@ -18,6 +18,9 @@ class TheWire extends Publisher {
   @override
   String get iconUrl => "$homePage/favicon-32x32.png";
 
+  @override
+  String get mainCategory => "India";
+
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await http.get(Uri.parse(homePage));
@@ -79,14 +82,14 @@ class TheWire extends Publisher {
             '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
         var excerpt = element['post_excerpt'];
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          excerpt,
-          author ?? "",
-          articleUrl,
-          thumbnail ?? "",
-          parseDateString(time?.trim() ?? ""),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt,
+          author: author ?? "",
+          url: articleUrl,
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(time?.trim() ?? ""),
         ));
       }
     }

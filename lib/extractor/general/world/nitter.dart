@@ -25,6 +25,9 @@ class Nitter extends Publisher {
   @override
   Future<Map<String, String>> get categories async => {};
 
+  @override
+  String get mainCategory => "World";
+
   Future<Set<NewsArticle?>> extract(String category, int page,
       {String query = ""}) async {
     Set<NewsArticle?> articles = {};
@@ -46,7 +49,8 @@ class Nitter extends Publisher {
         String? excerpt = articleElement.querySelector(".tweet-content")?.text;
         String? author = articleElement.querySelector(".username")?.text;
         String? url =
-            articleElement.querySelector(".tweet-link")?.attributes["href"];
+            articleElement.querySelector(".tweet-link")?.attributes["href"]
+        ?.replaceFirst(homePage, "");
         String? thumbnail = "";
         String? content = "";
         String? date =
@@ -55,15 +59,16 @@ class Nitter extends Publisher {
             convertToIso8601("$date", "MMM d, yyyy · h:mm a UTC");
 
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          content,
-          excerpt ?? "",
-          author ?? "",
-          "$homePage$url",
-          thumbnail,
-          parseDateString(parsedTime),
+          publisher: this,
+          title: title ?? "",
+          content: content ?? "",
+          excerpt: excerpt ?? "",
+          author: author ?? "",
+          url: "$homePage$url",
+          thumbnail: thumbnail,
+          publishedAt: parseDateString(parsedTime),
         ));
+
       }
       return articles;
     }
@@ -87,7 +92,7 @@ class Nitter extends Publisher {
 
   @override
   Future<NewsArticle?> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse(newsArticle.url),
+    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"),
         headers: headers);
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));

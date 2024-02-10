@@ -16,6 +16,9 @@ class BBC extends Publisher {
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
+  @override
+  String get mainCategory => "World";
+
   Future<Map<String, String>> extractCategories() async {
     return {
       "World": "world",
@@ -70,14 +73,14 @@ class BBC extends Publisher {
           var articleUrl = article['url'];
           var excerpt = article['summary'];
           articlesData.add(NewsArticle(
-            this,
-            title ?? "",
-            "",
-            excerpt,
-            author ?? "",
-            articleUrl,
-            thumbnail ?? "",
-            parseDateString(time?.trim() ?? ""),
+            publisher: this,
+            title: title ?? "",
+            content: "",
+            excerpt: excerpt,
+            author: author ?? "",
+            url: articleUrl,
+            thumbnail: thumbnail ?? "",
+            publishedAt: parseDateString(time?.trim() ?? ""),
           ));
         }
       }
@@ -109,14 +112,14 @@ class BBC extends Publisher {
         var articleUrl = article['url'];
         var excerpt = "";
         articlesData.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          excerpt,
-          author ?? "",
-          articleUrl,
-          thumbnail ?? "",
-          parseDateString(time),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt,
+          author: author ?? "",
+          url: articleUrl,
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(time),
         ));
       }
     }
@@ -135,18 +138,19 @@ class BBC extends Publisher {
         parsedTime = inputFormat.parse('$inputTime ${today.year.toString()}');
       } else if (inputTime
           .split(" ")
-          .length == 1) { // 20 December
+          .length == 1 && !inputTime.contains(":")) { // 20 December
         parsedTime =
             inputFormat.parse('00:00 $inputTime ${today.year.toString()}');
       } else if (inputTime
           .split(" ")
           .length == 2) { // 20 December 2020
         parsedTime = inputFormat.parse('00:00 $inputTime');
-      } else { // 04:20
-        String fullDate =
-            "${DateFormat('dd').format(today)} ${DateFormat('MMMM').format(
-            today)} ${DateFormat('yyyy').format(today)}";
-        parsedTime = inputFormat.parse('$inputTime ${fullDate.toString()}');
+      } else {
+        // 04:20
+        var hhmm = inputTime.split(":");
+        var hh = int.parse(hhmm[0]);
+        var mm = int.parse(hhmm[1]);
+        parsedTime = DateTime(today.year, today.month, today.day, hh, mm);
       }
       String iso8601Format = DateFormat('yyyy-MM-ddTHH:mm:ss').format(
           parsedTime);
@@ -175,16 +179,16 @@ class BBC extends Publisher {
       var excerpt = excerptElement?.text;
       var thumbnail = thumbnailElement?.attributes["src"];
       var time = timeElement?.attributes["datetime"];
-      
+
       return NewsArticle(
-        this,
-        title ?? "",
-        content ?? "",
-        excerpt ?? "",
-        author ?? "",
-        newsArticle.url,
-        thumbnail ?? "",
-        parseDateString(time?.trim() ?? ""),
+        publisher: this,
+        title: title ?? "",
+        content: content ?? "",
+        excerpt: excerpt ?? "",
+        author: author ?? "",
+        url: newsArticle.url,
+        thumbnail: thumbnail ?? "",
+        publishedAt: parseDateString(time?.trim() ?? ""),
       );
     }
     return null;
@@ -245,15 +249,16 @@ class BBC extends Publisher {
         }
 
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          excerpt ?? "",
-          author,
-          articleUrl?.replaceFirst("https://www.bbc.co.uk", "") ?? "",
-          thumbnail ?? "",
-          parseDateString(time?.trim() ?? ""),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt ?? "",
+          author: author,
+          url: articleUrl?.replaceFirst("https://www.bbc.co.uk", "") ?? "",
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(time?.trim() ?? ""),
         ));
+
       }
     }
     return articles;

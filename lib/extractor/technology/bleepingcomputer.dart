@@ -14,13 +14,19 @@ class BleepingComputer extends Publisher {
   String get name => "BleepingComputer";
 
   @override
+  String get mainCategory => "Technology";
+
+  @override
   Future<NewsArticle?> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse(newsArticle.url));
+    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      Element? articleElement = document.querySelector(".articleBody");
       String? thumbnail = "";
-      String? content = articleElement?.innerHtml;
+      String? content = document
+          .querySelectorAll(".articleBody > :not(.cz-related-article-wrapp)")
+          .toList()
+          .map((e) => e.innerHtml)
+          .join("<br><br>");
       return newsArticle.fill(content: content, thumbnail: thumbnail,);
     }
     return null;
@@ -54,15 +60,16 @@ class BleepingComputer extends Publisher {
         String parsedTime = convertToIso8601("$date $time", "MMMM dd, yyyy hh:mm a");
 
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          content,
-          excerpt ?? "",
-          author ?? "",
-          url ?? "",
-          thumbnail ?? "",
-          parseDateString(parsedTime),
+          publisher: this,
+          title: title ?? "",
+          content: content ?? "",
+          excerpt: excerpt ?? "",
+          author: author ?? "",
+          url: url?.replaceFirst(homePage, "") ?? "",
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(parsedTime),
         ));
+
       }
     }
     return articles;

@@ -14,8 +14,12 @@ class Engadget extends Publisher {
   String get name => "Engadget";
 
   @override
+  String get mainCategory => "Technology";
+
+  @override
   Future<NewsArticle?> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    
+    var response = await http.get(Uri.parse("$homePage/${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       Element? articleElement = document.querySelector(".caas-body");
@@ -44,33 +48,37 @@ class Engadget extends Publisher {
   Future<Set<NewsArticle?>> categoryArticles({String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
     if(category=="/" || category.isEmpty) category = "/news";
-    var response = await http.get(Uri.parse("$homePage$category/page/$page"));
+    var response = await http.get(
+        Uri.parse("$homePage/$category/page/$page"),
+    );
+    
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       List<Element> articleElements =
-          document.querySelectorAll("ul[data-component=LatestStream] li[class]");
+          document.querySelectorAll("div[data-component=HorizontalCard]");
+      
       for (Element articleElement in articleElements) {
-        String? title = articleElement.querySelector("h2 a")?.text;
+        String? title = articleElement.querySelector("h2,h4 a")?.text;
         String? excerpt = articleElement.querySelector("h2+div")?.text;
-        String? authorTime = articleElement.querySelector("div[class*=engadgetFontDarkGray]")?.text;
-        String? author = authorTime?.split(",")[0].replaceFirst("By ", "");
-        String? date = authorTime?.split(",").last.trim();
-        String? url = articleElement.querySelector("h2 a")?.attributes["href"];
+        String? author = articleElement.querySelector("a[href*=about] span")?.text?? "";
+        String? date = articleElement.querySelector("span[class*='Ai(c)']")?.text ?? "";
+        String? url = articleElement.querySelector("h2,h4 a")?.attributes["href"];
         String? thumbnail = articleElement
                 .querySelector("img[width]")
                 ?.attributes["src"];
-        String parsedTime = convertToIso8601(date!, "MM.dd.yyyy");
+        String parsedTime = convertToIso8601(date, "MM.dd.yyyy");
 
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          excerpt ?? "",
-          author ?? "",
-          url ?? "",
-          thumbnail ?? "",
-          parseDateString(parsedTime),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt ?? "",
+          author: author ?? "",
+          url: url ?? "",
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(parsedTime),
         ));
+
       }
     }
     return articles;
@@ -96,14 +104,14 @@ class Engadget extends Publisher {
         String parsedTime = convertToIso8601("$date", "MM.dd.yyyy");
 
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          excerpt ?? "",
-          author ?? "",
-          Uri.parse(url!).path??"",
-          thumbnail ?? "",
-          parseDateString(parsedTime),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt ?? "",
+          author: author ?? "",
+          url: Uri.parse(url!).path ?? "", // Parse URL and get path, use "" if url is null
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(parsedTime),
         ));
       }
     }

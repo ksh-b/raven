@@ -16,6 +16,9 @@ class TorrentFreak extends Publisher {
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
+  @override
+  String get mainCategory => "Technology";
+
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await http.get(Uri.parse(homePage));
@@ -93,15 +96,16 @@ class TorrentFreak extends Publisher {
         }
 
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          "",
-          author ?? "",
-          articleUrl?.replaceFirst(homePage, "") ?? "",
-          thumbnail ?? "",
-          parseDateString(time?.trim() ?? ""),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: "",
+          author: author ?? "",
+          url: articleUrl?.replaceFirst(homePage, "") ?? "",
+          thumbnail: thumbnail ?? "",
+          publishedAt: parseDateString(time?.trim() ?? ""),
         ));
+
       }
     }
     return articles;

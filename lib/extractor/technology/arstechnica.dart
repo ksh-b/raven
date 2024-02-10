@@ -14,13 +14,15 @@ class ArsTechnica extends Publisher {
   String get name => "Ars Technica";
 
   @override
+  String get mainCategory => "Technology";
+
+  @override
   Future<NewsArticle?> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse(newsArticle.url));
+    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      Element? articleElement = document.querySelector(".article-content");
-      String? thumbnail = "";
-      String? content = articleElement?.innerHtml;
+      String? thumbnail = document.querySelector(".figure img")?.attributes["href"];
+      String? content = document.querySelectorAll(".article-content p").map((e) => e.innerHtml).join("<br><br>");
       return newsArticle.fill(content: content, thumbnail: thumbnail);
     }
     return null;
@@ -64,15 +66,16 @@ class ArsTechnica extends Publisher {
             ?.attributes["style"];
 
         articles.add(NewsArticle(
-          this,
-          title ?? "",
-          "",
-          excerpt ?? "",
-          author ?? "",
-          url ?? "",
-          extractUrl(thumbnail),
-          parseDateString(date),
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt ?? "",
+          author: author ?? "",
+          url: url?.replaceFirst(homePage, "") ?? "",
+          thumbnail: extractUrl(thumbnail),
+          publishedAt: parseDateString(date),
         ));
+
       }
     }
     return articles;
