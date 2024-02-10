@@ -29,7 +29,6 @@ class ExtractorTest {
     var articleFull = await publisher.article(article!);
     expect(articleFull, isNotNull);
     expect(articleFull?.content, isNotEmpty);
-    print(article.content);
   }
 
   static Future<void> searchedArticlesTest(Publisher publisher, String query) async {
