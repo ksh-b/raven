@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whapp/utils/store.dart';
 
 class ThemeProvider {
 
@@ -32,4 +33,12 @@ class ThemeProvider {
       ),
     );
   }
+
+  static ThemeData getCurrentTheme() {
+    return ThemeProvider.get(
+      ThemeProvider.colors[Store.themeColorSetting]!,
+      Store.darkThemeSetting,
+    );
+  }
+  
 }

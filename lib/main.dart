@@ -24,10 +24,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           home: MyHomePage(),
-          theme: ThemeProvider.get(
-            ThemeProvider.colors[Store.themeColorSetting]!,
-            Store.darkThemeSetting,
-          ),
+          theme: ThemeProvider.getCurrentTheme(),
         );
       },
     );
