@@ -20,6 +20,7 @@ Map<String, Publisher> publishers = {
   "Nitter": Nitter(),
   "Reuters": Reuters(),
   "The Verge": TheVerge(),
+  "The Quint": TheQuint(),
   "The Wire": TheWire(),
   "TorrentFreak": TorrentFreak(),
 };
