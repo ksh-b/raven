@@ -79,7 +79,7 @@ class TheQuint extends Publisher {
         var author = element['story']["author-name"];
         var thumbnail = "https://images.quint.com/${element['story']['hero-image-s3-key']}";
         var time = element['story']["last-published-at"];
-        var articleUrl = element['story']["url"] ?? "";
+        String articleUrl = element['story']["url"] ?? "";
         var excerpt = element['story']['summary'] ?? "";
         articles.add(NewsArticle(
           publisher: this,
@@ -87,7 +87,7 @@ class TheQuint extends Publisher {
           content: "",
           excerpt: excerpt,
           author: author ?? "",
-          url: articleUrl.replace(homePage, ""),
+          url: articleUrl.replaceFirst(homePage, ""),
           thumbnail: thumbnail,
           publishedAt: parseUnixTime(time),
         ));
@@ -117,7 +117,7 @@ class TheQuint extends Publisher {
           content: "",
           excerpt: "",
           author: author ?? "",
-          url: articleUrl.replace(homePage, ""),
+          url: articleUrl.replaceFirst(homePage, ""),
           thumbnail: thumbnail,
           publishedAt: parseUnixTime(time),
         ));

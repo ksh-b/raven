@@ -119,7 +119,7 @@ class Reuters extends Publisher {
         'https://www.reuters.com/pf/api/v3/content/fetch/articles-by-search-v2?'
         'query={"keyword":"$searchQuery","offset":${(page-1)*20},'
         '"orderby":"display_date:desc","size":20,"website":"reuters"}'
-        '&d=168&_website=reuters';
+        '&d=175&_website=reuters';
     return extract(apiUrl);
   }
 }
