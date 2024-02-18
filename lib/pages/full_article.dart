@@ -57,11 +57,11 @@ class _ArticlePageState extends State<ArticlePage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<NewsArticle?>(
+    return StreamBuilder<NewsArticle?>(
       initialData: widget.article,
-      future: widget.article.publisher.article(widget.article),
+      stream: customArticle(widget.article, context),
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.none) {
+        if (snapshot.hasData) {
           String fullUrl =
               "${widget.article.publisher.homePage}${snapshot.data!.url}";
           String altUrl = "${Store.ladderUrl}/$fullUrl";
@@ -93,37 +93,41 @@ class _ArticlePageState extends State<ArticlePage> {
                 ),
               ],
             ),
-            body: (snapshot.connectionState == ConnectionState.done &&
-          snapshot.hasData) ? Padding(
-              padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-              child: ListView(
-                children: [
-                  textWidget("", snapshot.data!.title, titleStyle),
-                  textWidget("Author", snapshot.data!.author, metadataStyle),
-                  textWidget("Published", snapshot.data!.publishedAt.value,
-                      metadataStyle),
-                  if (Network.shouldLoadImage(snapshot.data!.thumbnail))
-                    image(snapshot),
-                  textWidget("", snapshot.data!.excerpt, excerptStyle),
-                  HtmlWidget(snapshot.data!.content),
-                ],
-              ),
-            ): Padding(
-              padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-              child: ListView(
-                children: [
-                  textWidget("", widget.article.title, titleStyle),
-                  textWidget("Author", widget.article.author, metadataStyle),
-                  textWidget("Published", widget.article.publishedAt.value,
-                      metadataStyle),
-                  LinearProgressIndicator(),
-                  textWidget("", widget.article.excerpt, excerptStyle),
-                  widget.article.content.isNotEmpty?
-                  HtmlWidget(widget.article.content):
-                  LinearProgressIndicator(),
-                ],
-              ),
-            ),
+            body: (snapshot.hasData)
+                ? Padding(
+                    padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: ListView(
+                      children: [
+                        snapshot.connectionState != ConnectionState.done ? LinearProgressIndicator():SizedBox.shrink(),
+                        textWidget("", snapshot.data!.title, titleStyle),
+                        textWidget(
+                            "Author", snapshot.data!.author, metadataStyle),
+                        textWidget("Published",
+                            snapshot.data!.publishedAt.value, metadataStyle),
+                        if (Network.shouldLoadImage(snapshot.data!.thumbnail))
+                          image(snapshot),
+                        textWidget("", snapshot.data!.excerpt, excerptStyle),
+                        HtmlWidget(snapshot.data!.content),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: ListView(
+                      children: [
+                        textWidget("", widget.article.title, titleStyle),
+                        textWidget(
+                            "Author", widget.article.author, metadataStyle),
+                        textWidget("Published",
+                            widget.article.publishedAt.value, metadataStyle),
+                        LinearProgressIndicator(),
+                        textWidget("", widget.article.excerpt, excerptStyle),
+                        widget.article.content.isNotEmpty
+                            ? HtmlWidget(widget.article.content)
+                            : LinearProgressIndicator(),
+                      ],
+                    ),
+                  ),
           );
         }
         else if (snapshot.hasError) {
@@ -179,15 +183,17 @@ class _ArticlePageState extends State<ArticlePage> {
     String value,
     TextStyle style,
   ) {
-    return value.isNotEmpty
-        ? Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-            child: Text(
-              label.isNotEmpty ? '$label: $value' : value,
-              style: style,
-            ),
-          )
-        : SizedBox.shrink();
+    if (value.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+        child: Text(
+          label.isNotEmpty ? '$label: $value' : value,
+          style: style,
+        ),
+      );
+    } else {
+      return SizedBox.shrink();
+    }
   }
 }
 
