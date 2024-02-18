@@ -2,7 +2,6 @@ import 'package:whapp/extractor/general/national/india/thequint.dart';
 import 'package:whapp/extractor/general/national/india/thewire.dart';
 import 'package:whapp/extractor/general/world/aljazeera.dart';
 import 'package:whapp/extractor/general/world/bbc.dart';
-import 'package:whapp/extractor/general/world/nitter.dart';
 import 'package:whapp/extractor/general/world/reuters.dart';
 import 'package:whapp/extractor/technology/arstechnica.dart';
 import 'package:whapp/extractor/technology/bleepingcomputer.dart';

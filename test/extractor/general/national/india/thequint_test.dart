@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whapp/extractor/general/national/india/thequint.dart';
-import 'package:whapp/extractor/general/national/india/thewire.dart';
 import 'package:whapp/model/publisher.dart';
 
 import '../../../common.dart';
