@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:whapp/api/simplytranslate.dart';
 import 'package:whapp/utils/store.dart';
 import 'package:whapp/utils/theme_provider.dart';
 
@@ -87,6 +88,32 @@ class _SettingsPageState extends State<SettingsPage> {
                       }
                     },
                     items: Store.ladders.keys.map<DropdownMenuItem<String>>((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                SwitchListTile(
+                  title: Text('Translate'),
+                  value: Store.translate,
+                  onChanged: (value) {
+                    setState(() {
+                      Store.translate = value;
+                    });
+                  },
+                ),
+                ListTile(
+                  title: Text('Translate language'),
+                  trailing: DropdownButton<String>(
+                    value: Store.language,
+                    onChanged: Store.translate? (String? option) {
+                      if(option!=null) {
+                        Store.languageSetting = option;
+                      }
+                    }:null,
+                    items: SimplyTranslate().languages.keys.map<DropdownMenuItem<String>>((String option) {
                       return DropdownMenuItem<String>(
                         value: option,
                         child: Text(option),

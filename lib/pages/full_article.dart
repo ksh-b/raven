@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:whapp/api/simplytranslate.dart';
 import 'package:whapp/model/article.dart';
 import 'package:whapp/utils/network.dart';
 import 'package:whapp/utils/store.dart';
@@ -28,6 +31,29 @@ class _ArticlePageState extends State<ArticlePage> {
   );
 
   TextStyle excerptStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+
+  Stream<NewsArticle?> customArticle(NewsArticle newsArticle, BuildContext context) async* {
+    NewsArticle? cArticle = await newsArticle.publisher.article(newsArticle);
+    if(cArticle==null) {
+      yield newsArticle;
+    }
+
+    if (Store.translate) {
+      var translator = SimplyTranslate();
+      cArticle!.title =
+      await translator.translate(cArticle.title, Store.language);
+      yield cArticle;
+      cArticle.content =
+      await translator.translate(cArticle.content, Store.language);
+      yield cArticle;
+      print(cArticle.content);
+      cArticle.excerpt =
+      await translator.translate(cArticle.excerpt, Store.language);
+      yield cArticle;
+    }
+
+    yield cArticle;
+  }
 
   @override
   Widget build(BuildContext context) {

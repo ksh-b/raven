@@ -45,6 +45,10 @@ class Store {
     settings.put("ladder", ladder);
   }
 
+  static set languageSetting(String language) {
+    settings.put("language", language);
+  }
+
   static String get loadImagesSetting {
     return settings.get("loadImages", defaultValue: loadImagesValues.first);
   }
@@ -71,6 +75,18 @@ class Store {
 
   static String get ladderUrl {
     return ladders[ladderSetting] ?? ladders.keys.first;
+  }
+
+  static String get language {
+    return settings.get("language", defaultValue: "English");
+  }
+
+  static bool get translate {
+    return settings.get("translate", defaultValue: false);
+  }
+
+  static set translate(bool should) {
+    settings.put("translate", should);
   }
 
 }
