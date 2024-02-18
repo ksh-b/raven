@@ -17,7 +17,6 @@ Map<String, Publisher> publishers = {
   "BBC": BBC(),
   "BleepingComputer": BleepingComputer(),
   "Engadget": Engadget(),
-  "Nitter": Nitter(),
   "Reuters": Reuters(),
   "The Verge": TheVerge(),
   "The Quint": TheQuint(),
