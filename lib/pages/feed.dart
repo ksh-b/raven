@@ -71,49 +71,57 @@ class _FeedPageState extends State<FeedPage>
                     }
                     if (index-1 < newsArticles.length) {
                       var article = newsArticles[index-1];
-                      return Card(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
-                          child: Flex(
-                            direction: Axis.vertical,
-                            children: [
-                              CachedNetworkImage(
-                                  imageUrl: article!.thumbnail,
-                                fit: BoxFit.contain,
-                                errorWidget: (context, url, error) {
-                                  return SizedBox.shrink();
-                                },
-                              ),
-                              ListTile(
-                                title: Text(article.title),
-                                leading: CachedNetworkImage(
-                                  imageUrl: article.publisher.iconUrl,
-                                  progressIndicatorBuilder: (context, url, downloadProgress) {
-                                    return CircularProgressIndicator(
-                                      value: downloadProgress.progress,
-                                    );
-                                  },
-                                  height: 24,
-                                  width: 24,
-                                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                                ),
-                                subtitle: Text(article.publishedAt.value),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ArticlePage(article: article),
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                        child: Card(
+                          elevation: 8,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
+                            child: InkWell(
+                              child: Flex(
+                                direction: Axis.vertical,
+                                children: [
+                                  CachedNetworkImage(
+                                      imageUrl: article!.thumbnail,
+                                    fit: BoxFit.contain,
+                                    errorWidget: (context, url, error) {
+                                      return SizedBox.shrink();
+                                    },
+                                  ),
+                                  ListTile(
+                                    title: Text(article.title),
+                                    leading: CachedNetworkImage(
+                                      imageUrl: article.publisher.iconUrl,
+                                      progressIndicatorBuilder: (context, url, downloadProgress) {
+                                        return CircularProgressIndicator(
+                                          value: downloadProgress.progress,
+                                        );
+                                      },
+                                      height: 24,
+                                      width: 24,
+                                      errorWidget: (context, url, error) => const Icon(Icons.error),
                                     ),
-                                  );
-                                },
+                                    subtitle: Text(
+                                        article.publishedAt.value,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ArticlePage(article: article),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       );
                     } else {
                       return Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 16),
+                        padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
                         child: ElevatedButton(
                           onPressed: () {
                             _loadMoreItems();
