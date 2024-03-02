@@ -82,7 +82,7 @@ class TorrentFreak extends Publisher {
             element.querySelector('.preview-article__published time');
         var title = titleElement?.text;
         var author = authorElement?.text;
-        var thumbnail = thumbnailElement?.attributes["src"];
+        var thumbnail = thumbnailElement?.attributes["data-lazy-src"];
         var time = timeElement?.attributes["datetime"] ?? timeElement?.text;
         var articleUrl = articleUrlElement?.attributes["href"];
 

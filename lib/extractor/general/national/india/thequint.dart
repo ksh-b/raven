@@ -50,7 +50,7 @@ class TheQuint extends Publisher {
       var thumbnail = document.querySelector("picture img")?.attributes["src"];
       return newsArticle.fill(
         content: content.map((e) => e.innerHtml).join("<br><br>"),
-        thumbnail: thumbnail,
+        thumbnail: Uri.encodeFull(thumbnail!),
       );
     }
     return null;
@@ -77,7 +77,7 @@ class TheQuint extends Publisher {
         if(element["story"]==null) continue;
         var title = element["story"]['headline'];
         var author = element['story']["author-name"];
-        var thumbnail = "https://images.quint.com/${element['story']['hero-image-s3-key']}";
+        var thumbnail = "https://images.thequint.com/${element['story']['hero-image-s3-key']}";
         var time = element['story']["last-published-at"];
         String articleUrl = element['story']["url"] ?? "";
         var excerpt = element['story']['summary'] ?? "";
@@ -108,7 +108,7 @@ class TheQuint extends Publisher {
       for (var element in data) {
         var title = element['headline'];
         var author = element['authors'][0]["name"];
-        var thumbnail = "https://images.quint.com/${element['hero-image-s3-key']}";
+        var thumbnail = "https://images.thequint.com/${element['hero-image-s3-key']}";
         var time = element["last-published-at"];
         var articleUrl = element["url"];
         articles.add(NewsArticle(

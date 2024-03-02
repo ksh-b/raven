@@ -85,7 +85,7 @@ class AlJazeera extends Publisher {
       for (var element in articlesData) {
         var title = element['title'];
         var author = element['author'].isNotEmpty?element['author'][0]['name']:"";
-        var thumbnail = element['featuredImage']['sourceUrl'];
+        var thumbnail = homePage + element['featuredImage']['sourceUrl'];
         var time = element['date'];
         var articleUrl = element['link'];
         var excerpt = element['excerpt'];
