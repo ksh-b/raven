@@ -38,16 +38,6 @@ class _FeedPageState extends State<FeedPage>
       child: Scaffold(
         appBar: AppBar(
           title: _isSearching ? TextField() : Text('What\'s happening?'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon( _isSearching ? Icons.close: Icons.search),
-              onPressed: () {
-                setState(() {
-                  _isSearching = !_isSearching;
-                });
-              },
-            ),
-          ],
         ),
         body: RefreshIndicator(
           key: _refreshIndicatorKey,
