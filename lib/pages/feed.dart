@@ -71,15 +71,20 @@ class _FeedPageState extends State<FeedPage>
                               child: Flex(
                                 direction: Axis.vertical,
                                 children: [
-                                  CachedNetworkImage(
-                                      imageUrl: article!.thumbnail,
+                                  Store.loadImagesSetting=="Always"?CachedNetworkImage(
+                                    imageUrl: article!.thumbnail,
                                     fit: BoxFit.contain,
+                                    progressIndicatorBuilder: (context, url, downloadProgress) {
+                                      return CircularProgressIndicator(
+                                        value: downloadProgress.progress,
+                                      );
+                                    },
                                     errorWidget: (context, url, error) {
                                       return SizedBox.shrink();
                                     },
-                                  ),
+                                  ):SizedBox.shrink(),
                                   ListTile(
-                                    title: Text(article.title),
+                                    title: Text(article!.title),
                                     leading: CachedNetworkImage(
                                       imageUrl: article.publisher.iconUrl,
                                       progressIndicatorBuilder: (context, url, downloadProgress) {
