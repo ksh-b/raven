@@ -19,6 +19,7 @@ class _FeedPageState extends State<FeedPage>
   List<NewsArticle?> newsArticles = [];
   TextEditingController searchController = TextEditingController();
   bool isLoading = false;
+  double loadProgress=0;
   int page = 1;
   bool _isSearching = false;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
@@ -63,35 +64,52 @@ class _FeedPageState extends State<FeedPage>
             builder: (BuildContext context, box, Widget? child) {
               if (Store.selectedSubscriptions.isNotEmpty) {
                 return ListView.builder(
-                  itemCount: newsArticles.length + 1,
+                  itemCount: newsArticles.length + 2,
                   itemBuilder: (context, index) {
-                    if (index < newsArticles.length) {
-                      var article = newsArticles[index];
-                      return ListTile(
-                        title: Text(article!.title),
-                        leading: CachedNetworkImage(
-                          imageUrl: article.publisher.iconUrl,
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) {
-                            return CircularProgressIndicator(
-                                value: downloadProgress.progress);
-                          },
-                          height: 24,
-                          width: 24,
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                    if(index==0) {
+                      return isLoading?LinearProgressIndicator(value: loadProgress,):SizedBox.shrink();
+                    }
+                    if (index-1 < newsArticles.length) {
+                      var article = newsArticles[index-1];
+                      return Card(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
+                          child: Flex(
+                            direction: Axis.vertical,
+                            children: [
+                              CachedNetworkImage(
+                                  imageUrl: article!.thumbnail,
+                                fit: BoxFit.contain,
+                                errorWidget: (context, url, error) {
+                                  return SizedBox.shrink();
+                                },
+                              ),
+                              ListTile(
+                                title: Text(article.title),
+                                leading: CachedNetworkImage(
+                                  imageUrl: article.publisher.iconUrl,
+                                  progressIndicatorBuilder: (context, url, downloadProgress) {
+                                    return CircularProgressIndicator(
+                                      value: downloadProgress.progress,
+                                    );
+                                  },
+                                  height: 24,
+                                  width: 24,
+                                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                                ),
+                                subtitle: Text(article.publishedAt.value),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ArticlePage(article: article),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                        subtitle: Text(
-                          article.publishedAt.value,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ArticlePage(article: article)),
-                          );
-                        },
                       );
                     } else {
                       return Padding(
@@ -116,26 +134,30 @@ class _FeedPageState extends State<FeedPage>
   }
 
   Future<void> _loadMoreItems() async {
+    int loaded = 0;
     if (!isLoading) {
       setState(() {
         isLoading = true;
+        loadProgress = 0;
       });
 
       List subscriptions = Store.selectedSubscriptions;
       for (var subscription in subscriptions) {
         Publisher publisher = publishers[subscription.publisher]!;
-        publisher
+         publisher
             .articles(page: page, category: subscription.category)
             .then((articles) {
           setState(() {
+            loaded+=1;
             newsArticles = newsArticles.toSet().union(articles).toList();
-            isLoading = false;
+            loadProgress = loaded/subscriptions.length;
           });
-        });
+        }).then((value) => null);
       }
 
       setState(() {
         isLoading = false;
+        loadProgress = 0;
         page++;
       });
     }
