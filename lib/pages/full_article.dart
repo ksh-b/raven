@@ -46,7 +46,6 @@ class _ArticlePageState extends State<ArticlePage> {
       cArticle.content =
       await translator.translate(cArticle.content, Store.language);
       yield cArticle;
-      print(cArticle.content);
       cArticle.excerpt =
       await translator.translate(cArticle.excerpt, Store.language);
       yield cArticle;

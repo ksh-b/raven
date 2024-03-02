@@ -59,8 +59,6 @@ class BleepingComputer extends Publisher {
               .querySelector(".bc_latest_news_img img")
               ?.attributes["data-src"];
         }
-        print(title);
-        print(thumbnail);
         String? content = "";
         String? date = articleElement.querySelector(".bc_news_date")?.text;
         String? time = articleElement.querySelector(".bc_news_time")?.text;
