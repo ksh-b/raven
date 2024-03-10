@@ -32,15 +32,12 @@ class _ArticlePageState extends State<ArticlePage> {
 
   TextStyle excerptStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
 
-  Stream<NewsArticle?> customArticle(NewsArticle newsArticle, BuildContext context) async* {
-    NewsArticle? cArticle = await newsArticle.publisher.article(newsArticle);
-    if(cArticle==null) {
-      yield newsArticle;
-    }
+  Stream<NewsArticle> customArticle(NewsArticle newsArticle, BuildContext context) async* {
+    NewsArticle cArticle = await newsArticle.publisher.article(newsArticle);
 
     if (Store.translate) {
       var translator = SimplyTranslate();
-      cArticle!.title =
+      cArticle.title =
       await translator.translate(cArticle.title, Store.language);
       yield cArticle;
       cArticle.content =
@@ -56,7 +53,7 @@ class _ArticlePageState extends State<ArticlePage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<NewsArticle?>(
+    return StreamBuilder<NewsArticle>(
       initialData: widget.article,
       stream: customArticle(widget.article, context),
       builder: (context, snapshot) {
@@ -158,10 +155,11 @@ class _ArticlePageState extends State<ArticlePage> {
     );
   }
 
-  Padding image(AsyncSnapshot<NewsArticle?> snapshot) {
+  Padding image(AsyncSnapshot<NewsArticle> snapshot) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: CachedNetworkImage(
+        fit: BoxFit.fitWidth,
         imageUrl: snapshot.data!.thumbnail,
         progressIndicatorBuilder: (context, url, downloadProgress) {
           return Center(
