@@ -17,11 +17,11 @@ class Store {
     return Hive.box("subscriptions");
   }
 
-  static List get selectedSubscriptions {
-    return subscriptions.get("selected", defaultValue: []);
+  static List<UserSubscription> get selectedSubscriptions {
+    return List<UserSubscription>.from(subscriptions.get("selected", defaultValue: []));
   }
 
-  static set selectedSubscriptions(List newSubscriptions) {
+  static set selectedSubscriptions(List<UserSubscription> newSubscriptions) {
     subscriptions.put("selected", newSubscriptions);
   }
 

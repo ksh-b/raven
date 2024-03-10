@@ -125,7 +125,7 @@ class CategoryPopup extends StatefulWidget {
 }
 
 class _CategoryPopupState extends State<CategoryPopup> {
-  List selectedSubscriptions = []; // List<UserSubscription>
+  List<UserSubscription> selectedSubscriptions = []; // List<UserSubscription>
   List customSubscriptions = []; // List<UserSubscription>
   String customCategory = "";
   TextEditingController customCategoryController = TextEditingController();
