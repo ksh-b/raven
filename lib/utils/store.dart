@@ -1,4 +1,6 @@
 import 'package:hive/hive.dart';
+import 'package:whapp/model/trends.dart';
+import 'package:whapp/model/user_subscription.dart';
 import 'package:whapp/utils/theme_provider.dart';
 
 class Store {
@@ -55,6 +57,22 @@ class Store {
 
   static set loadImagesSetting(String load) {
     settings.put("loadImages", load);
+  }
+
+  static String get trendsProviderSetting {
+    return settings.get("trendsProvider", defaultValue: trends.keys.first);
+  }
+
+  static set trendsProviderSetting(String provider) {
+    settings.put("trendsProvider", provider);
+  }
+
+  static String get countrySetting {
+    return settings.get("country", defaultValue: "United States of America");
+  }
+
+  static set countrySetting(String country) {
+    settings.put("country", country);
   }
 
   static bool get darkThemeSetting {
