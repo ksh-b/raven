@@ -35,31 +35,31 @@ class Reuters extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+  Future<NewsArticle> article(NewsArticle newsArticle) async {
     var response = await http.get(Uri.parse('https://neuters.de${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
       var articleElement = document.querySelectorAll('p:not(.byline)');
-      var content = articleElement.map((e) => e.text).join("\n");
+      var content = articleElement.map((e) => "<p>${e.text}</p>").join();
       return newsArticle.fill(
         content: content,
       );
     }
-    return null;
+    return newsArticle;
   }
 
   @override
-  Future<Set<NewsArticle?>> articles({
+  Future<Set<NewsArticle>> articles({
     String category = "world",
     int page = 1,
   }) async {
     return super.articles(category: category, page: page);
   }
 
-  Future<Set<NewsArticle?>> extract(
+  Future<Set<NewsArticle>> extract(
     String apiUrl,
   ) async {
-    Set<NewsArticle?> articles = {};
+    Set<NewsArticle> articles = {};
 
     List articlesData = [];
     final response = await http.get(Uri.parse(apiUrl));
@@ -76,6 +76,7 @@ class Reuters extends Publisher {
         var time = element["published_time"];
         var articleUrl = '${element['canonical_url']}';
         var excerpt = element['description'];
+        var tags = element['kicker']['names'];
         articles.add(NewsArticle(
           publisher: this,
           title: title ?? "",
@@ -85,6 +86,7 @@ class Reuters extends Publisher {
           url: articleUrl,
           thumbnail: thumbnail ?? "",
           publishedAt: parseDateString(time?.trim() ?? ""),
+          tags: List<String>.from(tags)
         ));
 
       }
@@ -93,7 +95,7 @@ class Reuters extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle?>> categoryArticles({
+  Future<Set<NewsArticle>> categoryArticles({
     String category = "All",
     int page = 1,
   }) {
@@ -102,24 +104,25 @@ class Reuters extends Publisher {
     }
     String apiUrl =
         '$homePage/pf/api/v3/content/fetch/recent-stories-by-sections-v1?'
-        'query={"section_ids":"/$category/","offset": ${(page-1)*10},'
-        '"size":10,'
+        'query={"section_ids":"/$category/","offset": ${(page-1)*5},'
+        '"size":5,'
         '"website":"reuters"}';
 
     return extract(apiUrl);
   }
 
   @override
-  Future<Set<NewsArticle?>> searchedArticles({
+  Future<Set<NewsArticle>> searchedArticles({
     required String searchQuery,
     int page = 1,
   }) {
     searchQuery = getAsSearchQuery(searchQuery);
     String apiUrl =
         'https://www.reuters.com/pf/api/v3/content/fetch/articles-by-search-v2?'
-        'query={"keyword":"$searchQuery","offset":${(page-1)*20},'
-        '"orderby":"display_date:desc","size":20,"website":"reuters"}'
-        '&d=175&_website=reuters';
+        'query={"keyword":"$searchQuery","offset":${(page-1)*5},'
+        '"orderby":"display_date:desc","size":5,"website":"reuters"}'
+        '&_website=reuters';
+
     return extract(apiUrl);
   }
 }

@@ -1,9 +1,12 @@
+// ignore_for_file: unused_import
+
 import 'package:intl/intl.dart';
 import 'package:whapp/model/article.dart';
 import 'package:whapp/model/publisher.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
+import 'package:whapp/utils/string.dart';
 import 'package:whapp/utils/time.dart';
 
 class BBC extends Publisher {
@@ -52,25 +55,25 @@ class BBC extends Publisher {
     };
   }
 
-  Future<Set<NewsArticle>> extractBatch(String id, int page) async {
+  Future<Set<NewsArticle>> extractBatch(String id, int page, String category) async {
 
     Set<NewsArticle> articlesData = {};
     String apiUrl = "https://push.api.bbci.co.uk/batch?"
         "t=/data/bbc-morph-lx-commentary-data-paged/about/$id/"
-        "isUk/false/limit/20/nitroKey/lx-nitro/pageNumber/$page/version/1.5.6";
+        "isUk/false/limit/5/nitroKey/lx-nitro/pageNumber/$page/version/1.5.6";
 
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-
         var articles = data["payload"][0]["body"]["results"];
         for (var article in articles) {
+          var articleUrl = article['url'];
+          if(articleUrl==null) continue;
           var title = article['title'];
           var author = article.containsKey("contributor")?article['contributor']["name"]:"";
-          var thumbnail = article["image"]["href"];
+          var thumbnail = article.containsKey("image")?article["image"]["href"]:"";
           var time = article["lastPublished"];
-          var articleUrl = article['url'];
           var excerpt = article['summary'];
           articlesData.add(NewsArticle(
             publisher: this,
@@ -81,6 +84,7 @@ class BBC extends Publisher {
             url: articleUrl,
             thumbnail: thumbnail ?? "",
             publishedAt: parseDateString(time?.trim() ?? ""),
+            tags: [category]
           ));
         }
       }
@@ -89,11 +93,11 @@ class BBC extends Publisher {
   }
 
   Future<Set<NewsArticle>> extractTopic(
-      String topicId, String groupResourceId, int page) async {
+      String topicId, String groupResourceId, int page, String category) async {
     Set<NewsArticle> articlesData = {};
     String apiUrl = 'https://www.bbc.com/wc-data/container/topic-stream?'
         'adSlotType=mpu_middle&enableDotcomAds=true&isUk=false'
-        '&lazyLoadImages=true&pageNumber=$page&pageSize=10'
+        '&lazyLoadImages=true&pageNumber=$page&pageSize=5'
         '&promoAttributionsToSuppress=["/news","/news/front_page"]'
         '&showPagination=true&title=Latest News'
         '&tracking={"groupName":"Latest News","groupType":"topic stream",'
@@ -120,6 +124,7 @@ class BBC extends Publisher {
           url: articleUrl,
           thumbnail: thumbnail ?? "",
           publishedAt: parseDateString(time),
+          tags: [category]
         ));
       }
     }
@@ -161,7 +166,7 @@ class BBC extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+  Future<NewsArticle> article(NewsArticle newsArticle) async {
     var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
@@ -191,11 +196,11 @@ class BBC extends Publisher {
         publishedAt: parseDateString(time?.trim() ?? ""),
       );
     }
-    return null;
+    return newsArticle;
   }
 
   @override
-  Future<Set<NewsArticle?>> articles({
+  Future<Set<NewsArticle>> articles({
     String category = "world",
     int page = 1,
   }) async {
@@ -203,7 +208,7 @@ class BBC extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle?>> categoryArticles({
+  Future<Set<NewsArticle>> categoryArticles({
     String category = "/",
     int page = 1,
   }) async {
@@ -213,19 +218,19 @@ class BBC extends Publisher {
     Map uuidMap_ = uuidMap();
     Map topicMap_ = topicMap();
     if(uuidMap_.containsKey(category)) {
-      return extractBatch(uuidMap_[category], page);
+      return extractBatch(uuidMap_[category], page, category);
     } else if (topicMap_.containsKey(category)) {
-      return extractTopic(topicMap_[category]["topic"], topicMap_[category]["urn"], page);
+      return extractTopic(topicMap_[category]["topic"], topicMap_[category]["urn"], page, category);
     }
     return {};
   }
 
   @override
-  Future<Set<NewsArticle?>> searchedArticles({
+  Future<Set<NewsArticle>> searchedArticles({
     required String searchQuery,
     int page = 1,
   }) async {
-    Set<NewsArticle?> articles = {};
+    Set<NewsArticle> articles = {};
     var response = await http.get(Uri.parse("https://www.bbc.co.uk/search?q=$searchQuery&page=$page&d=news_gnl"));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));

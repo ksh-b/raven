@@ -17,7 +17,7 @@ class Engadget extends Publisher {
   String get mainCategory => "Technology";
 
   @override
-  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+  Future<NewsArticle> article(NewsArticle newsArticle) async {
     
     var response = await http.get(Uri.parse("$homePage/${newsArticle.url}"));
     if (response.statusCode == 200) {
@@ -29,7 +29,7 @@ class Engadget extends Publisher {
       String? content = articleElement?.innerHtml;
       return newsArticle.fill(content: content, thumbnail: thumbnail);
     }
-    return null;
+    return newsArticle;
   }
 
   @override
@@ -45,7 +45,7 @@ class Engadget extends Publisher {
   };
 
   @override
-  Future<Set<NewsArticle?>> categoryArticles({String category = "", int page = 1}) async {
+  Future<Set<NewsArticle>> categoryArticles({String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
     if(category=="/" || category.isEmpty) category = "/news";
     var response = await http.get(
@@ -73,10 +73,11 @@ class Engadget extends Publisher {
           title: title ?? "",
           content: "",
           excerpt: excerpt ?? "",
-          author: author ?? "",
+          author: author,
           url: url ?? "",
           thumbnail: thumbnail ?? "",
           publishedAt: parseDateString(parsedTime),
+          tags: [category]
         ));
 
       }
@@ -85,7 +86,7 @@ class Engadget extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle?>> searchedArticles({required String searchQuery, int page = 1}) async{
+  Future<Set<NewsArticle>> searchedArticles({required String searchQuery, int page = 1}) async{
     Set<NewsArticle> articles = {};
     var response = await http.get(Uri.parse("https://search.engadget.com/search;?p=$searchQuery&pz=10&fr=engadget&fr2=sb-top&bct=0&b=${(page*10)+1}&pz=10&bct=0&xargs=0"));
     if (response.statusCode == 200) {
@@ -109,9 +110,10 @@ class Engadget extends Publisher {
           content: "",
           excerpt: excerpt ?? "",
           author: author ?? "",
-          url: Uri.parse(url!).path ?? "", // Parse URL and get path, use "" if url is null
+          url: Uri.parse(url!).path, // Parse URL and get path, use "" if url is null
           thumbnail: thumbnail ?? "",
           publishedAt: parseDateString(parsedTime),
+
         ));
       }
     }

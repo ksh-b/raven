@@ -17,7 +17,7 @@ class ArsTechnica extends Publisher {
   String get mainCategory => "Technology";
 
   @override
-  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+  Future<NewsArticle> article(NewsArticle newsArticle) async {
     var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
@@ -25,30 +25,32 @@ class ArsTechnica extends Publisher {
       String? content = document.querySelectorAll(".article-content p").map((e) => e.innerHtml).join("<br><br>");
       return newsArticle.fill(content: content, thumbnail: thumbnail);
     }
-    return null;
+    return newsArticle  ;
   }
 
   @override
   Future<Map<String, String>> get categories async => {
     "News": "",
-    "Reviews": "reviews",
-    "Guides": "guides",
-    "Gaming": "gaming",
-    "Gear": "gear",
-    "Entertainment": "entertainment",
-    "Tomorrow": "tomorrow",
-    "Deals": "deals",
+    "IT": "information-technology",
+    "Tech": "gadgets",
+    "Science": "science",
+    "Policy": "tech-policy",
+    "Cars": "cars",
+    "Gaming": "gaming"
   };
 
   @override
   bool get hasSearchSupport => false;
 
   @override
-  Future<Set<NewsArticle?>> categoryArticles({String category = "", int page = 1}) async {
+  Future<Set<NewsArticle>> categoryArticles({String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    if(category.isNotEmpty) {
+    var tag = category=="/"?"":category;
+
+    if(category.isNotEmpty && category!="/") {
       category="/$category";
     }
+
 
     var response = await http.get(Uri.parse("$homePage$category/page/$page"));
     if (response.statusCode == 200) {
@@ -74,6 +76,7 @@ class ArsTechnica extends Publisher {
           url: url?.replaceFirst(homePage, "") ?? "",
           thumbnail: extractUrl(thumbnail),
           publishedAt: parseDateString(date),
+          tags: [tag]
         ));
 
       }
@@ -95,7 +98,7 @@ class ArsTechnica extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle?>> searchedArticles({required String searchQuery, int page = 1}) async{
+  Future<Set<NewsArticle>> searchedArticles({required String searchQuery, int page = 1}) async{
     return {};
   }
 }

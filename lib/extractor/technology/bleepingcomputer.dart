@@ -17,7 +17,7 @@ class BleepingComputer extends Publisher {
   String get mainCategory => "Technology";
 
   @override
-  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+  Future<NewsArticle> article(NewsArticle newsArticle) async {
     var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
@@ -29,7 +29,7 @@ class BleepingComputer extends Publisher {
           .join("<br><br>");
       return newsArticle.fill(content: content, thumbnail: thumbnail,);
     }
-    return null;
+    return newsArticle;
   }
 
   @override
@@ -39,7 +39,7 @@ class BleepingComputer extends Publisher {
   Future<Map<String, String>> get categories async => {};
 
   @override
-  Future<Set<NewsArticle?>> categoryArticles({String category = "", int page = 1}) async {
+  Future<Set<NewsArticle>> categoryArticles({String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
     var response = await http.get(Uri.parse(page!=1?"$homePage/news/page/$page":"$homePage/news/"));
     if (response.statusCode == 200) {
@@ -51,6 +51,7 @@ class BleepingComputer extends Publisher {
         String? excerpt = articleElement.querySelector("p")?.text;
         String? author = articleElement.querySelector(".author")?.text;
         String? url = articleElement.querySelector("h4 a")?.attributes["href"];
+        var tags = articleElement.querySelectorAll(".bc_latest_news_category span a").map((e) => e.text).toList();
         String? thumbnail = articleElement
                 .querySelector(".bc_latest_news_img img")
                 ?.attributes["src"];
@@ -67,12 +68,13 @@ class BleepingComputer extends Publisher {
         articles.add(NewsArticle(
           publisher: this,
           title: title ?? "",
-          content: content ?? "",
+          content: content,
           excerpt: excerpt ?? "",
           author: author ?? "",
           url: url?.replaceFirst(homePage, "") ?? "",
           thumbnail: thumbnail ?? "",
           publishedAt: parseDateString(parsedTime),
+          tags: tags
         ));
 
       }
@@ -81,7 +83,7 @@ class BleepingComputer extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle?>> searchedArticles({required String searchQuery, int page = 1}) async{
+  Future<Set<NewsArticle>> searchedArticles({required String searchQuery, int page = 1}) async{
     return {};
   }
 }

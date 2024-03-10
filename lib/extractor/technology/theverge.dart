@@ -39,7 +39,7 @@ class TheVerge extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+  Future<NewsArticle> article(NewsArticle newsArticle) async {
     var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
@@ -59,16 +59,16 @@ class TheVerge extends Publisher {
         publishedAt: parseDateString(time?.trim() ?? ""),
       );
     }
-    return null;
+    return newsArticle;
   }
 
   @override
-  Future<Set<NewsArticle?>> articles({String category = "", int page = 1}) async {
+  Future<Set<NewsArticle>> articles({String category = "", int page = 1}) async {
     return super.articles(category: category, page: page);
   }
 
-  Future<Set<NewsArticle?>> extractCategoryArticles(String url) async {
-    Set<NewsArticle?> articles = {};
+  Future<Set<NewsArticle>> extractCategoryArticles(String url) async {
+    Set<NewsArticle> articles = {};
     var response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -81,8 +81,7 @@ class TheVerge extends Publisher {
             element.querySelector('a[href*=authors]');
         var thumbnailElement = element.querySelector('img');
         var articleUrlElement = element.querySelector('h2 a') ?? element.querySelector('a');
-        var timeElement =
-            element.querySelector('time');
+        var timeElement = element.querySelector('time');
         var title = titleElement?.text;
         var author = authorElement?.text;
         var thumbnail = thumbnailElement?.attributes["src"];
@@ -104,8 +103,8 @@ class TheVerge extends Publisher {
     return articles;
   }
 
-  Future<Set<NewsArticle?>> extractSearchArticles(String searchQuery, int page) async {
-    Set<NewsArticle?> articles = {};
+  Future<Set<NewsArticle>> extractSearchArticles(String searchQuery, int page) async {
+    Set<NewsArticle> articles = {};
     var response = await http.get(
       Uri.parse('$homePage/api/search?q=$searchQuery&page=$page')
     );
@@ -138,14 +137,14 @@ class TheVerge extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle?>> categoryArticles({String category = "All", int page = 1}) {
+  Future<Set<NewsArticle>> categoryArticles({String category = "All", int page = 1}) {
     String categoryPath = category.isNotEmpty?"/$category/archives":"/archives";
     var url = '$homePage$categoryPath/$page';
     return extractCategoryArticles(url);
   }
 
   @override
-  Future<Set<NewsArticle?>> searchedArticles({required String searchQuery, int page = 1}) {
+  Future<Set<NewsArticle>> searchedArticles({required String searchQuery, int page = 1}) {
     return extractSearchArticles(searchQuery, page);
   }
 }

@@ -40,7 +40,7 @@ class TorrentFreak extends Publisher {
   }
 
   @override
-  Future<NewsArticle?> article(NewsArticle newsArticle) async {
+  Future<NewsArticle> article(NewsArticle newsArticle) async {
     var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
@@ -57,16 +57,16 @@ class TorrentFreak extends Publisher {
         thumbnail: thumbnail,
       );
     }
-    return null;
+    return newsArticle;
   }
 
   @override
-  Future<Set<NewsArticle?>> articles({String category = "", int page = 1}) async {
+  Future<Set<NewsArticle>> articles({String category = "", int page = 1}) async {
     return super.articles(category: category, page: page);
   }
 
-  Future<Set<NewsArticle?>> extract(String url) async {
-    Set<NewsArticle?> articles = {};
+  Future<Set<NewsArticle>> extract(String url) async {
+    Set<NewsArticle> articles = {};
     var response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
@@ -82,12 +82,15 @@ class TorrentFreak extends Publisher {
             element.querySelector('.preview-article__published time');
         var title = titleElement?.text;
         var author = authorElement?.text;
-        var thumbnail = thumbnailElement?.attributes["data-lazy-src"];
+        var thumbnail = thumbnailElement?.attributes["src"];
         var time = timeElement?.attributes["datetime"] ?? timeElement?.text;
         var articleUrl = articleUrlElement?.attributes["href"];
+        var tags = articleUrlElement?.querySelectorAll(".preview-article__category").map((e) => e.text).toList()??[];
 
         if (time!=null) {
-          if (time.contains("yesterday")) {
+          if (time.contains("today")) {
+            time = DateTime.now().toIso8601String();
+          } else if (time.contains("yesterday")) {
             time = DateTime.now().subtract(Duration(days: 1)).toIso8601String();
           } else {
             DateTime parsedDateTime = DateFormat("MMMM d, y, HH:mm").parse(time);
@@ -104,6 +107,7 @@ class TorrentFreak extends Publisher {
           url: articleUrl?.replaceFirst(homePage, "") ?? "",
           thumbnail: thumbnail ?? "",
           publishedAt: parseDateString(time?.trim() ?? ""),
+          tags: tags
         ));
 
       }
@@ -112,14 +116,14 @@ class TorrentFreak extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle?>> categoryArticles({String category = "/", int page = 1}) {
+  Future<Set<NewsArticle>> categoryArticles({String category = "/", int page = 1}) {
     String categoryPath = category.isNotEmpty&&category!="/"?"/category/$category":"";
     var url = '$homePage$categoryPath/page/$page';
     return extract(url);
   }
 
   @override
-  Future<Set<NewsArticle?>> searchedArticles({required String searchQuery, int page = 1}) {
+  Future<Set<NewsArticle>> searchedArticles({required String searchQuery, int page = 1}) {
     return extract("$homePage/page/$page/?s=$searchQuery");
   }
 }
