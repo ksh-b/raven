@@ -148,6 +148,7 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
           newsArticles = [];
           page = 1;
         });
+        articleProvider = ArticleProvider();
         articleProvider.loadPage(page, query: widget.query).then(
               (value) => setState(
                 () {
