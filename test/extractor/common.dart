@@ -48,12 +48,12 @@ class ExtractorTest {
 
       var article = searchArticles.first;
       expect(article, isA<NewsArticle>());
-      expect(article?.title, isNotEmpty);
-      expect(article?.publishedAt.key, isNot(0), reason: article?.publishedAt.value);
+      expect(article.title, isNotEmpty);
+      expect(article.publishedAt.key, isNot(0), reason: article.publishedAt.value);
 
-      var articleFull = await publisher.article(article!);
+      var articleFull = await publisher.article(article);
       expect(articleFull, isNotNull);
-      expect(articleFull?.content, isNotEmpty);
+      expect(articleFull.content, isNotEmpty);
     }
   }
 }
