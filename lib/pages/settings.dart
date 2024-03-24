@@ -14,155 +14,158 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
-  List<Widget> themeSection() {
-    return [
-      Text(
-        'Theme',
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  Widget themeSection() {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'Theme',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SwitchListTile(
+            secondary: Icon(Icons.brightness_6_rounded),
+            title: Text('Dark Mode'),
+            value: Store.darkThemeSetting,
+            onChanged: (value) {
+              Store.darkThemeSetting = value;
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.format_paint_rounded),
+            title: Text('Color'),
+            subtitle: Text(Store.themeColorSetting),
+            onTap: () {
+              _showPopup(
+                context,
+                "Color",
+                (String option) {
+                  Store.themeColorSetting = option;
+                },
+                ThemeProvider.colors.keys.toList(),
+              );
+            },
+          ),
+          SizedBox(height: 20),
+        ],
       ),
-      SwitchListTile(
-        title: Text('Dark Mode'),
-        value: Store.darkThemeSetting,
-        onChanged: (value) {
-          Store.darkThemeSetting = value;
-        },
-      ),
-      ListTile(
-        title: Text('Color'),
-        trailing: DropdownButton<String>(
-          value: Store.themeColorSetting,
-          onChanged: (String? color) {
-            if(color!=null) {
-              Store.themeColorSetting = color;
-            }
-          },
-          items: ThemeProvider.colors.keys.map<DropdownMenuItem<String>>((String color) {
-            return DropdownMenuItem<String>(
-              value: color,
-              child: Text(color),
-            );
-          }).toList(),
-        ),
-      ),
-      SizedBox(height: 20),
-    ];
+    );
   }
 
-  List<Widget> articleSection() {
-    return [
-      Text(
-        'Article',
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  Widget articleSection() {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'Article',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.image),
+            title: Text('Load images'),
+            value: Store.loadImagesSetting,
+            onChanged: (bool value) {
+              Store.loadImagesSetting = value;
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.alt_route_rounded),
+            title: Text('Alternate URL (Long tap)'),
+            subtitle: Text(Store.ladderSetting),
+            onTap: () {
+              _showPopup(
+                context,
+                "Ladder",
+                (String option) {
+                  Store.ladderSetting = option;
+                },
+                Store.ladders.keys.toList(),
+              );
+            },
+          ),
+          SwitchListTile(
+            secondary: Icon(Icons.translate_rounded),
+            title: Text('Translate'),
+            value: Store.translate,
+            onChanged: (value) {
+              setState(() {
+                Store.translate = value;
+              });
+            },
+          ),
+          Store.translate
+              ? ListTile(
+                  leading: Icon(Icons.language_rounded),
+                  title: Text('Translate language'),
+                  subtitle: Text(Store.languageSetting),
+                  onTap: () {
+                    _showPopup(
+                      context,
+                      "Translate language",
+                      (String option) {
+                        Store.languageSetting = option;
+                      },
+                      SimplyTranslate().languages.keys.toList(),
+                    );
+                  },
+                )
+              : SizedBox.shrink(),
+          SizedBox(height: 20),
+        ],
       ),
-      ListTile(
-        title: Text('Load images'),
-        trailing: DropdownButton<String>(
-          value: Store.loadImagesSetting,
-          onChanged: (String? option) {
-            if(option!=null) {
-              Store.loadImagesSetting = option;
-            }
-          },
-          items: Store.loadImagesValues.map<DropdownMenuItem<String>>((String option) {
-            return DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
-            );
-          }).toList(),
-        ),
-      ),
-      ListTile(
-        title: Text('Redirection'),
-        subtitle: Text('Alternate URLs (Long tap)'),
-        trailing: DropdownButton<String>(
-          value: Store.ladderSetting,
-          onChanged: (String? option) {
-            if(option!=null) {
-              Store.ladderSetting = option;
-            }
-          },
-          items: Store.ladders.keys.map<DropdownMenuItem<String>>((String option) {
-            return DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
-            );
-          }).toList(),
-        ),
-      ),
-      SwitchListTile(
-        title: Text('Translate'),
-        value: Store.translate,
-        onChanged: (value) {
-          setState(() {
-            Store.translate = value;
-          });
-        },
-      ),
-      ListTile(
-        title: Text('Translate language'),
-        trailing: DropdownButton<String>(
-          value: Store.language,
-          onChanged: Store.translate? (String? option) {
-            if(option!=null) {
-              Store.languageSetting = option;
-            }
-          }:null,
-          items: SimplyTranslate().languages.keys.map<DropdownMenuItem<String>>((String option) {
-            return DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
-            );
-          }).toList(),
-        ),
-      ),
-      SizedBox(height: 20),
-    ];
+    );
   }
 
-
-  List<Widget> searchSection() {
-    return [
-      Text(
-        'Search',
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  Widget searchSection() {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'Search',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ListTile(
+            leading: Icon(Icons.trending_up_rounded),
+            title: Text('Suggestions provider'),
+            subtitle: Text(Store.trendsProviderSetting),
+            onTap: () {
+              _showPopup(
+                context,
+                "Suggestions provider",
+                (String option) {
+                  Store.trendsProviderSetting = option;
+                },
+                trends.keys.toList(),
+              );
+            },
+          ),
+          Store.trendsProviderSetting == "Google"
+              ? ListTile(
+                  leading: Icon(Icons.location_on_rounded),
+                  onTap: () {
+                    _showPopup(context, "Trends Provider", (String option) {
+                      Store.countrySetting = option;
+                    }, GoogleTrend.locations);
+                  },
+                  title: Text("Google Trends location"),
+                  subtitle: Text(Store.countrySetting),
+                )
+              : SizedBox.shrink(),
+          SizedBox(height: 20),
+        ],
       ),
-      ListTile(
-        title: Text('Suggestions provider'),
-        trailing: DropdownButton<String>(
-          value: Store.trendsProviderSetting,
-          onChanged: (String? option) {
-            if(option!=null) {
-                Store.trendsProviderSetting = option;
-            }
-          },
-          items: trends.keys.map<DropdownMenuItem<String>>((String option) {
-            return DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
-            );
-          }).toList(),
-        ),
-      ),
-    Store.trendsProviderSetting=="Google"?ListTile(
-        leading: Icon(Icons.location_on_rounded),
-        trailing: DropdownButton<String>(
-          value: Store.countrySetting,
-          onChanged: (String? option) {
-            if(option!=null) {
-              Store.countrySetting = option;
-            }
-          },
-          items: countryCodes.keys.map<DropdownMenuItem<String>>((String option) {
-            return DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
-            );
-          }).toList(),
-        ),
-      ):SizedBox.shrink(),
-      SizedBox(height: 20),
-    ];
+    );
   }
 
   @override
@@ -177,16 +180,104 @@ class _SettingsPageState extends State<SettingsPage> {
           valueListenable: Store.settings.listenable(),
           builder: (context, box, child) {
             return ListView(
-              children: List<Widget>.of(
-                  themeSection() +
-                  articleSection() +
-                  searchSection() +
-                  []
-              ),
+              children: [themeSection(), articleSection(), searchSection()],
             );
           },
         ),
       ),
     );
+  }
+
+  void _showPopup(BuildContext context, String title, Function callback,
+      List<String> options) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return OptionsPopup(
+          title: title,
+          callback: callback,
+          options: options,
+        );
+      },
+    );
+  }
+}
+
+class OptionsPopup extends StatefulWidget {
+  final String title;
+  final Function callback;
+  final List<String> options;
+
+  const OptionsPopup({
+    super.key,
+    required this.title,
+    required this.callback,
+    required this.options,
+  });
+
+  @override
+  State<OptionsPopup> createState() => _OptionsPopupState();
+}
+
+class _OptionsPopupState extends State<OptionsPopup> {
+  late List<String> filteredOptions;
+  late TextEditingController searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    filteredOptions = widget.options;
+    searchController = TextEditingController();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 16,
+            ),
+            TextField(
+              onChanged: _filterOptions,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+              ),
+            ),
+            Flexible(
+              fit: FlexFit.loose,
+              child: ListView(
+                children: filteredOptions.map((it) {
+                  return ListTile(
+                    title: Text(it),
+                    onTap: () {
+                      widget.callback(it);
+                      Navigator.of(context).pop();
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _filterOptions(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredOptions = widget.options;
+      } else {
+        filteredOptions = widget.options
+            .where((entry) => entry.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
   }
 }

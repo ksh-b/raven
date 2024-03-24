@@ -18,7 +18,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
   List<String> filteredNewsSources = [];
   TextEditingController searchController = TextEditingController();
   bool _isSearching = false;
-
+  int? _value = 0;
   @override
   void initState() {
     filteredNewsSources = newsSources;
@@ -32,15 +32,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
       appBar: AppBar(
         title: _isSearching ? TextField(
           controller: searchController,
-          onChanged: (value) {
-            setState(() {
-              filteredNewsSources = newsSources
-                  .where((source) {
-                return source.toLowerCase().contains(value.toLowerCase());
-              })
-                  .toList();
-            });
-          },
+          onChanged: (value) => searchSubscriptions(),
         )  : Text('Subscriptions'),
         actions: <Widget>[
           IconButton(
@@ -48,6 +40,10 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
             onPressed: () {
               setState(() {
                 _isSearching = !_isSearching;
+                if(!_isSearching) {
+                  searchController.text = "";
+                  searchSubscriptions();
+                }
               });
             },
           ),
@@ -55,6 +51,42 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
       ),
       body: Column(
         children: [
+          Wrap(
+            spacing: 5.0,
+            children: List<Widget>.generate(
+              Category.values.length + 1,
+                  (int index) {
+                  if (index==0) {
+                    return ChoiceChip(
+                      label: Text("all"),
+                      selected: _value == index,
+                      onSelected: (bool selected) {
+                        setState(() {
+                          _value = selected ? index : null;
+                          filteredNewsSources = newsSources;
+                          searchSubscriptions();
+                        });
+                      },
+                    );
+                  } else {
+                    return ChoiceChip(
+                  label: Text(Category.values[index-1].toString().split(".")[1]),
+                  selected: _value == index,
+                  onSelected: (bool selected) {
+                    setState(() {
+                      _value = selected ? index : null;
+                      searchSubscriptions();
+                      filteredNewsSources = filteredNewsSources
+                          .where((element) => publishers[element]?.mainCategory==Category.values[index-1])
+                      .toList();
+                    });
+                  },
+                );
+                  }
+              },
+            ).toList(),
+          ),
+
           Expanded(
             child: ListView.builder(
               itemCount: filteredNewsSources.length,
@@ -76,9 +108,6 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
                     errorWidget: (context, url, error) =>
                     const Icon(Icons.error),
                   ),
-                  subtitle: Text(
-                      publishers[newsSource]!.mainCategory,
-                  ),
                   trailing: categories.isEmpty?SizedBox.shrink():Icon(Icons.check_circle),
                   onTap: () {
                     showDialog(
@@ -99,6 +128,15 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
         ],
       ),
     );
+  }
+
+  void searchSubscriptions() {
+    setState(() {
+      filteredNewsSources = newsSources
+          .where((source) {
+        return source.toLowerCase().contains(searchController.text.toLowerCase());
+      }).toList();
+    });
   }
 
   String getSelectedCategories(String newsSource) {
