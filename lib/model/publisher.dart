@@ -1,15 +1,15 @@
-import 'package:whapp/extractor/general/national/india/thequint.dart';
-import 'package:whapp/extractor/general/national/india/thewire.dart';
-import 'package:whapp/extractor/general/world/aljazeera.dart';
-import 'package:whapp/extractor/general/world/bbc.dart';
-import 'package:whapp/extractor/general/world/reuters.dart';
-import 'package:whapp/extractor/technology/arstechnica.dart';
-import 'package:whapp/extractor/technology/bleepingcomputer.dart';
-import 'package:whapp/extractor/technology/engadget.dart';
-import 'package:whapp/extractor/technology/theverge.dart';
-import 'package:whapp/extractor/technology/torrentfreak.dart';
-import 'package:whapp/model/article.dart';
-import 'package:whapp/utils/string.dart';
+import 'package:raven/extractor/general/national/india/thequint.dart';
+import 'package:raven/extractor/general/national/india/thewire.dart';
+import 'package:raven/extractor/general/world/aljazeera.dart';
+import 'package:raven/extractor/general/world/bbc.dart';
+import 'package:raven/extractor/general/world/reuters.dart';
+import 'package:raven/extractor/technology/arstechnica.dart';
+import 'package:raven/extractor/technology/bleepingcomputer.dart';
+import 'package:raven/extractor/technology/engadget.dart';
+import 'package:raven/extractor/technology/theverge.dart';
+import 'package:raven/extractor/technology/torrentfreak.dart';
+import 'package:raven/model/article.dart';
+import 'package:raven/utils/string.dart';
 
 Map<String, Publisher> publishers = {
   "Al Jazeera": AlJazeera(),

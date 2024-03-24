@@ -1,4 +1,4 @@
-import 'package:whapp/model/trends.dart';
+import 'package:raven/model/trends.dart';
 
 class YahooTrend extends Trend {
 

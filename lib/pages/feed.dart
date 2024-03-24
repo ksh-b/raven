@@ -2,14 +2,10 @@ import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:whapp/brain/article_provider.dart';
-import 'package:whapp/model/article.dart';
-import 'package:whapp/model/trends.dart';
-
-import 'package:whapp/pages/full_article.dart';
-import 'package:whapp/utils/store.dart';
-import 'package:whapp/utils/string.dart';
+import 'package:raven/brain/article_provider.dart';
+import 'package:raven/model/article.dart';
+import 'package:raven/pages/feed_builder.dart';
+import 'package:raven/pages/search.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});

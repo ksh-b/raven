@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:whapp/extractor/general/national/india/thequint.dart';
-import 'package:whapp/model/publisher.dart';
+import 'package:raven/extractor/general/national/india/thequint.dart';
+import 'package:raven/model/publisher.dart';
 
 import '../../../common.dart';
 

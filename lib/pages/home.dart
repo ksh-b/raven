@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:whapp/pages/feed.dart';
-import 'package:whapp/pages/settings.dart';
-import 'package:whapp/pages/subscription.dart';
+import 'package:raven/pages/feed.dart';
+import 'package:raven/pages/settings.dart';
+import 'package:raven/pages/subscription.dart';
 
 
 class MyHomePage extends StatefulWidget {

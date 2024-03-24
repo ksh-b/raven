@@ -2,9 +2,9 @@ import 'dart:core';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:whapp/model/publisher.dart';
-import 'package:whapp/model/user_subscription.dart';
-import 'package:whapp/utils/store.dart';
+import 'package:raven/model/publisher.dart';
+import 'package:raven/model/user_subscription.dart';
+import 'package:raven/utils/store.dart';
 
 class SubscriptionsPage extends StatefulWidget {
   const SubscriptionsPage({super.key});

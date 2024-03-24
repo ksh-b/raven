@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:whapp/api/simplytranslate.dart';
-import 'package:whapp/model/country.dart';
-import 'package:whapp/model/trends.dart';
-import 'package:whapp/utils/store.dart';
-import 'package:whapp/utils/theme_provider.dart';
+import 'package:raven/api/simplytranslate.dart';
+import 'package:raven/extractor/trend/google.dart';
+import 'package:raven/model/trends.dart';
+import 'package:raven/utils/store.dart';
+import 'package:raven/utils/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

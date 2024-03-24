@@ -1,4 +1,4 @@
-import 'package:whapp/utils/store.dart';
+import 'package:raven/utils/store.dart';
 
 class Network {
   static bool shouldLoadImage(String url) {

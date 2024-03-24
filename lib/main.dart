@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:whapp/model/user_subscription.dart';
-import 'package:whapp/pages/home.dart';
-import 'package:whapp/utils/store.dart';
-import 'package:whapp/utils/theme_provider.dart';
+import 'package:raven/model/user_subscription.dart';
+import 'package:raven/pages/home.dart';
+import 'package:raven/utils/store.dart';
+import 'package:raven/utils/theme_provider.dart';
 
 Future<void> main() async {
   await Hive.initFlutter();

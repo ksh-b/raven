@@ -1,4 +1,4 @@
-import 'package:whapp/model/publisher.dart';
+import 'package:raven/model/publisher.dart';
 
 class NewsArticle {
   Publisher publisher;

@@ -29,7 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "ksh.b.whapp"
+    namespace "ksh.b.raven"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 

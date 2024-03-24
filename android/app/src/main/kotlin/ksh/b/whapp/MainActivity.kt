@@ -1,4 +1,4 @@
-package ksh.b.whapp
+package ksh.b.raven
 
 import io.flutter.embedding.android.FlutterActivity
 

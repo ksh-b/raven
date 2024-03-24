@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
-import 'package:whapp/model/trends.dart';
-import 'package:whapp/model/user_subscription.dart';
-import 'package:whapp/utils/theme_provider.dart';
+import 'package:raven/model/trends.dart';
+import 'package:raven/model/user_subscription.dart';
+import 'package:raven/utils/theme_provider.dart';
 
 class Store {
 

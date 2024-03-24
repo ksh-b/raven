@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whapp/api/simplytranslate.dart';
-import 'package:whapp/model/article.dart';
-import 'package:whapp/utils/network.dart';
-import 'package:whapp/utils/store.dart';
+import 'package:raven/api/simplytranslate.dart';
+import 'package:raven/model/article.dart';
+import 'package:raven/utils/network.dart';
+import 'package:raven/utils/store.dart';
 
 class ArticlePage extends StatefulWidget {
   final NewsArticle article;

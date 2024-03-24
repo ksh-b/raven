@@ -1,9 +1,9 @@
-import 'package:whapp/model/article.dart';
-import 'package:whapp/model/publisher.dart';
+import 'package:raven/model/article.dart';
+import 'package:raven/model/publisher.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
-import 'package:whapp/utils/time.dart';
+import 'package:raven/utils/time.dart';
 
 class TheVerge extends Publisher {
   @override

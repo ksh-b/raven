@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whapp/extractor/technology/bleepingcomputer.dart';
 import 'package:whapp/model/publisher.dart';
+import 'package:raven/extractor/technology/bleepingcomputer.dart';
+import 'package:raven/model/publisher.dart';
 
 import '../common.dart';
 

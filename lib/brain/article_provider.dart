@@ -1,11 +1,12 @@
 // ignore_for_file: unused_import
 
 import 'dart:collection';
-
-import 'package:flutter/material.dart';
-import 'package:whapp/model/article.dart';
-import 'package:whapp/model/publisher.dart';
-import 'package:whapp/utils/store.dart';
+import 'package:flutter/foundation.dart';
+import 'package:raven/brain/worker.dart';
+import 'package:raven/model/article.dart';
+import 'package:raven/model/publisher.dart';
+import 'package:raven/model/user_subscription.dart';
+import 'package:raven/utils/store.dart';
 
 class ArticleProvider {
   int few = 5;

@@ -1,12 +1,12 @@
-import 'package:whapp/model/country.dart';
-import 'package:whapp/model/trends.dart';
+import 'package:raven/model/country.dart';
+import 'package:raven/model/trends.dart';
 
 import 'dart:convert';
 
 import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
-import 'package:whapp/utils/store.dart';
+import 'package:raven/utils/store.dart';
 
 class GoogleTrend extends Trend {
 

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:whapp/model/article.dart';
-import 'package:whapp/model/publisher.dart';
+import 'package:raven/model/article.dart';
+import 'package:raven/model/publisher.dart';
 
 class ExtractorTest {
   static Future<void> categoriesTest(Publisher publisher) async {
