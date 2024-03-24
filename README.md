@@ -9,7 +9,7 @@ Feed Reader
 - No ads and paywalls
 
 ## Installation
-- Install the [latest version from releases](https://github.com/ksh-b/whapp/releases/latest)
+- Install the [latest version from releases](https://github.com/ksh-b/raven/releases/latest)
 - Or use [Obtanium](https://github.com/ImranR98/Obtainium) to install and keep up with updates
 
 ## Screenshots
