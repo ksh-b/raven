@@ -3,27 +3,16 @@ import 'package:raven/utils/store.dart';
 
 class ThemeProvider {
 
-  static String defaultColor  = "Orange";
+  static String defaultColor  = 'Raven';
 
   static Map<String, Color> colors = {
+    'Raven': Colors.deepPurple,
     'Red': Colors.red,
-    'Pink': Colors.pink,
-    'Purple': Colors.purple,
-    'Deep Purple': Colors.deepPurple,
-    'Indigo': Colors.indigo,
-    'Blue': Colors.blue,
-    'Light Blue': Colors.lightBlue,
-    'Cyan': Colors.cyan,
     'Teal': Colors.teal,
-    'Green': Colors.green,
-    'Light Green': Colors.lightGreen,
-    'Lime': Colors.lime,
-    'Yellow': Colors.yellow,
-    'Amber': Colors.amber,
+    'Blue': Colors.blue,
     'Orange': Colors.orange,
-    'Deep Orange': Colors.deepOrange,
-    'Brown': Colors.brown,
   };
+
 
   static ThemeData get(Color color, bool dark) {
     return ThemeData(
