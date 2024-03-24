@@ -21,7 +21,6 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
   late List<NewsArticle> newsArticles;
   late ArticleProvider articleProvider;
   late bool isLoading;
-  late double loadProgress;
   late int page;
   late GlobalKey<RefreshIndicatorState> _refreshIndicatorKey;
 
@@ -33,7 +32,6 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
     });
     articleProvider = ArticleProvider();
     isLoading = false;
-    loadProgress = 0;
     page = 1;
     _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   }
@@ -42,11 +40,10 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
-      strokeWidth: 4.0,
       onRefresh: () async {
         setState(() {
           newsArticles = [];
-          page = 1;
+          page = 0;
           isLoading = true;
         });
         loadMore();
@@ -60,9 +57,7 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return isLoading
-                      ? LinearProgressIndicator(
-                    value: loadProgress,
-                  )
+                      ? LinearProgressIndicator()
                       : SizedBox.shrink();
                 }
                 if (index - 1 < newsArticles.length) {
@@ -244,9 +239,7 @@ class ArticleThumbnail extends StatelessWidget {
             SizedBox(
               height: 200,
             ),
-            LinearProgressIndicator(
-              value: progress.progress,
-            )
+            LinearProgressIndicator()
           ]),
       errorWidget: (context, url, error) {
         return SizedBox.shrink();

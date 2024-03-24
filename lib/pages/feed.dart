@@ -18,9 +18,6 @@ class _FeedPageState extends State<FeedPage>
   List<NewsArticle> newsArticles = [];
   ArticleProvider articleProvider = ArticleProvider();
   TextEditingController searchController = TextEditingController();
-  bool isLoading = false;
-  double loadProgress = 0;
-  int page = 1;
   HashMap<int, dynamic> subscriptionPage = HashMap();
 
   @override
@@ -43,7 +40,7 @@ class _FeedPageState extends State<FeedPage>
           ],
         ),
         body: FutureBuilder(
-          future: articleProvider.loadPage(page, query: null),
+          future: articleProvider.loadPage(1, query: null),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return FeedPageBuilder(null, snapshot.data!);

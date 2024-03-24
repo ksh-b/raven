@@ -19,8 +19,6 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
   List<NewsArticle> newsArticles = [];
   ArticleProvider articleProvider = ArticleProvider();
   bool isLoading = false;
-  double loadProgress = 0;
-  int page = 1;
 
   @override
   void initState() {
@@ -30,7 +28,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: articleProvider.loadPage(page, query: widget.query),
+      future: articleProvider.loadPage(1, query: widget.query),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return FeedPageBuilder(widget.query, snapshot.data!);
