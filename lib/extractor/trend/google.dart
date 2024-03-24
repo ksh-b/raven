@@ -9,9 +9,9 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/store.dart';
 
 class GoogleTrend extends Trend {
-
   @override
-  String get url => "https://trends.google.com/trends/api/dailytrends?geo=${countryCodes[Store.countrySetting]}";
+  String get url =>
+      "https://trends.google.com/trends/api/dailytrends?geo=${countryCodes[Store.countrySetting]}";
 
   @override
   String get locator => "";
@@ -25,8 +25,7 @@ class GoogleTrend extends Trend {
       var jsonText = document.outerHtml
           .replaceFirst(")]}',", "")
           .replaceFirst("<html><head></head><body>", "")
-          .replaceFirst("</body></html>", "")
-      ;
+          .replaceFirst("</body></html>", "");
       var somethings = json.decode(jsonText)["default"]["trendingSearchesDays"];
       for (var something in somethings) {
         var searches = something["trendingSearches"];
@@ -38,5 +37,45 @@ class GoogleTrend extends Trend {
     }
     return [];
   }
-  
+
+  static List<String> locations = [
+    'Argentina',
+    'Australia',
+    'Austria',
+    'Belgium',
+    'Brazil',
+    'Canada',
+    'Chile',
+    'Colombia',
+    'Czechia',
+    'Denmark',
+    'Egypt',
+    'Finland',
+    'France',
+    'Germany',
+    'Greece',
+    'Hong Kong',
+    'Hungary',
+    'India',
+    'Indonesia',
+    'Ireland',
+    'Israel',
+    'Italy',
+    'Japan',
+    'Kenya',
+    'Malaysia',
+    'Mexico',
+    'Netherlands',
+    'New Zealand',
+    'Nigeria',
+    'Norway',
+    'Peru',
+    'Philippines',
+    'Poland',
+    'Portugal',
+    'Romania',
+    'Russia',
+    'Saudi Arabia',
+    'Singapore',
+  ];
 }
