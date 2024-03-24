@@ -4,6 +4,6 @@ class Network {
   static bool shouldLoadImage(String url) {
     return url.isNotEmpty &&
         url.startsWith("https") &&
-        Store.loadImagesSetting == "Always";
+        Store.loadImagesSetting;
   }
 }

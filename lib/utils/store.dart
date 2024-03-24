@@ -5,8 +5,6 @@ import 'package:raven/utils/theme_provider.dart';
 
 class Store {
 
-  static List<String> loadImagesValues = ["Always", "Never"];
-
   static Map<String, String> ladders = {
     "12ft": "https://12ft.io",
     "1ft": "https://1ft.io",
@@ -51,11 +49,11 @@ class Store {
     settings.put("language", language);
   }
 
-  static String get loadImagesSetting {
-    return settings.get("loadImages", defaultValue: loadImagesValues.first);
+  static bool get loadImagesSetting {
+    return settings.get("loadImages", defaultValue: true);
   }
 
-  static set loadImagesSetting(String load) {
+  static set loadImagesSetting(bool load) {
     settings.put("loadImages", load);
   }
 
@@ -95,7 +93,7 @@ class Store {
     return ladders[ladderSetting] ?? ladders.keys.first;
   }
 
-  static String get language {
+  static String get languageSetting {
     return settings.get("language", defaultValue: "English");
   }
 

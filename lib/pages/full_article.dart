@@ -38,13 +38,13 @@ class _ArticlePageState extends State<ArticlePage> {
     if (Store.translate) {
       var translator = SimplyTranslate();
       cArticle.title =
-      await translator.translate(cArticle.title, Store.language);
+      await translator.translate(cArticle.title, Store.languageSetting);
       yield cArticle;
       cArticle.content =
-      await translator.translate(cArticle.content, Store.language);
+      await translator.translate(cArticle.content, Store.languageSetting);
       yield cArticle;
       cArticle.excerpt =
-      await translator.translate(cArticle.excerpt, Store.language);
+      await translator.translate(cArticle.excerpt, Store.languageSetting);
       yield cArticle;
     }
 
