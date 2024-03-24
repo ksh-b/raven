@@ -28,15 +28,9 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^3.0.1
-  flutter_launcher_icons: ^0.13.1
   lints: ^3.0.0
   test: ^1.24.9
 
 flutter:
   uses-material-design: true
 
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon/whapp.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
