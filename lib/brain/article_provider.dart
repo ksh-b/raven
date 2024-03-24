@@ -36,18 +36,18 @@ class ArticleProvider {
             : page;
 
         if (query != null) {
-          await worker.parseArticles(subscription.publisher, page_, subscription.category, true)
+          await worker.parseArticles(subscription.publisher, page_, query, true)
               .then((articles) {
-            var x = articles as Set<NewsArticle>;
-            collectPublisherArticles(
-                subscriptionArticles, x, subscription, page);
+            if (articles is Set<NewsArticle>) {
+              collectPublisherArticles(subscriptionArticles, articles, subscription, page);
+            }
           });
         } else {
-
           await worker.parseArticles(subscription.publisher, page_, subscription.category, false)
               .then((articles) {
-            var x = articles as Set<NewsArticle>;
-              collectPublisherArticles(subscriptionArticles, x, subscription, page);
+            if (articles is Set<NewsArticle>) {
+              collectPublisherArticles(subscriptionArticles, articles, subscription, page);
+            }
           });
         }
       }
