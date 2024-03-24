@@ -20,7 +20,7 @@ class AlJazeera extends Publisher {
   bool get hasSearchSupport => false;
 
   @override
-  String get mainCategory => "World";
+  Category get mainCategory => Category.world;
 
   Future<Map<String, String>> extractCategories() async {
     return {

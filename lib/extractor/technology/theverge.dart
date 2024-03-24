@@ -16,7 +16,7 @@ class TheVerge extends Publisher {
   Future<Map<String, String>> get categories => extractCategories();
 
   @override
-  String get mainCategory => "Technology";
+  Category get mainCategory => Category.technology;
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};

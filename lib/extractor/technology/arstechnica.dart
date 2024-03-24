@@ -14,7 +14,7 @@ class ArsTechnica extends Publisher {
   String get name => "Ars Technica";
 
   @override
-  String get mainCategory => "Technology";
+  Category get mainCategory => Category.technology;
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {

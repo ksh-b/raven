@@ -21,28 +21,27 @@ class TheQuint extends Publisher {
   Future<Map<String, String>> get categories => extractCategories();
 
   @override
-  String get mainCategory => "India";
+  Category get mainCategory => Category.india;
 
   Future<Map<String, String>> extractCategories() async {
-    Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
-    if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
-
-      document
-          .querySelectorAll('#second-nav-bar a[id*=ga4-header]')
-          .forEach((element) {
-        map.putIfAbsent(
-          element.text,
-          () {
-            return element.attributes["href"]!
-                .replaceFirst("/", "")
-                .replaceFirst("news/", "");
-          },
-        );
-      });
-    }
-    return map..removeWhere((key, value) => key=="Videos");
+      Map<String, String> map = {};
+      var response = await http.get(Uri.parse(homePage));
+      if (response.statusCode == 200) {
+        var document = html_parser.parse(utf8.decode(response.bodyBytes));
+        document
+            .querySelectorAll('#second-nav-bar a[id*=ga4-header]')
+            .forEach((element) {
+          map.putIfAbsent(
+            element.text,
+            () {
+              return element.attributes["href"]!
+                  .replaceFirst("/", "")
+                  .replaceFirst("news/", "");
+            },
+          );
+        });
+      }
+      return map..removeWhere((key, value) => key == "Videos");
   }
 
   @override
@@ -50,7 +49,8 @@ class TheQuint extends Publisher {
     var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      var content = document.querySelectorAll(".story-element-text p,blockquote");
+      var content =
+          document.querySelectorAll(".story-element-text p,blockquote");
       return newsArticle.fill(
         content: content.map((e) => e.innerHtml).join("<br><br>"),
       );
@@ -65,22 +65,24 @@ class TheQuint extends Publisher {
   }) async {
     Set<NewsArticle> articles = {};
     var limit = 5;
-    var offset = limit * (page-1);
-    if(category=="/") {
+    var offset = limit * (page - 1);
+    if (category == "/") {
       category = "india";
     }
-    String url = "$homePage/api/v1/collections/$category?limit=$limit&offset=$offset";
-    
+    String url =
+        "$homePage/api/v1/collections/$category?limit=$limit&offset=$offset";
+
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       List data = json.decode(response.body)["items"];
 
       for (var element in data) {
-        if(element["story"]==null) continue;
+        if (element["story"] == null) continue;
         List<String> tags = [];
         var title = element["story"]['headline'];
         var author = element['story']["author-name"];
-        var thumbnail = "https://images.thequint.com/${element['story']['hero-image-s3-key']}";
+        var thumbnail =
+            "https://images.thequint.com/${element['story']['hero-image-s3-key']}";
         var time = element['story']["last-published-at"];
         String articleUrl = element['story']["url"] ?? "";
         var excerpt = element['story']['summary'] ?? "";
@@ -105,19 +107,22 @@ class TheQuint extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle>> searchedArticles(
-      {required String searchQuery, int page = 1,}) async {
+  Future<Set<NewsArticle>> searchedArticles({
+    required String searchQuery,
+    int page = 1,
+  }) async {
     Set<NewsArticle> articles = {};
     String apiUrl = '$homePage/route-data.json?path=/search&q=$searchQuery';
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
-      List data= json.decode(response.body)["data"]["stories"];
+      List data = json.decode(response.body)["data"]["stories"];
 
       for (var element in data) {
         List<String> tags = [];
         var title = element['headline'];
         var author = element['authors'][0]["name"];
-        var thumbnail = "https://images.thequint.com/${element['hero-image-s3-key']}";
+        var thumbnail =
+            "https://images.thequint.com/${element['hero-image-s3-key']}";
         var time = element["last-published-at"];
         var articleUrl = element["url"];
         var sections = element['story']["sections"];
@@ -125,19 +130,17 @@ class TheQuint extends Publisher {
           tags.add(section["name"]);
         }
         articles.add(NewsArticle(
-          publisher: this,
-          title: title ?? "",
-          content: "",
-          excerpt: "",
-          author: author ?? "",
-          url: articleUrl.replaceFirst(homePage, ""),
-          thumbnail: thumbnail,
-          publishedAt: parseUnixTime(time),
-          tags:tags
-        ));
+            publisher: this,
+            title: title ?? "",
+            content: "",
+            excerpt: "",
+            author: author ?? "",
+            url: articleUrl.replaceFirst(homePage, ""),
+            thumbnail: thumbnail,
+            publishedAt: parseUnixTime(time),
+            tags: tags));
       }
     }
     return articles;
   }
-
 }

@@ -19,7 +19,7 @@ class TheWire extends Publisher {
   String get iconUrl => "$homePage/favicon-32x32.png";
 
   @override
-  String get mainCategory => "India";
+  Category get mainCategory => Category.india;
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};

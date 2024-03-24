@@ -20,7 +20,7 @@ class BBC extends Publisher {
   Future<Map<String, String>> get categories => extractCategories();
 
   @override
-  String get mainCategory => "World";
+  Category get mainCategory => Category.world;
 
   Future<Map<String, String>> extractCategories() async {
     return {

@@ -24,6 +24,12 @@ Map<String, Publisher> publishers = {
   "TorrentFreak": TorrentFreak(),
 };
 
+enum Category {
+  world,
+  technology,
+  india,
+}
+
 abstract class Publisher {
   String get name;
 
@@ -35,7 +41,7 @@ abstract class Publisher {
 
   Future<Map<String, String>> get categories;
 
-  String get mainCategory;
+  Category get mainCategory;
 
   Future<Set<NewsArticle>> articles({String category = "All", int page = 1}) {
     return category.startsWith("#")
