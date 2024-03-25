@@ -29,7 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "ksh.b.raven"
+    namespace "kshib.raven"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -38,6 +38,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    // remove in dev env
     splits {
         abi {
             enable true
@@ -56,7 +57,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "ksh.b.whapp"
+        applicationId "kshib.raven"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
