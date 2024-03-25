@@ -1,0 +1,7 @@
+### Changed:
+- App name
+- Subscription page layout
+- Settings page layout
+
+### Fixed:
+- Second refresh showing previous articles
