@@ -4,7 +4,6 @@ import 'package:raven/model/user_subscription.dart';
 import 'package:raven/utils/theme_provider.dart';
 
 class Store {
-
   static Map<String, String> ladders = {
     "12ft": "https://12ft.io",
     "1ft": "https://1ft.io",
@@ -18,7 +17,8 @@ class Store {
   }
 
   static List<UserSubscription> get selectedSubscriptions {
-    return List<UserSubscription>.from(subscriptions.get("selected", defaultValue: []));
+    return List<UserSubscription>.from(
+        subscriptions.get("selected", defaultValue: []));
   }
 
   static set selectedSubscriptions(List<UserSubscription> newSubscriptions) {
@@ -104,5 +104,4 @@ class Store {
   static set translate(bool should) {
     settings.put("translate", should);
   }
-
 }

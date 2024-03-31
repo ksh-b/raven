@@ -49,9 +49,11 @@ abstract class Publisher {
         : categoryArticles(category: category, page: page);
   }
 
-  Future<Set<NewsArticle>> categoryArticles({String category = "All", int page = 1});
+  Future<Set<NewsArticle>> categoryArticles(
+      {String category = "All", int page = 1});
 
-  Future<Set<NewsArticle>> searchedArticles({required String searchQuery, int page = 1});
+  Future<Set<NewsArticle>> searchedArticles(
+      {required String searchQuery, int page = 1});
 
   Future<NewsArticle> article(NewsArticle newsArticle);
 
@@ -62,5 +64,4 @@ abstract class Publisher {
       'categories': categories,
     };
   }
-
 }

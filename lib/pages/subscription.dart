@@ -13,7 +13,8 @@ class SubscriptionsPage extends StatefulWidget {
   State<SubscriptionsPage> createState() => _SubscriptionsPageState();
 }
 
-class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKeepAliveClientMixin {
+class _SubscriptionsPageState extends State<SubscriptionsPage>
+    with AutomaticKeepAliveClientMixin {
   List<String> newsSources = publishers.keys.toList();
   List<String> filteredNewsSources = [];
   TextEditingController searchController = TextEditingController();
@@ -30,17 +31,19 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
     super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: _isSearching ? TextField(
-          controller: searchController,
-          onChanged: (value) => searchSubscriptions(),
-        )  : Text('Subscriptions'),
+        title: _isSearching
+            ? TextField(
+                controller: searchController,
+                onChanged: (value) => searchSubscriptions(),
+              )
+            : Text('Subscriptions'),
         actions: <Widget>[
           IconButton(
-            icon: Icon( _isSearching ? Icons.close: Icons.search),
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
             onPressed: () {
               setState(() {
                 _isSearching = !_isSearching;
-                if(!_isSearching) {
+                if (!_isSearching) {
                   searchController.text = "";
                   searchSubscriptions();
                 }
@@ -55,38 +58,40 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
             spacing: 5.0,
             children: List<Widget>.generate(
               Category.values.length + 1,
-                  (int index) {
-                  if (index==0) {
-                    return ChoiceChip(
-                      label: Text("all"),
-                      selected: _value == index,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          _value = selected ? index : null;
-                          filteredNewsSources = newsSources;
-                          searchSubscriptions();
-                        });
-                      },
-                    );
-                  } else {
-                    return ChoiceChip(
-                  label: Text(Category.values[index-1].toString().split(".")[1]),
-                  selected: _value == index,
-                  onSelected: (bool selected) {
-                    setState(() {
-                      _value = selected ? index : null;
-                      searchSubscriptions();
-                      filteredNewsSources = filteredNewsSources
-                          .where((element) => publishers[element]?.mainCategory==Category.values[index-1])
-                      .toList();
-                    });
-                  },
-                );
-                  }
+              (int index) {
+                if (index == 0) {
+                  return ChoiceChip(
+                    label: Text("all"),
+                    selected: _value == index,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        _value = selected ? index : null;
+                        filteredNewsSources = newsSources;
+                        searchSubscriptions();
+                      });
+                    },
+                  );
+                } else {
+                  return ChoiceChip(
+                    label: Text(
+                        Category.values[index - 1].toString().split(".")[1]),
+                    selected: _value == index,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        _value = selected ? index : null;
+                        searchSubscriptions();
+                        filteredNewsSources = filteredNewsSources
+                            .where((element) =>
+                                publishers[element]?.mainCategory ==
+                                Category.values[index - 1])
+                            .toList();
+                      });
+                    },
+                  );
+                }
               },
             ).toList(),
           ),
-
           Expanded(
             child: ListView.builder(
               itemCount: filteredNewsSources.length,
@@ -97,23 +102,25 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
                   title: Text(newsSource),
                   leading: CachedNetworkImage(
                     imageUrl: publishers[newsSource]!.iconUrl,
-                    progressIndicatorBuilder:
-                        (context, url, downloadProgress) {
+                    progressIndicatorBuilder: (context, url, downloadProgress) {
                       return CircularProgressIndicator(
-                          value: downloadProgress.progress,
+                        value: downloadProgress.progress,
                       );
                     },
                     height: 24,
                     width: 24,
                     errorWidget: (context, url, error) =>
-                    const Icon(Icons.error),
+                        const Icon(Icons.error),
                   ),
-                  trailing: categories.isEmpty?SizedBox.shrink():Icon(Icons.check_circle),
+                  trailing: categories.isEmpty
+                      ? SizedBox.shrink()
+                      : Icon(Icons.check_circle),
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (context) {
-                        return CategoryPopup(publishers, newsSource, callback: () {
+                        return CategoryPopup(publishers, newsSource,
+                            callback: () {
                           setState(() {
                             categories = getSelectedCategories(newsSource);
                           });
@@ -132,17 +139,18 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> with AutomaticKee
 
   void searchSubscriptions() {
     setState(() {
-      filteredNewsSources = newsSources
-          .where((source) {
-        return source.toLowerCase().contains(searchController.text.toLowerCase());
+      filteredNewsSources = newsSources.where((source) {
+        return source
+            .toLowerCase()
+            .contains(searchController.text.toLowerCase());
       }).toList();
     });
   }
 
   String getSelectedCategories(String newsSource) {
     var categories = Store.selectedSubscriptions
-        .where((element) => element.publisher==newsSource)
-        .map((e) => e.category!="/"?e.category.split("/").last:e.category)
+        .where((element) => element.publisher == newsSource)
+        .map((e) => e.category != "/" ? e.category.split("/").last : e.category)
         .join(", ");
     return categories;
   }
@@ -156,7 +164,8 @@ class CategoryPopup extends StatefulWidget {
   final String newsSource;
   final VoidCallback callback;
 
-  const CategoryPopup(this.publishers, this.newsSource, {super.key, required this.callback});
+  const CategoryPopup(this.publishers, this.newsSource,
+      {super.key, required this.callback});
 
   @override
   State<CategoryPopup> createState() => _CategoryPopupState();
@@ -167,14 +176,18 @@ class _CategoryPopupState extends State<CategoryPopup> {
   List customSubscriptions = []; // List<UserSubscription>
   String customCategory = "";
   TextEditingController customCategoryController = TextEditingController();
+  Future<Map<String, String>>? future;
 
   @override
   void initState() {
     setState(() {
       selectedSubscriptions = Store.selectedSubscriptions;
-      customSubscriptions = Store.customSubscriptions.where((element) => element.publisher==widget.newsSource).toList();
+      customSubscriptions = Store.customSubscriptions
+          .where((element) => element.publisher == widget.newsSource)
+          .toList();
     });
     super.initState();
+    future = widget.publishers[widget.newsSource]?.categories;
   }
 
   String convertString(String input) {
@@ -195,7 +208,7 @@ class _CategoryPopupState extends State<CategoryPopup> {
   Widget build(BuildContext context) {
     return Dialog(
       child: FutureBuilder(
-        future: widget.publishers[widget.newsSource]?.categories,
+        future: future,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Padding(
@@ -207,7 +220,8 @@ class _CategoryPopupState extends State<CategoryPopup> {
                     padding: EdgeInsets.all(8.0),
                     child: Text(
                       "Categories",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   ),
                   ListView.builder(
@@ -222,12 +236,13 @@ class _CategoryPopupState extends State<CategoryPopup> {
                         // All checkbox
                         return CheckboxListTile(
                           title: Text(subCategoryKey),
-                          value: selectedSubscriptions.contains(userSubscription),
+                          value:
+                              selectedSubscriptions.contains(userSubscription),
                           onChanged: (value) {
                             if (value!) {
                               selectedSubscriptions.removeWhere((element) {
                                 return element.publisher ==
-                                  userSubscription.publisher;
+                                    userSubscription.publisher;
                               });
                             }
                             updateList(value, userSubscription);
@@ -245,7 +260,10 @@ class _CategoryPopupState extends State<CategoryPopup> {
                         title: Text(subCategoryKey),
                         value: selectedSubscriptions.contains(userSubscription),
                         onChanged: selectedSubscriptions
-                                .where((element) => element.publisher == userSubscription.publisher && element.category == "/")
+                                .where((element) =>
+                                    element.publisher ==
+                                        userSubscription.publisher &&
+                                    element.category == "/")
                                 .isNotEmpty
                             ? null
                             : (value) {
@@ -256,29 +274,38 @@ class _CategoryPopupState extends State<CategoryPopup> {
                   ),
                   ListView.builder(
                     shrinkWrap: true,
-                    itemCount: customSubscriptions.where((element) => element.publisher==widget.newsSource).length,
+                    itemCount: customSubscriptions
+                        .where(
+                            (element) => element.publisher == widget.newsSource)
+                        .length,
                     itemBuilder: (context, index) {
                       return CheckboxListTile(
-                        secondary: IconButton(icon: const Icon(Icons.delete_forever), onPressed: () {
-                          var subscription = customSubscriptions[index];
-                          setState(() {
-                            customSubscriptions.remove(subscription);
-                            selectedSubscriptions.remove(subscription);
-                          });
-                          var cs = Store.customSubscriptions;
-                          cs.remove(subscription);
-                          Store.customSubscriptions= cs;
-                          var ss = Store.selectedSubscriptions;
-                          ss.remove(subscription);
-                          Store.selectedSubscriptions = ss;
-                        }),
-                        title: Text(convertString((customSubscriptions[index] as UserSubscription).category)),
-                        value: selectedSubscriptions.contains(customSubscriptions[index]),
+                        secondary: IconButton(
+                            icon: const Icon(Icons.delete_forever),
+                            onPressed: () {
+                              var subscription = customSubscriptions[index];
+                              setState(() {
+                                customSubscriptions.remove(subscription);
+                                selectedSubscriptions.remove(subscription);
+                              });
+                              var cs = Store.customSubscriptions;
+                              cs.remove(subscription);
+                              Store.customSubscriptions = cs;
+                              var ss = Store.selectedSubscriptions;
+                              ss.remove(subscription);
+                              Store.selectedSubscriptions = ss;
+                            }),
+                        title: Text(convertString(
+                            (customSubscriptions[index] as UserSubscription)
+                                .category)),
+                        value: selectedSubscriptions
+                            .contains(customSubscriptions[index]),
                         onChanged: (value) {
                           updateList(value, customSubscriptions[index]);
                         },
                       );
-                  },),
+                    },
+                  ),
                   Flex(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -288,8 +315,8 @@ class _CategoryPopupState extends State<CategoryPopup> {
                           flex: 3,
                           child: TextField(
                             controller: customCategoryController,
-                            decoration:
-                                const InputDecoration(hintText: "Custom category"),
+                            decoration: const InputDecoration(
+                                hintText: "Custom category"),
                             onEditingComplete: () {
                               setState(() {
                                 customCategory = customCategoryController.text;
@@ -310,15 +337,18 @@ class _CategoryPopupState extends State<CategoryPopup> {
                                     ? IconButton(
                                         onPressed: () {
                                           setState(() {
-                                            customSubscriptions.add(UserSubscription(
+                                            customSubscriptions
+                                                .add(UserSubscription(
                                               widget.newsSource,
                                               customCategory,
                                             ));
                                           });
-                                          Store.customSubscriptions +=[UserSubscription(
-                                            widget.newsSource,
-                                            customCategory,
-                                          )];
+                                          Store.customSubscriptions += [
+                                            UserSubscription(
+                                              widget.newsSource,
+                                              customCategory,
+                                            )
+                                          ];
                                         },
                                         icon: const Icon(Icons.save_alt))
                                     : const Icon(Icons.cancel);

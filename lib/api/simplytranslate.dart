@@ -139,10 +139,10 @@ class SimplyTranslate {
   };
 
   Future<String> translate(String inputText, String language) async {
-    if(!languages.containsKey(language)) {
+    if (!languages.containsKey(language)) {
       return inputText;
     }
-    String translatedText ="";
+    String translatedText = "";
     String url = 'https://simplytranslate.org/?engine=google';
     inputText = removeHtmlAttributes(inputText);
     List<String> inputTextParts = splitString(inputText, 500);
@@ -154,9 +154,7 @@ class SimplyTranslate {
       };
       var response = await http.post(Uri.parse(url), body: payload);
       var document = parse(response.body);
-      translatedText += document
-          .getElementById('output')
-          ?.text ?? "";
+      translatedText += document.getElementById('output')?.text ?? "";
     }
     return translatedText;
   }
@@ -177,12 +175,13 @@ class SimplyTranslate {
 
     return result;
   }
+
   String removeHtmlAttributes(String htmlString) {
     RegExp exp = RegExp(r'<[^>]+>');
     return htmlString.replaceAllMapped(exp, (match) {
       String tag = match.group(0)!;
-      return tag.replaceAll(RegExp(r'\s\S+?="[^"]*?"'), ''); // Removes attributes
+      return tag.replaceAll(
+          RegExp(r'\s\S+?="[^"]*?"'), ''); // Removes attributes
     });
   }
-
 }

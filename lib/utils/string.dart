@@ -5,7 +5,6 @@ String getAsSearchQuery(String category) {
   return category;
 }
 
-
 String createTag(String inputString) {
   RegExp specialChars = RegExp(r'[^\w\s]', multiLine: true);
   String tag = inputString.replaceAll(specialChars, '').toLowerCase();
