@@ -9,45 +9,36 @@ import 'package:raven/utils/string.dart';
 
 class FeedPageBuilder extends StatefulWidget {
   final String? query;
-  final List<NewsArticle> newsArticles;
 
-  const FeedPageBuilder(this.query, this.newsArticles, {super.key});
+  const FeedPageBuilder({super.key, this.query});
 
   @override
   State<FeedPageBuilder> createState() => _FeedPageBuilderState();
 }
 
 class _FeedPageBuilderState extends State<FeedPageBuilder> {
-  late List<NewsArticle> newsArticles;
-  late ArticleProvider articleProvider;
-  late bool isLoading;
-  late int page;
-  late GlobalKey<RefreshIndicatorState> _refreshIndicatorKey;
+  List<NewsArticle> newsArticles = [];
+  bool isLoading = false;
+  ArticleProvider articleProvider = ArticleProvider();
+  int page = 1;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      newsArticles = widget.newsArticles;
+      articleProvider.loadPage(page).then((value) => setState(() {
+            newsArticles = value;
+          }));
     });
-    articleProvider = ArticleProvider();
-    isLoading = false;
-    page = 1;
-    _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
-      onRefresh: () async {
-        setState(() {
-          newsArticles = [];
-          page = 0;
-          isLoading = true;
-        });
-        loadMore();
-      },
+      onRefresh: refresh,
       child: ValueListenableBuilder(
         valueListenable: Store.subscriptions.listenable(),
         builder: (BuildContext context, box, Widget? child) {
@@ -70,9 +61,7 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
                     child: ElevatedButton(
-                      onPressed: isLoading
-                          ? null
-                          : loadMore,
+                      onPressed: isLoading ? null : loadMore,
                       child: Text(isLoading ? "Loading" : "Load more"),
                     ),
                   );
@@ -86,24 +75,34 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
     );
   }
 
-  void loadMore() {
-    page += 1;
+  Future<void> refresh() async {
     setState(() {
+      newsArticles = [];
+      page = 0;
       isLoading = true;
     });
-    articleProvider
-        .loadPage(page, query: widget.query)
-        .then(
-          (value) => setState(
-            () => newsArticles += value,
-      ),
-    )
-        .whenComplete(
-          () => setState(() => isLoading = false),
+    articleProvider.reset();
+    loadMore();
+  }
+
+  void loadMore() {
+    setState(() {
+      page += 1;
+      isLoading = true;
+    });
+    articleProvider.loadPage(page, query: widget.query).then((value) {
+      setState(() {
+        newsArticles += value;
+      });
+    }).whenComplete(
+      () {
+        setState(() {
+          isLoading = false;
+        });
+      },
     );
   }
 }
-
 
 class FeedCard extends StatelessWidget {
   const FeedCard({
@@ -125,11 +124,11 @@ class FeedCard extends StatelessWidget {
             children: [
               Store.loadImagesSetting
                   ? Stack(
-                children: [
-                  ArticleThumbnail(article: article),
-                  ArticleTags(article: article),
-                ],
-              )
+                      children: [
+                        ArticleThumbnail(article: article),
+                        ArticleTags(article: article),
+                      ],
+                    )
                   : SizedBox.shrink(),
               ListTile(
                 title: Text(article.title),
@@ -196,23 +195,23 @@ class ArticleTags extends StatelessWidget {
         child: Row(
           children: article.tags
               .where((element) =>
-          element.length > 1 && element.toLowerCase() != "news")
+                  element.length > 1 && element.toLowerCase() != "news")
               .take(2)
               .map((e) => Padding(
-            padding: const EdgeInsets.only(left: 4, right: 4),
-            child: Chip(
-              // avatar: Icon(Icons.tag),
-              label: Text(
-                createTag(e),
-                style: TextStyle(fontSize: 10),
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              labelPadding: EdgeInsets.zero,
-              visualDensity: VisualDensity.compact,
-            ),
-          ))
+                    padding: const EdgeInsets.only(left: 4, right: 4),
+                    child: Chip(
+                      // avatar: Icon(Icons.tag),
+                      label: Text(
+                        createTag(e),
+                        style: TextStyle(fontSize: 10),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      labelPadding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ))
               .toList(),
         ),
       ),
@@ -236,11 +235,11 @@ class ArticleThumbnail extends StatelessWidget {
       imageUrl: article.thumbnail,
       progressIndicatorBuilder: (context, url, progress) =>
           Stack(alignment: AlignmentDirectional.bottomCenter, children: [
-            SizedBox(
-              height: 200,
-            ),
-            LinearProgressIndicator()
-          ]),
+        SizedBox(
+          height: 200,
+        ),
+        LinearProgressIndicator()
+      ]),
       errorWidget: (context, url, error) {
         return SizedBox.shrink();
       },

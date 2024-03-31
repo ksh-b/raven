@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:raven/brain/article_provider.dart';
-import 'package:raven/model/article.dart';
 import 'package:raven/model/trends.dart';
 import 'package:raven/pages/feed_builder.dart';
 import 'package:raven/utils/store.dart';
-
 
 class SearchResultsPage extends StatefulWidget {
   final String query;
@@ -16,10 +13,6 @@ class SearchResultsPage extends StatefulWidget {
 }
 
 class _SearchResultsPageState extends State<SearchResultsPage> {
-  List<NewsArticle> newsArticles = [];
-  ArticleProvider articleProvider = ArticleProvider();
-  bool isLoading = false;
-
   @override
   void initState() {
     super.initState();
@@ -27,20 +20,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: articleProvider.loadPage(1, query: widget.query),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return FeedPageBuilder(widget.query, snapshot.data!);
-        } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          return Center(child: Text("No data"));
-        }
-      },
-    );
+    return FeedPageBuilder(query: widget.query);
   }
 }
 
@@ -81,13 +61,13 @@ class MySearchDelegate extends SearchDelegate<String> {
           return ListView(
             children: snapshot.data!
                 .map((e) => ListTile(
-              leading: Icon(Icons.trending_up_rounded),
-              title: Text(e),
-              onTap: () {
-                query = e;
-                showResults(context);
-              },
-            ))
+                      leading: Icon(Icons.trending_up_rounded),
+                      title: Text(e),
+                      onTap: () {
+                        query = e;
+                        showResults(context);
+                      },
+                    ))
                 .toList(),
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
