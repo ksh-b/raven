@@ -22,6 +22,9 @@ class TheGuardian extends Publisher {
   @override
   Category get mainCategory => Category.world;
 
+  @override
+  bool get hasSearchSupport => false;
+
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await http.get(Uri.parse(homePage));

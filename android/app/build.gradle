@@ -39,18 +39,18 @@ android {
     }
 
     // remove in dev env
-    splits {
-        abi {
-            enable true
-            reset()
-            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
-            universalApk false
-        }
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+//    splits {
+//        abi {
+//            enable true
+//            reset()
+//            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+//            universalApk false
+//        }
+//    }
+//
+//    kotlinOptions {
+//        jvmTarget = '1.8'
+//    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
