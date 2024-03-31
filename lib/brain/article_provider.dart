@@ -3,6 +3,7 @@ import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/utils/store.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 class ArticleProvider {
   int few = 5;
@@ -23,7 +24,6 @@ class ArticleProvider {
 
     // Load user subscriptions (Publisher+Category)
     for (var subscription in subscriptions) {
-      
       // get publisher for this subscription
       Publisher publisher = publishers[subscription.publisher]!;
       // if there are any articles in stash, un-stash them
@@ -43,21 +43,30 @@ class ArticleProvider {
 
         if (query != null) {
           futures.add(
-            publisher.searchedArticles(
-              searchQuery: query,
-              page: page_,
+            workerManager.execute<Set<NewsArticle>>(
+                  () async {
+                return publisher.searchedArticles(
+                  searchQuery: query,
+                  page: page_,
+                );
+              },
+              priority: WorkPriority.immediately,
             ),
           );
         } else {
           futures.add(
-            publisher.categoryArticles(
-              category: subscription.category,
-              page: page_,
+            workerManager.execute<Set<NewsArticle>>(
+              () async {
+                return publisher.categoryArticles(
+                  category: subscription.category,
+                  page: page_,
+                );
+              },
+              priority: WorkPriority.immediately,
             ),
           );
         }
       }
-      
     }
     if (needFresh) {
       await Future.wait(futures).then((values) {
