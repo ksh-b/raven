@@ -36,7 +36,8 @@ class Reuters extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse('https://neuters.de${newsArticle.url}'));
+    var response =
+        await http.get(Uri.parse('https://neuters.de${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
       var articleElement = document.querySelectorAll('p:not(.byline)');
@@ -56,9 +57,7 @@ class Reuters extends Publisher {
     return super.articles(category: category, page: page);
   }
 
-  Future<Set<NewsArticle>> extract(
-    String apiUrl,
-  ) async {
+  Future<Set<NewsArticle>> extract(String apiUrl, String category) async {
     Set<NewsArticle> articles = {};
 
     List articlesData = [];
@@ -78,17 +77,16 @@ class Reuters extends Publisher {
         var excerpt = element['description'];
         var tags = element['kicker']['names'];
         articles.add(NewsArticle(
-          publisher: this,
-          title: title ?? "",
-          content: "",
-          excerpt: excerpt,
-          author: author ?? "",
-          url: articleUrl,
-          thumbnail: thumbnail ?? "",
-          publishedAt: parseDateString(time?.trim() ?? ""),
-          tags: List<String>.from(tags)
-        ));
-
+            publisher: this,
+            title: title ?? "",
+            content: "",
+            excerpt: excerpt,
+            author: author ?? "",
+            url: articleUrl,
+            thumbnail: thumbnail ?? "",
+            publishedAt: parseDateString(time?.trim() ?? ""),
+            tags: List<String>.from(tags),
+            category: category));
       }
     }
     return articles;
@@ -104,11 +102,11 @@ class Reuters extends Publisher {
     }
     String apiUrl =
         '$homePage/pf/api/v3/content/fetch/recent-stories-by-sections-v1?'
-        'query={"section_ids":"/$category/","offset": ${(page-1)*5},'
+        'query={"section_ids":"/$category/","offset": ${(page - 1) * 5},'
         '"size":5,'
         '"website":"reuters"}';
 
-    return extract(apiUrl);
+    return extract(apiUrl, category);
   }
 
   @override
@@ -119,10 +117,10 @@ class Reuters extends Publisher {
     searchQuery = getAsSearchQuery(searchQuery);
     String apiUrl =
         'https://www.reuters.com/pf/api/v3/content/fetch/articles-by-search-v2?'
-        'query={"keyword":"$searchQuery","offset":${(page-1)*5},'
+        'query={"keyword":"$searchQuery","offset":${(page - 1) * 5},'
         '"orderby":"display_date:desc","size":5,"website":"reuters"}'
         '&_website=reuters';
 
-    return extract(apiUrl);
+    return extract(apiUrl, searchQuery);
   }
 }

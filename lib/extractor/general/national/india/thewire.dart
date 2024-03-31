@@ -10,13 +10,14 @@ class TheWire extends Publisher {
   String get name => "The Wire";
 
   @override
-  String get homePage => "https://thewire.in";
+  String get homePage => "https://cms.thewire.in";
 
   @override
   Future<Map<String, String>> get categories => extractCategories();
 
   @override
-  String get iconUrl => "$homePage/favicon-32x32.png";
+  String get iconUrl =>
+      "https://cdn.thewire.in/wp-content/uploads/2020/07/09150055/wirelogo_square_white_on_red_favicon.ico";
 
   @override
   Category get mainCategory => Category.india;
@@ -48,14 +49,14 @@ class TheWire extends Publisher {
       category = 'home';
     }
     String apiUrl =
-        '$homePage/wp-json/thewire/v2/posts/$category/recent-stories?page=$page&per_page=5';
-    return extract(apiUrl, false);
+        'https://cms.thewire.in/wp-json/thewire/v2/posts/$category/recent-stories?page=$page&per_page=5';
+    return extract(apiUrl, false, category);
   }
 
   @override
   Future<Set<NewsArticle>> searchedArticles(
       {required String searchQuery, int page = 1}) {
-    String apiUrl = '$homePage/wp-json/thewire/v2/posts/search';
+    String apiUrl = 'https://cms.thewire.in/wp-json/thewire/v2/posts/search';
     Map<String, String> params = {
       'keyword': searchQuery,
       'orderby': 'rel',
@@ -65,10 +66,11 @@ class TheWire extends Publisher {
     };
     Uri uri = Uri.parse(apiUrl).replace(queryParameters: params);
     String fullUrl = uri.toString();
-    return extract(fullUrl, true);
+    return extract(fullUrl, true, searchQuery);
   }
 
-  Future<Set<NewsArticle>> extract(String apiUrl, bool isSearch) async {
+  Future<Set<NewsArticle>> extract(
+      String apiUrl, bool isSearch, String category) async {
     Set<NewsArticle> articles = {};
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -76,7 +78,11 @@ class TheWire extends Publisher {
       if (isSearch) {
         data = json.decode(response.body)["generic"];
       } else {
-        data = json.decode(response.body);
+        try {
+          data = json.decode(response.body);
+        } catch (e) {
+          data = [];
+        }
       }
       for (var element in data) {
         var title = element['post_title'];
@@ -86,7 +92,7 @@ class TheWire extends Publisher {
         var articleUrl =
             '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
         var excerpt = element['post_excerpt'];
-        var tags = element['categories'].map((e)=>e['name']).toList();
+        var tags = element['categories'].map((e) => e['name']).toList();
         articles.add(NewsArticle(
             publisher: this,
             title: title ?? "",
@@ -95,9 +101,9 @@ class TheWire extends Publisher {
             author: author ?? "",
             url: articleUrl,
             thumbnail: thumbnail ?? "",
+            category: category,
             publishedAt: parseDateString(time?.trim() ?? ""),
-            tags: List<String>.from(tags)
-        ));
+            tags: List<String>.from(tags)));
       }
     }
     return articles;
@@ -124,5 +130,4 @@ class TheWire extends Publisher {
       {String category = "home", int page = 1}) async {
     return super.articles(category: category, page: page);
   }
-
 }

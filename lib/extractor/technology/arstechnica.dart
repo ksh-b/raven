@@ -21,64 +21,67 @@ class ArsTechnica extends Publisher {
     var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      String? thumbnail = document.querySelector(".figure img")?.attributes["href"];
-      String? content = document.querySelectorAll(".article-content p").map((e) => e.innerHtml).join("<br><br>");
+      String? thumbnail =
+          document.querySelector(".figure img")?.attributes["href"];
+      String? content = document
+          .querySelectorAll(".article-content p")
+          .map((e) => e.innerHtml)
+          .join("<br><br>");
       return newsArticle.fill(content: content, thumbnail: thumbnail);
     }
-    return newsArticle  ;
+    return newsArticle;
   }
 
   @override
   Future<Map<String, String>> get categories async => {
-    "News": "",
-    "IT": "information-technology",
-    "Tech": "gadgets",
-    "Science": "science",
-    "Policy": "tech-policy",
-    "Cars": "cars",
-    "Gaming": "gaming"
-  };
+        "News": "",
+        "IT": "information-technology",
+        "Tech": "gadgets",
+        "Science": "science",
+        "Policy": "tech-policy",
+        "Cars": "cars",
+        "Gaming": "gaming"
+      };
 
   @override
   bool get hasSearchSupport => false;
 
   @override
-  Future<Set<NewsArticle>> categoryArticles({String category = "", int page = 1}) async {
+  Future<Set<NewsArticle>> categoryArticles(
+      {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    var tag = category=="/"?"":category;
+    var tag = category == "/" ? "" : category;
 
-    if(category.isNotEmpty && category!="/") {
-      category="/$category";
+    if (category.isNotEmpty && category != "/") {
+      category = "/$category";
     }
-
 
     var response = await http.get(Uri.parse("$homePage$category/page/$page"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      List<Element> articleElements =
-      document.querySelectorAll(".article");
+      List<Element> articleElements = document.querySelectorAll(".article");
       for (Element articleElement in articleElements) {
         String? title = articleElement.querySelector("h2 a")?.text;
         String? excerpt = articleElement.querySelector(".excerpt")?.text;
-        String? author = articleElement.querySelector("span[itemprop=name]")?.text;
-        String? date = articleElement.querySelector("time")?.attributes["datetime"] ?? "";
+        String? author =
+            articleElement.querySelector("span[itemprop=name]")?.text;
+        String? date =
+            articleElement.querySelector("time")?.attributes["datetime"] ?? "";
         String? url = articleElement.querySelector("h2 a")?.attributes["href"];
-        String? thumbnail = articleElement
-            .querySelector("figure div")
-            ?.attributes["style"];
+        String? thumbnail =
+            articleElement.querySelector("figure div")?.attributes["style"];
 
         articles.add(NewsArticle(
-          publisher: this,
-          title: title ?? "",
-          content: "",
-          excerpt: excerpt ?? "",
-          author: author ?? "",
-          url: url?.replaceFirst(homePage, "") ?? "",
-          thumbnail: extractUrl(thumbnail),
-          publishedAt: parseDateString(date),
-          tags: [tag]
-        ));
-
+            publisher: this,
+            title: title ?? "",
+            content: "",
+            excerpt: excerpt ?? "",
+            author: author ?? "",
+            url: url?.replaceFirst(homePage, "") ?? "",
+            thumbnail: extractUrl(thumbnail),
+            publishedAt: parseDateString(date),
+            tags: [tag],
+            category: category));
       }
     }
     return articles;
@@ -86,7 +89,7 @@ class ArsTechnica extends Publisher {
 
   String extractUrl(String? inputString) {
     RegExp regExp = RegExp(r"url\('([^']*)'\)");
-    if(inputString!=null) {
+    if (inputString != null) {
       Match? match = regExp.firstMatch(inputString);
       if (match != null) {
         return match.group(1)!;
@@ -98,7 +101,8 @@ class ArsTechnica extends Publisher {
   }
 
   @override
-  Future<Set<NewsArticle>> searchedArticles({required String searchQuery, int page = 1}) async{
+  Future<Set<NewsArticle>> searchedArticles(
+      {required String searchQuery, int page = 1}) async {
     return {};
   }
 }

@@ -39,7 +39,8 @@ class AlJazeera extends Publisher {
 
       var article = document.getElementById("main-content-area");
       var thumbnailElement = article?.querySelector('img');
-      var content = article?.querySelectorAll('.wysiwyg p')
+      var content = article
+          ?.querySelectorAll('.wysiwyg p')
           .map((e) => e.innerHtml)
           .join("<br><br>");
       var thumbnail = "$homePage${thumbnailElement?.attributes["src"]}";
@@ -70,43 +71,45 @@ class AlJazeera extends Publisher {
       category = "features";
     }
 
-    var url = Uri.parse('https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"where","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page-1)*5}}&extensions={}');
+    var url = Uri.parse(
+        'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"where","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}');
     var headers = {'wp-site': 'aje'};
 
     var response = await http.get(url, headers: headers);
-    if (json.decode(response.body)["data"]["articles"]==null) {
-      url = Uri.parse('https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"categories","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page-1)*5}}&extensions={}');
+    if (json.decode(response.body)["data"]["articles"] == null) {
+      url = Uri.parse(
+          'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"categories","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}');
       response = await http.get(url, headers: headers);
     }
 
-    if (json.decode(response.body)["data"]["articles"]==null) {
-      url = Uri.parse('https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"tags","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page-1)*5}}&extensions={}');
+    if (json.decode(response.body)["data"]["articles"] == null) {
+      url = Uri.parse(
+          'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"tags","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}');
       response = await http.get(url, headers: headers);
     }
-
-
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       var articlesData = data["data"]["articles"];
       for (var element in articlesData) {
         var title = element['title'];
-        var author = element['author'].isNotEmpty?element['author'][0]['name']:"";
+        var author =
+            element['author'].isNotEmpty ? element['author'][0]['name'] : "";
         var thumbnail = homePage + element['featuredImage']['sourceUrl'];
         var time = element['date'];
         var articleUrl = element['link'];
         var excerpt = element['excerpt'];
         articles.add(NewsArticle(
-          publisher: this,
-          title: title ?? "",
-          content: "",
-          excerpt: excerpt,
-          author: author ?? "",
-          url: articleUrl,
-          thumbnail: thumbnail,
-          publishedAt: parseDateString(time?.trim() ?? ""),
-          tags: [createTag(category)]
-        ));
+            publisher: this,
+            title: title ?? "",
+            content: "",
+            excerpt: excerpt,
+            author: author ?? "",
+            url: articleUrl,
+            thumbnail: thumbnail,
+            publishedAt: parseDateString(time?.trim() ?? ""),
+            tags: [createTag(category)],
+            category: category));
       }
     }
 

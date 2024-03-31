@@ -8,6 +8,7 @@ class NewsArticle {
   String author;
   String url;
   String thumbnail;
+  String category;
   List<String> tags;
   MapEntry<int, String> publishedAt;
 
@@ -21,6 +22,7 @@ class NewsArticle {
     required this.thumbnail,
     this.tags = const [],
     required this.publishedAt,
+    required this.category,
   });
 
   NewsArticle fill({
@@ -32,6 +34,7 @@ class NewsArticle {
     String? thumbnail,
     List<String>? tags,
     MapEntry<int, String>? publishedAt,
+    String? category,
   }) {
     return NewsArticle(
       publisher: publisher,
@@ -42,6 +45,7 @@ class NewsArticle {
       url: url ?? this.url,
       thumbnail: thumbnail ?? this.thumbnail,
       publishedAt: publishedAt ?? this.publishedAt,
+      category: category ?? this.category,
     );
   }
 
@@ -56,6 +60,7 @@ class NewsArticle {
       'thumbnail': thumbnail,
       'tags': tags,
       'publishedAt': publishedAt,
+      'category': category,
     };
   }
 

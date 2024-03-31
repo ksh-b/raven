@@ -27,7 +27,10 @@ class BleepingComputer extends Publisher {
           .toList()
           .map((e) => e.innerHtml)
           .join("<br><br>");
-      return newsArticle.fill(content: content, thumbnail: thumbnail,);
+      return newsArticle.fill(
+        content: content,
+        thumbnail: thumbnail,
+      );
     }
     return newsArticle;
   }
@@ -39,9 +42,11 @@ class BleepingComputer extends Publisher {
   Future<Map<String, String>> get categories async => {};
 
   @override
-  Future<Set<NewsArticle>> categoryArticles({String category = "", int page = 1}) async {
+  Future<Set<NewsArticle>> categoryArticles(
+      {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse(page!=1?"$homePage/news/page/$page":"$homePage/news/"));
+    var response = await http.get(
+        Uri.parse(page != 1 ? "$homePage/news/page/$page" : "$homePage/news/"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       List<Element> articleElements =
@@ -51,11 +56,14 @@ class BleepingComputer extends Publisher {
         String? excerpt = articleElement.querySelector("p")?.text;
         String? author = articleElement.querySelector(".author")?.text;
         String? url = articleElement.querySelector("h4 a")?.attributes["href"];
-        var tags = articleElement.querySelectorAll(".bc_latest_news_category span a").map((e) => e.text).toList();
+        var tags = articleElement
+            .querySelectorAll(".bc_latest_news_category span a")
+            .map((e) => e.text)
+            .toList();
         String? thumbnail = articleElement
-                .querySelector(".bc_latest_news_img img")
-                ?.attributes["src"];
-        if (thumbnail!=null && thumbnail.endsWith("==")) {
+            .querySelector(".bc_latest_news_img img")
+            ?.attributes["src"];
+        if (thumbnail != null && thumbnail.endsWith("==")) {
           thumbnail = articleElement
               .querySelector(".bc_latest_news_img img")
               ?.attributes["data-src"];
@@ -63,27 +71,28 @@ class BleepingComputer extends Publisher {
         String? content = "";
         String? date = articleElement.querySelector(".bc_news_date")?.text;
         String? time = articleElement.querySelector(".bc_news_time")?.text;
-        String parsedTime = convertToIso8601("$date $time", "MMMM dd, yyyy hh:mm a");
+        String parsedTime =
+            convertToIso8601("$date $time", "MMMM dd, yyyy hh:mm a");
 
         articles.add(NewsArticle(
-          publisher: this,
-          title: title ?? "",
-          content: content,
-          excerpt: excerpt ?? "",
-          author: author ?? "",
-          url: url?.replaceFirst(homePage, "") ?? "",
-          thumbnail: thumbnail ?? "",
-          publishedAt: parseDateString(parsedTime),
-          tags: tags
-        ));
-
+            publisher: this,
+            title: title ?? "",
+            content: content,
+            excerpt: excerpt ?? "",
+            author: author ?? "",
+            url: url?.replaceFirst(homePage, "") ?? "",
+            thumbnail: thumbnail ?? "",
+            publishedAt: parseDateString(parsedTime),
+            tags: tags,
+            category: category));
       }
     }
     return articles;
   }
 
   @override
-  Future<Set<NewsArticle>> searchedArticles({required String searchQuery, int page = 1}) async{
+  Future<Set<NewsArticle>> searchedArticles(
+      {required String searchQuery, int page = 1}) async {
     return {};
   }
 }

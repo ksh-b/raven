@@ -24,24 +24,24 @@ class TheQuint extends Publisher {
   Category get mainCategory => Category.india;
 
   Future<Map<String, String>> extractCategories() async {
-      Map<String, String> map = {};
-      var response = await http.get(Uri.parse(homePage));
-      if (response.statusCode == 200) {
-        var document = html_parser.parse(utf8.decode(response.bodyBytes));
-        document
-            .querySelectorAll('#second-nav-bar a[id*=ga4-header]')
-            .forEach((element) {
-          map.putIfAbsent(
-            element.text,
-            () {
-              return element.attributes["href"]!
-                  .replaceFirst("/", "")
-                  .replaceFirst("news/", "");
-            },
-          );
-        });
-      }
-      return map..removeWhere((key, value) => key == "Videos");
+    Map<String, String> map = {};
+    var response = await http.get(Uri.parse(homePage));
+    if (response.statusCode == 200) {
+      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      document
+          .querySelectorAll('#second-nav-bar a[id*=ga4-header]')
+          .forEach((element) {
+        map.putIfAbsent(
+          element.text,
+          () {
+            return element.attributes["href"]!
+                .replaceFirst("/", "")
+                .replaceFirst("news/", "");
+          },
+        );
+      });
+    }
+    return map..removeWhere((key, value) => key == "Videos");
   }
 
   @override
@@ -91,16 +91,16 @@ class TheQuint extends Publisher {
           tags.add(section["name"]);
         }
         articles.add(NewsArticle(
-          publisher: this,
-          title: title ?? "",
-          content: "",
-          excerpt: excerpt,
-          author: author ?? "",
-          url: articleUrl.replaceFirst(homePage, ""),
-          tags: tags,
-          thumbnail: thumbnail,
-          publishedAt: parseUnixTime(time),
-        ));
+            publisher: this,
+            title: title ?? "",
+            content: "",
+            excerpt: excerpt,
+            author: author ?? "",
+            url: articleUrl.replaceFirst(homePage, ""),
+            tags: tags,
+            thumbnail: thumbnail,
+            publishedAt: parseUnixTime(time),
+            category: category));
       }
     }
     return articles;
@@ -138,6 +138,7 @@ class TheQuint extends Publisher {
             url: articleUrl.replaceFirst(homePage, ""),
             thumbnail: thumbnail,
             publishedAt: parseUnixTime(time),
+            category: searchQuery,
             tags: tags));
       }
     }
