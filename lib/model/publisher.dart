@@ -3,6 +3,7 @@ import 'package:raven/extractor/general/national/india/thewire.dart';
 import 'package:raven/extractor/general/world/aljazeera.dart';
 import 'package:raven/extractor/general/world/bbc.dart';
 import 'package:raven/extractor/general/world/reuters.dart';
+import 'package:raven/extractor/general/world/theguardian.dart';
 import 'package:raven/extractor/technology/arstechnica.dart';
 import 'package:raven/extractor/technology/bleepingcomputer.dart';
 import 'package:raven/extractor/technology/engadget.dart';
@@ -18,6 +19,7 @@ Map<String, Publisher> publishers = {
   "BleepingComputer": BleepingComputer(),
   "Engadget": Engadget(),
   "Reuters": Reuters(),
+  "The Guardian": TheGuardian(),
   "The Verge": TheVerge(),
   "The Quint": TheQuint(),
   "The Wire": TheWire(),
