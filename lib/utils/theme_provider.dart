@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:raven/utils/store.dart';
 
 class ThemeProvider {
-
-  static String defaultColor  = 'Raven';
+  static String defaultColor = 'Raven';
 
   static Map<String, Color> colors = {
     'Raven': Colors.deepPurple,
@@ -13,12 +12,11 @@ class ThemeProvider {
     'Orange': Colors.orange,
   };
 
-
   static ThemeData get(Color color, bool dark) {
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: color,
-        brightness: dark?Brightness.dark:Brightness.light,
+        brightness: dark ? Brightness.dark : Brightness.light,
       ),
     );
   }
@@ -29,5 +27,4 @@ class ThemeProvider {
       Store.darkThemeSetting,
     );
   }
-  
 }

@@ -1,7 +1,6 @@
 import 'package:raven/model/trends.dart';
 
 class NoneTrend extends Trend {
-
   @override
   String get url => "";
 

@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 part 'user_subscription.g.dart';
 
 @HiveType(typeId: 0)
-class UserSubscription extends HiveObject{
+class UserSubscription extends HiveObject {
   @HiveField(0)
   String publisher;
 

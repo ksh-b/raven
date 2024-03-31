@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:html/dom.dart';
@@ -19,7 +18,6 @@ Map<String, Trend> trends = {
 };
 
 abstract class Trend {
-
   String get url;
   String get locator;
 
@@ -31,5 +29,4 @@ abstract class Trend {
     }
     return [];
   }
-
 }

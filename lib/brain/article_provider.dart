@@ -29,11 +29,8 @@ class ArticleProvider {
       // if there are any articles in stash, un-stash them
       var stashedPublisherArticles =
           stashedArticles.where((e) => e.publisher == publisher).toList();
-      
-          "Loading page $page for $subscription, stashed: ${stashedPublisherArticles.length}");
       if (stashedPublisherArticles.isNotEmpty) {
         subscriptionArticles = stashedPublisherArticles.take(few).toList();
-        
         stashedArticles.removeAll(subscriptionArticles);
       }
 

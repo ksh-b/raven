@@ -3,7 +3,6 @@ import 'package:raven/pages/feed.dart';
 import 'package:raven/pages/settings.dart';
 import 'package:raven/pages/subscription.dart';
 
-
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 

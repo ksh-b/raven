@@ -32,19 +32,20 @@ class _ArticlePageState extends State<ArticlePage> {
 
   TextStyle excerptStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
 
-  Stream<NewsArticle> customArticle(NewsArticle newsArticle, BuildContext context) async* {
+  Stream<NewsArticle> customArticle(
+      NewsArticle newsArticle, BuildContext context) async* {
     NewsArticle cArticle = await newsArticle.publisher.article(newsArticle);
 
     if (Store.translate) {
       var translator = SimplyTranslate();
       cArticle.title =
-      await translator.translate(cArticle.title, Store.languageSetting);
+          await translator.translate(cArticle.title, Store.languageSetting);
       yield cArticle;
       cArticle.content =
-      await translator.translate(cArticle.content, Store.languageSetting);
+          await translator.translate(cArticle.content, Store.languageSetting);
       yield cArticle;
       cArticle.excerpt =
-      await translator.translate(cArticle.excerpt, Store.languageSetting);
+          await translator.translate(cArticle.excerpt, Store.languageSetting);
       yield cArticle;
     }
 
@@ -94,7 +95,9 @@ class _ArticlePageState extends State<ArticlePage> {
                     padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
                     child: ListView(
                       children: [
-                        snapshot.connectionState != ConnectionState.done ? LinearProgressIndicator():SizedBox.shrink(),
+                        snapshot.connectionState != ConnectionState.done
+                            ? LinearProgressIndicator()
+                            : SizedBox.shrink(),
                         textWidget("", snapshot.data!.title, titleStyle),
                         textWidget(
                             "Author", snapshot.data!.author, metadataStyle),
@@ -125,8 +128,7 @@ class _ArticlePageState extends State<ArticlePage> {
                     ),
                   ),
           );
-        }
-        else if (snapshot.hasError) {
+        } else if (snapshot.hasError) {
           String fallbackUrl =
               "${widget.article.publisher.homePage}${widget.article.url}";
           return Scaffold(
