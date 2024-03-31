@@ -28,7 +28,7 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
   void initState() {
     super.initState();
     setState(() {
-      articleProvider.loadPage(page).then((value) => setState(() {
+      articleProvider.loadPage(page, query: widget.query).then((value) => setState(() {
             newsArticles = value;
           }));
     });
@@ -115,7 +115,6 @@ class FeedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 8,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
         child: InkWell(
