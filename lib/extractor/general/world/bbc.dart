@@ -1,12 +1,9 @@
-// ignore_for_file: unused_import
-
 import 'package:intl/intl.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
-import 'package:raven/utils/string.dart';
 import 'package:raven/utils/time.dart';
 
 class BBC extends Publisher {
@@ -61,7 +58,6 @@ class BBC extends Publisher {
     String apiUrl = "https://push.api.bbci.co.uk/batch?"
         "t=/data/bbc-morph-lx-commentary-data-paged/about/$id/"
         "isUk/false/limit/5/nitroKey/lx-nitro/pageNumber/$page/version/1.5.6";
-
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
@@ -79,16 +75,17 @@ class BBC extends Publisher {
         var time = article["lastPublished"];
         var excerpt = article['summary'];
         articlesData.add(NewsArticle(
-            publisher: this,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt,
-            author: author ?? "",
-            url: articleUrl,
-            thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(time?.trim() ?? ""),
-            tags: [category],
-            category: category));
+          publisher: this,
+          title: title ?? "",
+          content: "",
+          excerpt: excerpt,
+          author: author ?? "",
+          url: articleUrl,
+          thumbnail: thumbnail.replaceFirst("http:", "https:") ?? "",
+          publishedAt: parseDateString(time?.trim() ?? ""),
+          tags: [category],
+          category: category,
+        ));
       }
     }
 
@@ -125,7 +122,7 @@ class BBC extends Publisher {
             excerpt: excerpt,
             author: author ?? "",
             url: articleUrl,
-            thumbnail: thumbnail ?? "",
+            thumbnail: thumbnail.replaceFirst("http:", "https:") ?? "",
             publishedAt: parseDateString(time),
             tags: [category],
             category: category));
@@ -165,41 +162,28 @@ class BBC extends Publisher {
     }
   }
 
+  String convertString(String input) {
+    return '@${input.replaceAll('/', '","')}",'.replaceFirst('@","', '@"');
+  }
+
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
     var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
-
-      var article = document.querySelector('article');
-      var titleElement = article?.querySelector('h1');
-      var excerptElement = article?.querySelector('div b');
-      var timeElement = article?.querySelector('time');
-      var thumbnailElement = article?.querySelector('img');
-      var authorElement =
-          article?.querySelector("div[class*=TextContributorName]");
-      var title = titleElement?.text;
-      var content = article
-          ?.querySelectorAll(".ep2nwvo0")
-          .map((e) => e.innerHtml)
-          .toList()
-          .sublist(1)
-          .join();
-      var author = authorElement?.text.replaceFirst("By ", "");
-      var excerpt = excerptElement?.text;
-      var thumbnail = thumbnailElement?.attributes["src"];
-      var time = timeElement?.attributes["datetime"];
-
-      return NewsArticle(
-          publisher: this,
-          title: title ?? "",
-          content: content ?? "",
-          excerpt: excerpt ?? "",
-          author: author ?? "",
-          url: newsArticle.url,
-          thumbnail: thumbnail ?? "",
-          publishedAt: parseDateString(time?.trim() ?? ""),
-          category: "");
+      var jsonContent = jsonDecode(
+          document.querySelector('script[type="application/json"]')?.text ??
+              "{}");
+      String content = '<html><body>';
+      var blocks = jsonContent["props"]["pageProps"]["page"]
+          [convertString(newsArticle.url)]["contents"];
+      for (var b in blocks) {
+        if (b["type"] == "text") {
+          content += '<p>${b["model"]["blocks"][0]["model"]["text"]}</p>';
+        }
+      }
+      content = "$content</body></html>";
+      newsArticle.content = content;
     }
     return newsArticle;
   }
@@ -252,7 +236,8 @@ class BBC extends Publisher {
         var title = titleElement?.text;
         var author = "";
         var excerpt = excerptElement?.text;
-        var thumbnail = thumbnailElement?.attributes["src"];
+        var thumbnail = thumbnailElement?.attributes["src"]
+            ?.replaceFirst("http:", "https:");
         var time = timeElement?.text;
         var articleUrl = articleUrlElement?.attributes["href"];
 
