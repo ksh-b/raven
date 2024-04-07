@@ -4,6 +4,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:raven/brain/article_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/pages/full_article.dart';
+import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/string.dart';
 
@@ -28,9 +29,11 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
   void initState() {
     super.initState();
     setState(() {
-      articleProvider.loadPage(page, query: widget.query).then((value) => setState(() {
-            newsArticles = value;
-          }));
+      articleProvider
+          .loadPage(page, query: widget.query)
+          .then((value) => setState(() {
+                newsArticles = value;
+              }));
     });
   }
 
@@ -132,9 +135,11 @@ class FeedCard extends StatelessWidget {
               ListTile(
                 title: Text(article.title),
                 leading: ArticlePublisherIcon(article: article),
-                subtitle: Text(
-                  article.publishedAt.value,
-                ),
+                subtitle: article.publishedAt.value.isNotEmpty
+                    ? Text(
+                        article.publishedAt.value,
+                      )
+                    : SizedBox.shrink(),
               ),
             ],
           ),
@@ -228,6 +233,9 @@ class ArticleThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Network.shouldLoadImage(article.thumbnail)) {
+      return SizedBox.shrink();
+    }
     return CachedNetworkImage(
       width: MediaQuery.of(context).size.width,
       fit: BoxFit.fill,
