@@ -14,6 +14,7 @@ import 'package:raven/utils/string.dart';
 
 Map<String, Publisher> publishers = {
   "Al Jazeera": AlJazeera(),
+  "AP News": APNews(),
   "Ars Technica": ArsTechnica(),
   "BBC": BBC(),
   "BleepingComputer": BleepingComputer(),
