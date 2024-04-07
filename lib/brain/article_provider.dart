@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:developer';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
@@ -27,8 +28,9 @@ class ArticleProvider {
       // get publisher for this subscription
       Publisher publisher = publishers[subscription.publisher]!;
       // if there are any articles in stash, un-stash them
-      var stashedPublisherArticles =
-          stashedArticles.where((e) => e.publisher == publisher).toList();
+      var stashedPublisherArticles = stashedArticles
+          .where((e) => e.publisher.toString() == publisher.toString())
+          .toList();
       if (stashedPublisherArticles.isNotEmpty) {
         subscriptionArticles = stashedPublisherArticles.take(few).toList();
         stashedArticles.removeAll(subscriptionArticles);
@@ -44,7 +46,7 @@ class ArticleProvider {
         if (query != null) {
           futures.add(
             workerManager.execute<Set<NewsArticle>>(
-                  () async {
+              () async {
                 return publisher.searchedArticles(
                   searchQuery: query,
                   page: page_,
@@ -71,12 +73,14 @@ class ArticleProvider {
     if (needFresh) {
       await Future.wait(futures).then((values) {
         for (Set<NewsArticle> value in values) {
-          collectPublisherArticles(
-            subscriptionArticles,
-            value,
-            "${value.first.publisher.name}~${value.first.category}",
-            page,
-          );
+          if (value.isNotEmpty) {
+            collectPublisherArticles(
+              subscriptionArticles,
+              value,
+              "${value.first.publisher.name}~${value.first.category}",
+              page,
+            );
+          }
         }
       });
     }
