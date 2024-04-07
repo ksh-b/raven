@@ -2,7 +2,7 @@ name: raven
 description: "News aggregator"
 publish_to: 'none'
 
-version: 0.8.1+81
+version: 0.8.1+2
 
 environment:
   sdk: '>=3.2.1 <4.0.0'
