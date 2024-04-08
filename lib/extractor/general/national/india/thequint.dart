@@ -1,7 +1,3 @@
-// ignore_for_file: unused_import
-
-import 'dart:collection';
-
 import 'package:html/dom.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
@@ -125,7 +121,7 @@ class TheQuint extends Publisher {
             "https://images.thequint.com/${element['hero-image-s3-key']}";
         var time = element["last-published-at"];
         var articleUrl = element["url"];
-        var sections = element['story']["sections"];
+        var sections = element["sections"];
         for (var section in sections) {
           tags.add(section["name"]);
         }
