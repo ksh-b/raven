@@ -6,7 +6,7 @@ import '../../../common.dart';
 
 void main() {
   Publisher publisher = TheQuint();
-  
+
   test('Extract Categories Test', () async {
     await ExtractorTest.categoriesTest(publisher);
   });
@@ -19,4 +19,3 @@ void main() {
     await ExtractorTest.searchedArticlesTest(publisher, 'politics');
   });
 }
-

@@ -81,7 +81,8 @@ class CNN extends Publisher {
   int convertToUnixTimestamp(String dateString) {
     DateFormat dateFormat =
         DateFormat("h:mm a 'EDT', EEE MMMM d, yyyy", 'en_US');
-    DateTime dateTime = dateFormat.parse(dateString.trim());
+    DateTime dateTime =
+        dateFormat.tryParse(dateString.trim()) ?? DateTime.timestamp();
     return dateTime.millisecondsSinceEpoch ~/ 1000;
   }
 
