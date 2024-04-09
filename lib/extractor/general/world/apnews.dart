@@ -1,12 +1,9 @@
-// ignore_for_file: unused_import
-
 import 'package:intl/intl.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
-import 'package:raven/utils/string.dart';
 import 'package:raven/utils/time.dart';
 
 class APNews extends Publisher {
@@ -29,7 +26,6 @@ class APNews extends Publisher {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
       document
           .querySelectorAll('.Page-header-navigation .AnClick-MainNav')
-          .take(5)
           .forEach((element) {
         map.putIfAbsent(
           element.text,

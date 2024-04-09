@@ -7,9 +7,7 @@ import '../common.dart';
 void main() {
   Publisher publisher = BleepingComputer();
 
-  test('Extract Categories Test', () async {
-
-  });
+  test('Extract Categories Test', () async {});
 
   test('Category Articles Test', () async {
     await ExtractorTest.categoryArticlesTest(publisher, category: '');
