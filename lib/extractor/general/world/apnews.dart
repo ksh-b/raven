@@ -26,7 +26,6 @@ class APNews extends Publisher {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
       document
           .querySelectorAll('.Page-header-navigation .AnClick-MainNav')
-          .take(5)
           .forEach((element) {
         map.putIfAbsent(
           element.text,
