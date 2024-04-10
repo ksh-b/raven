@@ -8,6 +8,10 @@ Feed Reader
 - Translation
 - No ads and paywalls
 
+### Note
+Users who installed from izzy on droid:
+If you are using v0.8.1, please uninstall it and install v0.8.3. You may not be able to see future updates on your app store client otherwise.
+
 ## Installation
 - Install the [latest version from releases](https://github.com/ksh-b/raven/releases/latest)
 - Or use [Obtanium](https://github.com/ImranR98/Obtainium) to install and keep up with updates
