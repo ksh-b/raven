@@ -5,3 +5,6 @@ Features:
 - Category selection for source
 - Translation
 - No ads
+
+The app scrapes the sources instead of using RSS feeds. Adding custom sources is not possible.
+Current sources include Al Jazeera, BBC, Reuters, etc. More sources would be added overtime.
