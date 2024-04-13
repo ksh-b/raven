@@ -93,6 +93,7 @@ class _SettingsPageState extends State<SettingsPage> {
           SwitchListTile(
             secondary: Icon(Icons.translate_rounded),
             title: Text('Translate'),
+            subtitle: Text('simplytranslate.org'),
             value: Store.translate,
             onChanged: (value) {
               setState(() {
