@@ -232,38 +232,38 @@ class _OptionsPopupState extends State<OptionsPopup> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 16,
-            ),
-            TextField(
-              onChanged: _filterOptions,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-              ),
-            ),
-            Flexible(
-              fit: FlexFit.loose,
-              child: ListView(
-                children: filteredOptions.map((it) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: Container(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: ListBody(
+            children: [
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: filteredOptions.length+1,
+                itemBuilder: (BuildContext context, int index) {
+                  if(index==0) {
+                    return widget.options.length>5?TextField(
+                      onChanged: _filterOptions,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                      ),
+                    ):SizedBox.shrink();
+                  }
                   return ListTile(
-                    title: Text(it),
+                    title: Text(filteredOptions[index-1]),
                     onTap: () {
-                      widget.callback(it);
+                      widget.callback(filteredOptions[index-1]);
                       Navigator.of(context).pop();
                     },
                   );
-                }).toList(),
+                },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
