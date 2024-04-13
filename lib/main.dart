@@ -1,3 +1,5 @@
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:raven/model/user_subscription.dart';
@@ -10,6 +12,12 @@ Future<void> main() async {
   Hive.registerAdapter(UserSubscriptionAdapter());
   await Hive.openBox('subscriptions');
   await Hive.openBox('settings');
+
+  if (Store.sdkVersion==-1) {
+    await DeviceInfoPlugin().androidInfo.then((value) {
+      Store.sdkVersion = value.version.sdkInt;
+    });
+  }
   runApp(const MyApp());
 }
 
@@ -21,10 +29,17 @@ class MyApp extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: Store.settings.listenable(),
       builder: (context, box, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: MyHomePage(),
-          theme: ThemeProvider.getCurrentTheme(),
+        return DynamicColorBuilder(
+          builder: (lightDynamic, darkDynamic) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: MyHomePage(),
+              theme: ThemeProvider().getCurrentTheme(
+                lightScheme: lightDynamic,
+                darkScheme: darkDynamic,
+              ),
+            );
+          },
         );
       },
     );

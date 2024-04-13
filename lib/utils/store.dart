@@ -89,6 +89,22 @@ class Store {
     settings.put("themeColor", color);
   }
 
+  static int get materialYouColor {
+    return settings.get("materialYouColor", defaultValue: -1);
+  }
+
+  static set materialYouColor(int color) {
+    settings.put("materialYouColor", color);
+  }
+
+  static int get sdkVersion {
+    return settings.get("sdkVersion", defaultValue: -1);
+  }
+
+  static set sdkVersion(int version) {
+    settings.put("sdkVersion", version);
+  }
+
   static String get ladderUrl {
     return ladders[ladderSetting] ?? ladders.keys.first;
   }

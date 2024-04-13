@@ -45,7 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 (String option) {
                   Store.themeColorSetting = option;
                 },
-                ThemeProvider.colors.keys.toList(),
+                ThemeProvider().colorOptions(),
               );
             },
           ),
