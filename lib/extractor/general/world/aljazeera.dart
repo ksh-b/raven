@@ -105,7 +105,7 @@ class AlJazeera extends Publisher {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
-      var articlesData = data["data"]["articles"];
+      var articlesData = data["data"]["articles"] ?? [];
       for (var element in articlesData) {
         var title = element['title'];
         var author =
