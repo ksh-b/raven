@@ -45,13 +45,17 @@ class APNews extends Publisher {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
       var isLive =
           document.querySelectorAll("gu-island[name=PulsingDot]").isNotEmpty;
+      var content = isLive
+          ? document.querySelector('#liveblog-body')?.outerHtml
+          : document.querySelector('.RichTextStoryBody')?.outerHtml ?? "";
+      if (content!=null && content.isEmpty) {
+        content = document.querySelector('.VideoPage-pageSubHeading')?.outerHtml;
+      }
       return newsArticle.fill(
         excerpt:
             document.querySelector('div[data-gu-name="standfirst"] p')?.text ??
                 "",
-        content: isLive
-            ? document.querySelector('#liveblog-body')?.outerHtml
-            : document.querySelector('.RichTextStoryBody')?.outerHtml ?? "",
+        content: content,
         author: document.querySelector('a[rel="author"]')?.text ?? "",
         tags: [
           document.querySelector('.content__label__link span')?.text ?? ""

@@ -111,7 +111,7 @@ class BBC extends Publisher {
       for (var article in articles) {
         var title = article['headline'];
         var author = article['contributor'] ?? "";
-        var thumbnail = article["image"]["src"];
+        var thumbnail = article["image"]!=null? article["image"]["src"] : "";
         var time = convertToIso8601(article["timestamp"]);
         var articleUrl = article['url'];
         var excerpt = "";

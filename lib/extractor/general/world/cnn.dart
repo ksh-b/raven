@@ -52,13 +52,16 @@ class CNN extends Publisher {
       var timestamp =
           document.querySelector('.timestamp')?.text.split("\n")[2].trim() ??
               "";
+      if (timestamp.isEmpty) {
+        timestamp = document.querySelector(".timeAlert")?.text ?? "";
+      }
       var live = document.querySelector("#posts-and-button");
       return newsArticle.fill(
           excerpt: "",
           content: live != null
               ? live.outerHtml
               : document
-                      .querySelector('.article__content,.video-resource')
+                      .querySelector('.article__content,.video-resource,article[data-position]')
                       ?.outerHtml ??
                   "",
           author: document.querySelector('.byline__name')?.text ?? "",
@@ -67,7 +70,7 @@ class CNN extends Publisher {
                   ?.attributes["src"] ??
               "",
           publishedAt: live != null
-              ? MapEntry(-1, "")
+              ? parseDateString(timestamp)
               : parseUnixTime(convertToUnixTimestamp(timestamp) * 1000),
           tags: document
               .querySelectorAll(
