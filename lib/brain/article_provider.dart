@@ -47,6 +47,7 @@ class ArticleProvider {
               page: page_,
             ).then(
               (value) {
+                if (value.isNotEmpty)
                 collectPublisherArticles(
                   subscriptionArticles,
                   value,
@@ -62,6 +63,7 @@ class ArticleProvider {
             page: page_,
           ).then(
             (value) {
+              if (value.isNotEmpty)
               collectPublisherArticles(
                 subscriptionArticles,
                 value,

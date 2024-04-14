@@ -37,7 +37,8 @@ class TheQuint extends Publisher {
         );
       });
     }
-    return map..removeWhere((key, value) => key == "Videos");
+    var unsupported = ["Videos", "The Quint Lab", "Graphic Novels"];
+    return map..removeWhere((key, value) => unsupported.contains(key));
   }
 
   @override
