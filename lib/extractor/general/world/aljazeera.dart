@@ -23,12 +23,26 @@ class AlJazeera extends Publisher {
   Category get mainCategory => Category.world;
 
   Future<Map<String, String>> extractCategories() async {
-    return {
-      "Features": "features",
-      "Economy": "economy",
-      "Science & Technology": "science-and-technology",
-      "Sport": "sports",
-    };
+    Map<String, String> map = {};
+    var response = await http.get(Uri.parse(homePage));
+    if (response.statusCode == 200) {
+      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      document
+          .querySelectorAll(".header-menu .menu__item--aje a")
+          .forEach((element) {
+        map.putIfAbsent(
+          element.text.trim(),
+              () {
+            return element.attributes["href"]!
+                .replaceAll(homePage, "")
+                .replaceAll("tag/", "")
+                .replaceAll("/", "");
+          },
+        );
+      });
+    }
+    var unsupported = ["Opinion","Investigations","Interactives","In Pictures","Podcasts",];
+    return map..removeWhere((key, value) => unsupported.contains(key));
   }
 
   @override
@@ -36,13 +50,14 @@ class AlJazeera extends Publisher {
     var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
-
-      var article = document.getElementById("main-content-area");
+      var more = document.querySelector(".more-on")?.innerHtml ?? "";
+      var article = document.querySelector("#main-content-area");
       var thumbnailElement = article?.querySelector('img');
-      var content = article
-          ?.querySelectorAll('.wysiwyg p')
-          .map((e) => e.innerHtml)
-          .join("<br><br>");
+      var content = document.querySelector('.wysiwyg--all-content')?.innerHtml ?? "";
+      if (content.isEmpty) {
+        content = article?.querySelector(".article__subhead")?.innerHtml ?? "";
+      }
+      content = content.replaceAll(more, "");
       var thumbnail = "$homePage${thumbnailElement?.attributes["src"]}";
       return newsArticle.fill(
         content: content,
@@ -68,7 +83,7 @@ class AlJazeera extends Publisher {
     Set<NewsArticle> articles = {};
 
     if (category == "/") {
-      category = "features";
+      category = "news";
     }
 
     var url = Uri.parse(
