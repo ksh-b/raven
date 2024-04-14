@@ -26,12 +26,12 @@ class ExtractorTest {
         var article = categoryArticles.first;
         expect(article, isNotNull);
         expect(article, isA<NewsArticle>());
-        expect(article.title, isNotEmpty);
+        expect(article.title, isNotEmpty, reason: "$article");
 
         await publisher.article(article).then((value) {
           print(article);
           expect(value, isNotNull);
-          expect(value.publishedAt.key, isNonNegative);
+          expect(value.publishedAt.key, isNonNegative, reason: article.url);
           expect(value.content, isNotEmpty, reason: article.url);
         },);
       }
