@@ -156,7 +156,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
   String getSelectedCategories(String newsSource) {
     var categories = Store.selectedSubscriptions
         .where((element) => element.publisher == newsSource)
-        .map((e) => e.category != "/" ? e.category.split("/").last : e.category)
+        .map((e) => e.category != "/" ? e.category.split("/").where((i) => i.isNotEmpty).last : e.category)
         .join(", ");
     return categories;
   }
