@@ -3,7 +3,6 @@ import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/utils/store.dart';
-import 'package:worker_manager/worker_manager.dart';
 
 class ArticleProvider {
   int few = 5;
@@ -16,7 +15,7 @@ class ArticleProvider {
   }
 
   Future<List<NewsArticle>> loadPage(int page, {String? query}) async {
-    List<Future<Set<NewsArticle>>> futures = [];
+    List<Future> futures = [];
     List<NewsArticle> newsArticles = [];
     List<NewsArticle> subscriptionArticles = [];
     List<UserSubscription> subscriptions = Store.selectedSubscriptions;
@@ -43,46 +42,39 @@ class ArticleProvider {
             : page;
 
         if (query != null) {
-          futures.add(
-            workerManager.execute<Set<NewsArticle>>(
-              () async {
-                return publisher.searchedArticles(
-                  searchQuery: query,
-                  page: page_,
+          futures.add(publisher.searchedArticles(
+              searchQuery: query,
+              page: page_,
+            ).then(
+              (value) {
+                collectPublisherArticles(
+                  subscriptionArticles,
+                  value,
+                  "${value.first.publisher.name}~${value.first.category}",
+                  page,
                 );
               },
-              priority: WorkPriority.immediately,
             ),
           );
         } else {
-          futures.add(
-            workerManager.execute<Set<NewsArticle>>(
-              () async {
-                return publisher.categoryArticles(
-                  category: subscription.category,
-                  page: page_,
-                );
-              },
-              priority: WorkPriority.immediately,
-            ),
-          );
+          futures.add(publisher.categoryArticles(
+            category: subscription.category,
+            page: page_,
+          ).then(
+            (value) {
+              collectPublisherArticles(
+                subscriptionArticles,
+                value,
+                "${value.first.publisher.name}~${value.first.category}",
+                page,
+              );
+            },
+          ),);
         }
       }
     }
-    if (needFresh) {
-      await Future.wait(futures).then((values) {
-        for (Set<NewsArticle> value in values) {
-          if (value.isNotEmpty) {
-            collectPublisherArticles(
-              subscriptionArticles,
-              value,
-              "${value.first.publisher.name}~${value.first.category}",
-              page,
-            );
-          }
-        }
-      });
-    }
+    if (needFresh)
+      await Future.wait(futures);
     newsArticles.addAll(subscriptionArticles);
     return newsArticles;
   }
