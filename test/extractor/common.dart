@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 
@@ -16,6 +16,7 @@ class ExtractorTest {
       final Map<String, String> categories = await publisher.categories;
 
       for (String category in categories.values) {
+        print(category);
         expect(category, isNotNull);
         final categoryArticles =
             await publisher.categoryArticles(category: category, page: 1);
@@ -23,19 +24,16 @@ class ExtractorTest {
         expect(categoryArticles, isNotEmpty, reason: category);
 
         var article = categoryArticles.first;
-        print("<<<$article>>>");
         expect(article, isNotNull);
         expect(article, isA<NewsArticle>());
         expect(article.title, isNotEmpty);
-        if (article.publishedAt.key == 0) {
-          print("date format issue<<<${article.publishedAt.key}>>>");
-        }
 
-        var articleFull = await publisher.article(article);
-        expect(articleFull, isNotNull);
-        if (articleFull.content.isEmpty) {
-          print("Content was empty<<<\n$article>>>");
-        }
+        await publisher.article(article).then((value) {
+          print(article);
+          expect(value, isNotNull);
+          expect(value.publishedAt.key, isNonNegative);
+          expect(value.content, isNotEmpty, reason: article.url);
+        },);
       }
     }
   }

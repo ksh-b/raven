@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:raven/extractor/general/national/india/thequint.dart';
 import 'package:raven/model/publisher.dart';
 
