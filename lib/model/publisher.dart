@@ -1,3 +1,4 @@
+import 'package:raven/extractor/general/national/india/thehindu.dart';
 import 'package:raven/extractor/general/national/india/thequint.dart';
 import 'package:raven/extractor/general/national/india/thewire.dart';
 import 'package:raven/extractor/general/world/aljazeera.dart';
@@ -24,6 +25,7 @@ Map<String, Publisher> publishers = {
   "Engadget": Engadget(),
   "Reuters": Reuters(),
   "The Guardian": TheGuardian(),
+  "The Hindu": TheHindu(),
   "The Verge": TheVerge(),
   "The Quint": TheQuint(),
   "The Wire": TheWire(),
