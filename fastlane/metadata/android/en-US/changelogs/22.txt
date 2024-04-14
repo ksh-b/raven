@@ -1,0 +1,10 @@
+## [0.9.0] - 2024-04-14
+
+### Added:
+- Source: The Hindu
+- Source: The Indian Express
+- Material You theme (Android S+)
+
+### Changed:
+- Minor layout changes in Settings screen
+- Updated extractors: AlJazeera, APNews, BBC, CNN
