@@ -50,6 +50,10 @@ class TheIndianExpress extends Publisher {
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       var content = document.querySelector("#pcl-full-content")?.innerHtml ?? "";
+      var ads = ".osv-ad-class,.ad-slot,.subscriber_hide,.adboxtop,.pdsc-related-modify";
+      document.querySelectorAll(ads).forEach((ad) {
+        content = content.replaceAll(ad.innerHtml, "");
+      },);
       var thumbnail = document.querySelector(".custom-caption img")?.attributes["content"];
       var excerpt = document.querySelector(".synopsis")?.text;
       var timestamp = document.querySelector("span[itemprop=dateModified]")?.attributes["content"];
@@ -96,7 +100,7 @@ class TheIndianExpress extends Publisher {
         timestamp = timestamp.contains("Updated:")?timestamp.split("Updated:")[1].trim():timestamp;
         articles.add(NewsArticle(
             publisher: this,
-            title: title ?? "",
+            title: title,
             content: "",
             excerpt: excerpt,
             author:  "",
