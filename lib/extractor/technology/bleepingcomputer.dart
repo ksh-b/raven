@@ -71,8 +71,10 @@ class BleepingComputer extends Publisher {
         String? content = "";
         String? date = articleElement.querySelector(".bc_news_date")?.text;
         String? time = articleElement.querySelector(".bc_news_time")?.text;
-        String parsedTime =
-            convertToIso8601("$date $time", "MMMM dd, yyyy hh:mm a");
+        MapEntry<int, String> parsedTime = parseDateString(
+          "$date $time",
+          format: "MMMM dd, yyyy hh:mm a",
+        );
 
         articles.add(NewsArticle(
             publisher: this,
@@ -82,7 +84,7 @@ class BleepingComputer extends Publisher {
             author: author ?? "",
             url: url?.replaceFirst(homePage, "") ?? "",
             thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(parsedTime),
+            publishedAt: parsedTime,
             tags: tags,
             category: category));
       }

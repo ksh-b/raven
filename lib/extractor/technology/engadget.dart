@@ -67,7 +67,7 @@ class Engadget extends Publisher {
             articleElement.querySelector("h2,h4 a")?.attributes["href"];
         String? thumbnail =
             articleElement.querySelector("img[width]")?.attributes["src"];
-        String parsedTime = convertToIso8601(date, "MM.dd.yyyy");
+        MapEntry<int, String> parsedTime = parseDateString(date, format: "MM.dd.yyyy");
 
         articles.add(NewsArticle(
             publisher: this,
@@ -77,7 +77,7 @@ class Engadget extends Publisher {
             author: author,
             url: url ?? "",
             thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(parsedTime),
+            publishedAt: parsedTime,
             tags: [category],
             category: category));
       }
@@ -105,7 +105,7 @@ class Engadget extends Publisher {
         String? url = articleElement.querySelector("h4 a")?.attributes["href"];
         String? thumbnail =
             articleElement.querySelector(".thmb")?.attributes["src"];
-        String parsedTime = convertToIso8601("$date", "MM.dd.yyyy");
+        MapEntry<int, String> parsedTime = parseDateString(date??"", format: "MM.dd.yyyy");
 
         articles.add(NewsArticle(
             publisher: this,
@@ -116,7 +116,7 @@ class Engadget extends Publisher {
             url: Uri.parse(url!)
                 .path, // Parse URL and get path, use "" if url is null
             thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(parsedTime),
+            publishedAt: parsedTime,
             category: searchQuery));
       }
     }

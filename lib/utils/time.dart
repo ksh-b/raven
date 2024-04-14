@@ -1,45 +1,37 @@
 import 'package:intl/intl.dart';
 
-MapEntry<int, String> parseDateString(String timestamp) {
+MapEntry<int, String> parseDateString(String timestamp, {String? format}) {
   try {
-    int differenceInSeconds = calculateDifferenceInSeconds(timestamp);
-    return formatTimeDifference(differenceInSeconds);
+    if (format!=null) {
+      DateFormat inputFormat = DateFormat(format);
+      DateTime parsedTime = inputFormat.parse(timestamp.replaceFirst("pm", "PM").replaceFirst("am", "AM"));
+      return _formatTimeDifference(DateTime.now().difference(parsedTime).inSeconds);
+    }
+    int differenceInSeconds = _calculateDifferenceInSeconds(timestamp);
+    return _formatTimeDifference(differenceInSeconds);
   } catch (e) {
-    return MapEntry(0, timestamp);
+    return MapEntry(-1, timestamp);
   }
 }
 
 MapEntry<int, String> parseUnixTime(int unixTime) {
   try {
     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(unixTime);
-    DateTime now = DateTime.now();
-    int differenceInSeconds = now.difference(dateTime).inSeconds;
-    return formatTimeDifference(differenceInSeconds);
+    return _formatTimeDifference(DateTime.now().difference(dateTime).inSeconds);
   } catch (e) {
-    return MapEntry(0, unixTime.toString());
+    return MapEntry(-1, unixTime.toString());
   }
 }
 
-int calculateDifferenceInSeconds(String timestamp) {
-  if (timestamp.contains("ago")) {
-    if (timestamp.startsWith("a ")) {
-      timestamp = timestamp.replaceFirst("a ", "1 ");
-    }
-    return convertTimeStringToSeconds(timestamp);
-  } else {
-    DateTime dateTime = DateTime.parse(timestamp);
-    DateTime now = DateTime.now();
-    return now.difference(dateTime).inSeconds;
-  }
-}
-
-MapEntry<int, String> formatTimeDifference(int differenceInSeconds) {
+MapEntry<int, String> _formatTimeDifference(int differenceInSeconds) {
   const int minute = 60;
   const int hour = 60 * minute;
   const int day = 24 * hour;
   const int month = 30 * day;
 
-  if (differenceInSeconds < 1) {
+  if (differenceInSeconds == -1) {
+    return MapEntry(differenceInSeconds, '');
+  } else if (differenceInSeconds < 1) {
     return MapEntry(differenceInSeconds, 'just now');
   } else if (differenceInSeconds < minute) {
     return MapEntry(differenceInSeconds, '$differenceInSeconds seconds ago');
@@ -65,7 +57,20 @@ MapEntry<int, String> formatTimeDifference(int differenceInSeconds) {
   }
 }
 
-int convertTimeStringToSeconds(String timeString) {
+int _calculateDifferenceInSeconds(String timestamp) {
+  if (timestamp.contains("ago")) {
+    if (timestamp.startsWith("a ")) {
+      timestamp = timestamp.replaceFirst("a ", "1 ");
+    }
+    return _convertTimeStringToSeconds(timestamp);
+  } else {
+    DateTime dateTime = DateTime.parse(timestamp);
+    DateTime now = DateTime.now();
+    return now.difference(dateTime).inSeconds;
+  }
+}
+
+int _convertTimeStringToSeconds(String timeString) {
   List<String> words = timeString.split(' ');
   int value = int.parse(words[0]);
   String unit = words[1].toLowerCase();
@@ -91,12 +96,3 @@ int convertTimeStringToSeconds(String timeString) {
   return seconds;
 }
 
-String convertToIso8601(String inputTime, String inputFormatString) {
-  try {
-    DateFormat inputFormat = DateFormat(inputFormatString);
-    DateTime parsedTime = inputFormat.parse(inputTime);
-    return parsedTime.toString();
-  } catch (e) {
-    return inputTime;
-  }
-}

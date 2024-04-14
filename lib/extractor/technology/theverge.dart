@@ -131,7 +131,7 @@ class TheVerge extends Publisher {
         var excerpt = element["htmlSnippet"];
         var thumbnail = element["pagemap"]["cse_image"][0]["src"];
         var time = element["snippet"].split("...")[0];
-        var dateEntry = parseDateString(convertToIso8601(time, 'MMM dd, yyyy'));
+        var dateEntry = parseDateString(time, format: 'MMM dd, yyyy');
         articles.add(NewsArticle(
             publisher: this,
             title: title ?? "",
