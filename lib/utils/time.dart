@@ -76,10 +76,12 @@ int _convertTimeStringToSeconds(String timeString) {
   String unit = words[1].toLowerCase();
   int seconds;
   switch (unit) {
+    case 'sec':
     case 'second':
     case 'seconds':
       seconds = value;
       break;
+    case 'min':
     case 'minute':
     case 'minutes':
       seconds = value * 60;
