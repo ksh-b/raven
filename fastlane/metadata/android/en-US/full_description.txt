@@ -1,6 +1,7 @@
 A news reader app made with Flutter.
 
 Features:
+
 - Multiple sources
 - Category selection for source
 - Translation
