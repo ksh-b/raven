@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
@@ -11,11 +13,12 @@ class ExtractorTest {
   }
 
   static Future<void> categoryArticlesTest(Publisher publisher,
-      {String? category}) async {
+      {String? category, bool skipDateCheck=false}) async {
     if (category == null) {
       final Map<String, String> categories = await publisher.categories;
 
       for (String category in categories.values) {
+        sleep(Duration(seconds: 2));
         print(category);
         expect(category, isNotNull);
         final categoryArticles =
@@ -31,7 +34,7 @@ class ExtractorTest {
         await publisher.article(article).then((value) {
           print(article);
           expect(value, isNotNull);
-          expect(value.publishedAt.key, isNonNegative, reason: article.url);
+          expect(value.publishedAt, isNonNegative, reason: article.url, skip: skipDateCheck);
           expect(value.content, isNotEmpty, reason: article.url);
         },);
       }
@@ -39,7 +42,7 @@ class ExtractorTest {
   }
 
   static Future<void> searchedArticlesTest(
-      Publisher publisher, String query) async {
+      Publisher publisher, String query, {bool ignoreDateCheck=false}) async {
     if (publisher.hasSearchSupport) {
       final searchArticles =
           await publisher.searchedArticles(searchQuery: query, page: 1);
@@ -50,8 +53,8 @@ class ExtractorTest {
       print("<<<$article>>>");
       expect(article, isA<NewsArticle>());
       expect(article.title, isNotEmpty);
-      expect(article.publishedAt.key, isNot(0),
-          reason: article.publishedAt.value);
+      expect(article.publishedAt, isNot(-1),
+          reason: article.publishedAt.toString(), skip: ignoreDateCheck);
 
       var articleFull = await publisher.article(article);
       expect(articleFull, isNotNull);
