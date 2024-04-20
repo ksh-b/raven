@@ -4,7 +4,6 @@ import 'package:raven/model/publisher.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
-import 'package:raven/utils/time.dart';
 
 class TheQuint extends Publisher {
   @override
