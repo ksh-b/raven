@@ -70,8 +70,8 @@ class CNN extends Publisher {
                   ?.attributes["src"] ??
               "",
           publishedAt: live != null
-              ? parseDateString(timestamp)
-              : parseUnixTime(convertToUnixTimestamp(timestamp) * 1000),
+              ? stringToUnix(timestamp)
+              : stringToUnix(timestamp.trim(), format: "h:mm a 'EDT', EEE MMMM d, yyyy"),
           tags: document
               .querySelectorAll(
                   ".header__nav-container a[class='header__nav-item-link'][href]")
@@ -79,14 +79,6 @@ class CNN extends Publisher {
               .toList());
     }
     return newsArticle;
-  }
-
-  int convertToUnixTimestamp(String dateString) {
-    DateFormat dateFormat =
-        DateFormat("h:mm a 'EDT', EEE MMMM d, yyyy", 'en_US');
-    DateTime dateTime =
-        dateFormat.tryParse(dateString.trim()) ?? DateTime.timestamp();
-    return dateTime.millisecondsSinceEpoch ~/ 1000;
   }
 
   @override
@@ -127,7 +119,7 @@ class CNN extends Publisher {
           url: article.querySelector("a")?.attributes["href"] ?? "",
           tags: [category],
           thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
-          publishedAt: MapEntry(-1, ""),
+          publishedAt: -1,
           category: category,
         ));
       }
@@ -167,7 +159,7 @@ class CNN extends Publisher {
           author: author,
           url: articleUrl,
           thumbnail: thumbnail,
-          publishedAt: parseDateString(time?.trim() ?? ""),
+          publishedAt: stringToUnix(time?.trim() ?? ""),
           category: searchQuery,
         ));
       }

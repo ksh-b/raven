@@ -65,7 +65,7 @@ class TheVerge extends Publisher {
         content: content,
         author: author,
         thumbnail: thumbnail,
-        publishedAt: parseDateString(time?.trim() ?? ""),
+        publishedAt: stringToUnix(time?.trim() ?? ""),
       );
     }
     return newsArticle;
@@ -108,7 +108,7 @@ class TheVerge extends Publisher {
             author: author ?? "",
             url: articleUrl?.replaceFirst(homePage, "") ?? "",
             thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(time?.trim() ?? ""),
+            publishedAt: stringToUnix(time?.trim() ?? ""),
             category: category));
       }
     }
@@ -119,7 +119,7 @@ class TheVerge extends Publisher {
       String searchQuery, int page) async {
     Set<NewsArticle> articles = {};
     var response = await http
-        .get(Uri.parse('$homePage/api/search?q=$searchQuery&page=$page'));
+        .get(Uri.parse('$homePage/api/search?q=$searchQuery&page=${page - 1}'));
 
     if (response.statusCode == 200) {
       var document = json.decode(response.body);
@@ -131,7 +131,7 @@ class TheVerge extends Publisher {
         var excerpt = element["htmlSnippet"];
         var thumbnail = element["pagemap"]["cse_image"][0]["src"];
         var time = element["snippet"].split("...")[0];
-        var dateEntry = parseDateString(time, format: 'MMM dd, yyyy');
+        var dateEntry = stringToUnix(time, format: 'MMM d, yyyy');
         articles.add(NewsArticle(
             publisher: this,
             title: title ?? "",

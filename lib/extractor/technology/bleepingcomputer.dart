@@ -71,7 +71,7 @@ class BleepingComputer extends Publisher {
         String? content = "";
         String? date = articleElement.querySelector(".bc_news_date")?.text;
         String? time = articleElement.querySelector(".bc_news_time")?.text;
-        MapEntry<int, String> parsedTime = parseDateString(
+        int parsedTime = stringToUnix(
           "$date $time",
           format: "MMMM dd, yyyy hh:mm a",
         );

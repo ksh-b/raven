@@ -84,7 +84,7 @@ class Reuters extends Publisher {
             author: author ?? "",
             url: articleUrl,
             thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(time?.trim() ?? ""),
+            publishedAt: stringToUnix(time?.trim() ?? ""),
             tags: List<String>.from(tags),
             category: category));
       }

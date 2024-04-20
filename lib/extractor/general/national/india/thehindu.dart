@@ -65,7 +65,7 @@ class TheHindu extends Publisher {
         content: content.map((e) => e.innerHtml,).join().replaceFirst(related, "").trim(),
         thumbnail: thumbnail,
         excerpt: excerpt,
-        publishedAt: parseDateString(timestamp??"", format: "MMMM d, yyyy hh:mm a"),
+        publishedAt: stringToUnix(timestamp??"", format: "MMMM d, yyyy hh:mm a"),
         tags: tags
       );
     }
@@ -88,6 +88,8 @@ class TheHindu extends Publisher {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       var articleElements = [];
       articleElements = document.querySelectorAll(".result .element");
+      if(articleElements.isEmpty)
+        articleElements = document.querySelectorAll(".element");
       for (var article in articleElements) {
         List<String> tags = [];
         var title = article.querySelector(".title a")?.text.trim();
@@ -105,7 +107,7 @@ class TheHindu extends Publisher {
             url: articleUrl.replaceFirst(homePage, ""),
             tags: tags,
             thumbnail: thumbnail ?? "",
-            publishedAt: MapEntry(-1, ""),
+            publishedAt: -1,
             category: category));
       }
     }

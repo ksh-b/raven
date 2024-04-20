@@ -96,7 +96,7 @@ class TheQuint extends Publisher {
             url: articleUrl.replaceFirst(homePage, ""),
             tags: tags,
             thumbnail: thumbnail,
-            publishedAt: parseUnixTime(time),
+            publishedAt:time,
             category: category));
       }
     }
@@ -134,7 +134,7 @@ class TheQuint extends Publisher {
             author: author ?? "",
             url: articleUrl.replaceFirst(homePage, ""),
             thumbnail: thumbnail,
-            publishedAt: parseUnixTime(time),
+            publishedAt: time,
             category: searchQuery,
             tags: tags));
       }

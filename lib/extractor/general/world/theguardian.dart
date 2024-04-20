@@ -105,9 +105,9 @@ class TheGuardian extends Publisher {
               "",
           tags: [category],
           thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
-          publishedAt: parseUnixTime((int.parse(
+          publishedAt: (int.parse(
                   article.querySelector("time")?.attributes["data-timestamp"] ??
-                      "0"))
+                      "0")
               .toInt()),
           category: category,
         ));

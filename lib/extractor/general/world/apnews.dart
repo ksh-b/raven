@@ -35,7 +35,21 @@ class APNews extends Publisher {
         );
       });
     }
-    return map;
+    var unsupported = [
+      "Election 2024",
+      "Fact Check",
+      "Oddities",
+      "Newsletters",
+      "Video",
+      "Photography",
+      "AP Buyline Personal Finance",
+      "AP Buyline Shopping",
+      "Press Releases",
+    ];
+    return map
+      ..removeWhere(
+        (key, value) => unsupported.contains(key),
+      );
   }
 
   @override
@@ -48,8 +62,9 @@ class APNews extends Publisher {
       var content = isLive
           ? document.querySelector('#liveblog-body')?.outerHtml
           : document.querySelector('.RichTextStoryBody')?.outerHtml ?? "";
-      if (content!=null && content.isEmpty) {
-        content = document.querySelector('.VideoPage-pageSubHeading')?.outerHtml;
+      if (content != null && content.isEmpty) {
+        content =
+            document.querySelector('.VideoPage-pageSubHeading')?.outerHtml;
       }
       return newsArticle.fill(
         excerpt:
@@ -108,7 +123,7 @@ class APNews extends Publisher {
               "",
           tags: [category],
           thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
-          publishedAt: MapEntry(-1, ""),
+          publishedAt: -1,
           category: category,
         ));
       }
@@ -147,7 +162,7 @@ class APNews extends Publisher {
                   ?.replaceFirst(homePage, "") ??
               "",
           thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
-          publishedAt: parseUnixTime(timestamp),
+          publishedAt: timestamp,
           category: searchQuery,
         ));
       }

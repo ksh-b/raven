@@ -23,23 +23,16 @@ class TheWire extends Publisher {
   Category get mainCategory => Category.india;
 
   Future<Map<String, String>> extractCategories() async {
-    Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
-    if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
-
-      document.querySelectorAll('.wire-subheader a').forEach((element) {
-        map.putIfAbsent(
-          element.text,
-          () {
-            return element.attributes["href"]!
-                .replaceFirst("/", "")
-                .replaceFirst("/all", "");
-          },
-        );
-      });
-    }
-    return map;
+    return {
+      "Politics": "category/politics",
+      "Economy": "category/economy",
+      "World": "category/world",
+      "Security": "category/security",
+      "Law": "category/law",
+      "Science": "category/science",
+      "Society": "category/society",
+      "Culture": "category/culture",
+    };
   }
 
   @override
@@ -49,7 +42,7 @@ class TheWire extends Publisher {
       category = 'home';
     }
     String apiUrl =
-        'https://cms.thewire.in/wp-json/thewire/v2/posts/$category/recent-stories?page=$page&per_page=5';
+        'https://cms.thewire.in/wp-json/thewire/v2/posts/$category/recent-stories/?page=$page&per_page=5';
     return extract(apiUrl, false, category);
   }
 
@@ -102,7 +95,7 @@ class TheWire extends Publisher {
             url: articleUrl,
             thumbnail: thumbnail ?? "",
             category: category,
-            publishedAt: parseDateString(time?.trim() ?? ""),
+            publishedAt: stringToUnix(time?.trim() ?? ""),
             tags: List<String>.from(tags)));
       }
     }

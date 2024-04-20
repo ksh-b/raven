@@ -67,7 +67,7 @@ class Engadget extends Publisher {
             articleElement.querySelector("h2,h4 a")?.attributes["href"];
         String? thumbnail =
             articleElement.querySelector("img[width]")?.attributes["src"];
-        MapEntry<int, String> parsedTime = parseDateString(date, format: "MM.dd.yyyy");
+        int parsedTime = stringToUnix(date, format: "MM.dd.yyyy");
 
         articles.add(NewsArticle(
             publisher: this,
@@ -105,7 +105,7 @@ class Engadget extends Publisher {
         String? url = articleElement.querySelector("h4 a")?.attributes["href"];
         String? thumbnail =
             articleElement.querySelector(".thmb")?.attributes["src"];
-        MapEntry<int, String> parsedTime = parseDateString(date??"", format: "MM.dd.yyyy");
+        int parsedTime = stringToUnix(date??"", format: "MM.dd.yyyy");
 
         articles.add(NewsArticle(
             publisher: this,

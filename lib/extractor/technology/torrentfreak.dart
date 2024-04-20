@@ -114,7 +114,7 @@ class TorrentFreak extends Publisher {
             author: author ?? "",
             url: articleUrl?.replaceFirst(homePage, "") ?? "",
             thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(time?.trim() ?? ""),
+            publishedAt: stringToUnix(time?.trim() ?? ""),
             tags: tags,
             category: category));
       }

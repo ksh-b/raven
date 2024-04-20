@@ -62,7 +62,7 @@ class TheIndianExpress extends Publisher {
         content: content,
         thumbnail: thumbnail,
         excerpt: excerpt,
-        publishedAt: parseDateString(timestamp??"", format: "yyyy-MM-ddTHH:mm:ssZ"),
+        publishedAt: stringToUnix(timestamp??"", format: "yyyy-MM-ddTHH:mm:ssZ"),
         tags: tags,
       );
     }
@@ -107,7 +107,7 @@ class TheIndianExpress extends Publisher {
             url: articleUrl.replaceFirst(homePage, ""),
             tags: tags,
             thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(timestamp, format: "MMMM d, yyyy HH:mm z"),
+            publishedAt: stringToUnix(timestamp, format: "MMMM d, yyyy HH:mm z"),
             category: category),
         );
       }

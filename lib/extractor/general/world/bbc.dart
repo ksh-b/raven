@@ -82,7 +82,7 @@ class BBC extends Publisher {
           author: author ?? "",
           url: articleUrl,
           thumbnail: thumbnail.replaceFirst("http:", "https:") ?? "",
-          publishedAt: parseDateString(time?.trim() ?? ""),
+          publishedAt: stringToUnix(time?.trim() ?? ""),
           tags: [category],
           category: category,
         ));
@@ -123,7 +123,7 @@ class BBC extends Publisher {
             author: author ?? "",
             url: articleUrl,
             thumbnail: thumbnail.replaceFirst("http:", "https:") ?? "",
-            publishedAt: parseDateString(time),
+            publishedAt: stringToUnix(time),
             tags: [category],
             category: category));
       }
@@ -222,24 +222,18 @@ class BBC extends Publisher {
   }) async {
     Set<NewsArticle> articles = {};
     var response = await http.get(Uri.parse(
-        "https://www.bbc.co.uk/search?q=$searchQuery&page=$page&d=news_gnl"));
+        "https://web-cdn.api.bbci.co.uk/xd/search?terms=$searchQuery&page=$page"));
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
-
-      var articleElements = document.querySelectorAll('li div[data-testid]');
-      for (var element in articleElements) {
-        var titleElement = element.querySelector('a span');
-        var thumbnailElement = element.querySelector('img');
-        var articleUrlElement = element.querySelector('a');
-        var excerptElement = element.querySelector('p[class*=Paragraph]');
-        var timeElement = element.querySelector('span[class*=MetadataText]');
-        var title = titleElement?.text;
+      var document = jsonDecode(utf8.decode(response.bodyBytes))['data'];
+      for (var element in document) {
+        var title = element['title'];
+        var thumbnail = element['indexImage']['model']['blocks']['src'];
+        var articleUrl = element['path'];
+        var excerpt = element['summary'];
+        var time = element['lastPublishedAt'];
+        var tags = element['topics'].cast<String>();
         var author = "";
-        var excerpt = excerptElement?.text;
-        var thumbnail = thumbnailElement?.attributes["src"]
-            ?.replaceFirst("http:", "https:");
-        var time = timeElement?.text;
-        var articleUrl = articleUrlElement?.attributes["href"];
+
 
         if (time != null) {
           time = convertToIso8601(time);
@@ -253,7 +247,8 @@ class BBC extends Publisher {
             author: author,
             url: articleUrl?.replaceFirst("https://www.bbc.co.uk", "") ?? "",
             thumbnail: thumbnail ?? "",
-            publishedAt: parseDateString(time?.trim() ?? ""),
+            publishedAt: stringToUnix(time?.trim() ?? ""),
+            tags: tags,
             category: searchQuery));
       }
     }

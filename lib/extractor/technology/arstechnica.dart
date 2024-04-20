@@ -79,7 +79,7 @@ class ArsTechnica extends Publisher {
             author: author ?? "",
             url: url?.replaceFirst(homePage, "") ?? "",
             thumbnail: extractUrl(thumbnail),
-            publishedAt: parseDateString(date),
+            publishedAt: stringToUnix(date),
             tags: [tag],
             category: category));
       }
