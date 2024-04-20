@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:raven/utils/time.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:raven/api/simplytranslate.dart';
@@ -101,8 +102,8 @@ class _ArticlePageState extends State<ArticlePage> {
                         textWidget("", snapshot.data!.title, titleStyle),
                         textWidget(
                             "Author", snapshot.data!.author, metadataStyle),
-                        textWidget("Published",
-                            snapshot.data!.publishedAt.value, metadataStyle),
+                        textWidget("Published",unixToString(snapshot.data!.publishedAt)
+                            , metadataStyle),
                         if (Network.shouldLoadImage(snapshot.data!.thumbnail))
                           image(snapshot),
                         textWidget("", snapshot.data!.excerpt, excerptStyle),
@@ -118,7 +119,7 @@ class _ArticlePageState extends State<ArticlePage> {
                         textWidget(
                             "Author", widget.article.author, metadataStyle),
                         textWidget("Published",
-                            widget.article.publishedAt.value, metadataStyle),
+                            unixToString(widget.article.publishedAt), metadataStyle),
                         LinearProgressIndicator(),
                         textWidget("", widget.article.excerpt, excerptStyle),
                         widget.article.content.isNotEmpty

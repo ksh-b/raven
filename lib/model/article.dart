@@ -10,7 +10,7 @@ class NewsArticle {
   String thumbnail;
   String category;
   List<String> tags;
-  MapEntry<int, String> publishedAt;
+  int publishedAt;
 
   NewsArticle({
     required this.publisher,
@@ -33,7 +33,7 @@ class NewsArticle {
     String? url,
     String? thumbnail,
     List<String>? tags,
-    MapEntry<int, String>? publishedAt,
+    int? publishedAt,
     String? category,
   }) {
     return NewsArticle(

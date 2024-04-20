@@ -7,6 +7,7 @@ import 'package:raven/pages/full_article.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/string.dart';
+import 'package:raven/utils/time.dart';
 
 class FeedPageBuilder extends StatefulWidget {
   final String? query;
@@ -135,9 +136,9 @@ class FeedCard extends StatelessWidget {
               ListTile(
                 title: Text(article.title),
                 leading: ArticlePublisherIcon(article: article),
-                subtitle: article.publishedAt.value.isNotEmpty
+                subtitle: article.publishedAt != -1
                     ? Text(
-                        article.publishedAt.value,
+                  unixToString(article.publishedAt),
                       )
                     : SizedBox.shrink(),
               ),

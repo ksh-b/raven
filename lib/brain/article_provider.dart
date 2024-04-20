@@ -98,6 +98,6 @@ class ArticleProvider {
 
     // sort - show most recent first
     subscriptionArticles
-        .sort((a, b) => a.publishedAt.key.compareTo(b.publishedAt.key));
+        .sort((a, b) => a.publishedAt.compareTo(b.publishedAt));
   }
 }
