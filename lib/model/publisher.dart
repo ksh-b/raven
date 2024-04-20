@@ -71,7 +71,6 @@ abstract class Publisher {
     return {
       'homePage': homePage,
       'iconUrl': iconUrl,
-      'categories': categories,
     };
   }
 }
