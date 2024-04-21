@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:raven/api/simplytranslate.dart';
 import 'package:raven/brain/article_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/pages/full_article.dart';
@@ -22,20 +23,14 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
   List<NewsArticle> newsArticles = [];
   bool isLoading = false;
   ArticleProvider articleProvider = ArticleProvider();
-  int page = 1;
+  int page = 0;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      articleProvider
-          .loadPage(page, query: widget.query)
-          .then((value) => setState(() {
-                newsArticles = value;
-              }));
-    });
+    refresh();
   }
 
   @override
@@ -94,7 +89,17 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
       page += 1;
       isLoading = true;
     });
-    articleProvider.loadPage(page, query: widget.query).then((value) {
+    articleProvider.loadPage(page, query: widget.query).then((value) async {
+      if (Store.shouldTranslate) {
+        var originalTitles = value.map((e) => e.title.replaceAll("\n", "")).join("\n");
+        var translated = await SimplyTranslate().translate(originalTitles, Store.languageSetting);
+        var translatedTitles = translated.split("\n");
+        if(value.length==translatedTitles.length) {
+          for(var i=0; i<value.length; i++) {
+            value[i].title = translatedTitles[i];
+          }
+        }
+      }
       setState(() {
         newsArticles += value;
       });
