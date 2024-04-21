@@ -237,19 +237,19 @@ class _OptionsPopupState extends State<OptionsPopup> {
       title: Text(widget.title),
       content: Container(
         width: double.maxFinite,
-        child: SingleChildScrollView(
-          child: ListBody(
-            children: [
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: filteredOptions.length+1,
-                itemBuilder: (BuildContext context, int index) {
-                  if(index==0) {
-                    return widget.options.length>5?TextField(
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: filteredOptions.length + 1,
+          itemBuilder: (BuildContext context, int index) {
+            if (index == 0) {
+              return widget.options.length > 5
+                  ? TextField(
                       onChanged: _filterOptions,
                       decoration: InputDecoration(
+                        icon: Icon(Icons.search_rounded),
+                        hintText: "Search with flag or text",
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.0),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
                     ):SizedBox.shrink();
@@ -265,6 +265,19 @@ class _OptionsPopupState extends State<OptionsPopup> {
               ),
             ],
           ),
+                    )
+                  : SizedBox.shrink();
+            }
+            var languageFlag = SimplyTranslate.languageFlags[filteredOptions[index - 1]] ??
+                "";
+            return ListTile(
+              title: Text(filteredOptions[index - 1]),
+              onTap: () {
+                widget.callback(filteredOptions[index - 1]);
+                Navigator.of(context).pop();
+              },
+            );
+          },
         ),
       ),
     );
