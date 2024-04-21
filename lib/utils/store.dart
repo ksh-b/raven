@@ -113,11 +113,11 @@ class Store {
     return settings.get("language", defaultValue: "English");
   }
 
-  static bool get translate {
+  static bool get shouldTranslate {
     return settings.get("translate", defaultValue: false);
   }
 
-  static set translate(bool should) {
+  static set shouldTranslate(bool should) {
     settings.put("translate", should);
   }
 }

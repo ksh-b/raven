@@ -37,7 +37,7 @@ class _ArticlePageState extends State<ArticlePage> {
       NewsArticle newsArticle, BuildContext context) async* {
     NewsArticle cArticle = await newsArticle.publisher.article(newsArticle);
 
-    if (Store.translate) {
+    if (Store.shouldTranslate) {
       var translator = SimplyTranslate();
       cArticle.title =
           await translator.translate(cArticle.title, Store.languageSetting);

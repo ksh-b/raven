@@ -94,14 +94,14 @@ class _SettingsPageState extends State<SettingsPage> {
             secondary: Icon(Icons.translate_rounded),
             title: Text('Translate'),
             subtitle: Text('simplytranslate.org'),
-            value: Store.translate,
+            value: Store.shouldTranslate,
             onChanged: (value) {
               setState(() {
-                Store.translate = value;
+                Store.shouldTranslate = value;
               });
             },
           ),
-          Store.translate
+          Store.shouldTranslate
               ? ListTile(
                   leading: Icon(Icons.language_rounded),
                   title: Text('Translate language'),
