@@ -1,1 +1,1 @@
-News reader
+This app uses APIs and web scraping to fetch news articles. RSS feeds are not supported.
