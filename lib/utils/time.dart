@@ -14,44 +14,35 @@ int stringToUnix(String timestamp, {String? format}) {
   }
 }
 
-// int unixToEpoch(int unixTime) {
-//   try {
-//     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(unixTime);
-//     return dateTime.millisecondsSinceEpoch;
-//   } catch (e) {
-//     return -1;
-//   }
-// }
-
-String unixToString(int unix) {
+String unixToString(int then) {
   const int minute = 60;
   const int hour = 60 * minute;
   const int day = 24 * hour;
   const int month = 30 * day;
+  var now = DateTime.now().millisecondsSinceEpoch;
+  var timePassed = (now - then)/1000;
 
-  var x = (DateTime.now().millisecondsSinceEpoch/1000) - unix;
-
-  if (unix == -1) {
+  if (then == -1) {
     return '';
-  } else if (x < 1) {
+  } else if (timePassed < 1) {
     return 'just now';
-  } else if (x < minute) {
-    return '$x seconds ago';
-  } else if (x < hour) {
-    int minutes = (x / minute).floor();
+  } else if (timePassed < minute) {
+    return '$timePassed seconds ago';
+  } else if (timePassed < hour) {
+    int minutes = (timePassed / minute).floor();
     return '$minutes ${(minutes == 1) ? 'minute' : 'minutes'} ago';
-  } else if (x < day) {
-    int hours = (x / hour).floor();
+  } else if (timePassed < day) {
+    int hours = (timePassed / hour).floor();
     return '$hours ${(hours == 1) ? 'hour' : 'hours'} ago';
-  } else if (x < month) {
-    int days = (x / day).floor();
+  } else if (timePassed < month) {
+    int days = (timePassed / day).floor();
     if (days == 1) {
       return 'yesterday';
     } else {
       return '$days days ago';
     }
   } else {
-    int months = (x / month).floor();
+    int months = (timePassed / month).floor();
     return '$months ${(months == 1) ? 'month' : 'months'} ago';
   }
 }
