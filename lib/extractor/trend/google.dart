@@ -1,3 +1,4 @@
+import 'package:hive/hive.dart';
 import 'package:raven/model/country.dart';
 import 'package:raven/model/trends.dart';
 
@@ -11,14 +12,17 @@ import 'package:raven/utils/store.dart';
 class GoogleTrend extends Trend {
   @override
   String get url =>
-      "https://trends.google.com/trends/api/dailytrends?geo=${countryCodes[Store.countrySetting]}";
+      "https://trends.google.com/trends/api/dailytrends?geo=";
 
   @override
   String get locator => "";
 
   @override
   Future<List<String>> get topics async {
-    var response = await http.get(Uri.parse(url));
+    var country = "US";
+    if(Hive.isBoxOpen("settings"))
+      country = "${countryCodes[Store.countrySetting]}";
+    var response = await http.get(Uri.parse(url+country));
     List<String> queries = [];
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
