@@ -4,7 +4,6 @@ import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/extractor/trend/apnews.dart';
-import 'package:raven/extractor/trend/brave.dart';
 import 'package:raven/extractor/trend/google.dart';
 import 'package:raven/extractor/trend/none.dart';
 import 'package:raven/extractor/trend/yahoo.dart';
@@ -12,7 +11,6 @@ import 'package:raven/extractor/trend/yahoo.dart';
 Map<String, Trend> trends = {
   "None": NoneTrend(),
   "APNews": APNewsTrend(),
-  "Brave": BraveTrend(),
   "Google": GoogleTrend(),
   "Yahoo": YahooTrend(),
 };
