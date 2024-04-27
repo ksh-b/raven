@@ -2,152 +2,106 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:raven/api/simplytranslate.dart';
-import 'package:raven/brain/article_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/pages/full_article.dart';
+import 'package:raven/pages/search.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/string.dart';
 import 'package:raven/utils/theme_provider.dart';
 import 'package:raven/utils/time.dart';
 
-class FeedPageBuilder extends StatefulWidget {
+class SavedPage extends StatefulWidget {
   final String? query;
   final bool saved;
 
-  const FeedPageBuilder({super.key, this.query, this.saved = false});
+  const SavedPage({super.key, this.query, this.saved = false});
 
   @override
-  State<FeedPageBuilder> createState() => _FeedPageBuilderState();
+  State<SavedPage> createState() => _SavedPageState();
 }
 
-class _FeedPageBuilderState extends State<FeedPageBuilder> {
-  List<NewsArticle> newsArticles = [];
-  bool isLoading = false;
-  ArticleProvider articleProvider = ArticleProvider();
-  int page = 0;
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
-
+class _SavedPageState extends State<SavedPage> {
   @override
   void initState() {
     super.initState();
-    refresh();
   }
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      key: _refreshIndicatorKey,
-      onRefresh: refresh,
-      child: ValueListenableBuilder(
-        valueListenable: Store.subscriptions.listenable(),
-        builder: (BuildContext context, box, Widget? child) {
-          if (Store.selectedSubscriptions.isNotEmpty) {
-            return ListView.builder(
-              itemCount: newsArticles.length + 2,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return isLoading
-                      ? LinearProgressIndicator()
-                      : SizedBox.shrink();
-                }
-                if (index - 1 < newsArticles.length) {
-                  var article = newsArticles[index - 1];
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: Text("x"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: MySearchDelegate(),
+                );
+              },
+            ),
+          ],),
+
+        body: ValueListenableBuilder(
+          valueListenable: Store.saved.listenable(),
+          builder: (BuildContext context, box, Widget? child) {
+            if (Store.saved.isNotEmpty) {
+              return ListView.builder(
+                itemCount: Store.saved.keys.length,
+                itemBuilder: (context, index) {
+                  var article = Store.saved.values.toList()[index];
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                     child: Slidable(
                       key: Key(article.url),
-                      startActionPane: ActionPane(
+                      endActionPane: ActionPane(
                         motion: ScrollMotion(),
                         children: [
                           SlidableAction(
-                            backgroundColor: ThemeProvider().getCurrentTheme().cardColor,
-                            foregroundColor: ThemeProvider().getCurrentTheme().textTheme.titleMedium!.color,
+                            backgroundColor:
+                                ThemeProvider().getCurrentTheme().cardColor,
+                            foregroundColor: ThemeProvider()
+                                .getCurrentTheme()
+                                .textTheme
+                                .titleMedium!
+                                .color,
                             onPressed: (context) {
                               article.load().then((value) {
-                                Store.saveArticle(value);
+                                Store.deleteArticle(value);
                               });
                             },
-                            icon: Icons.save,
-                            label: "Save",
+                            icon: Icons.delete,
+                            label: "Delete",
                           )
                         ],
                       ),
                       child: FeedCard(article: article),
                     ),
                   );
-                } else {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : loadMore,
-                      child: Text(isLoading ? "Loading" : "Load more"),
-                    ),
-                  );
-                }
-              },
-            );
-          }
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 64, right: 64),
-              child: Flex(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                direction: Axis.vertical,
-                children: [
-                  Icon(Icons.checklist_rounded),
-                  SizedBox(height: 32),
-                  Text("Select some subscriptions to get started")
-                ],
+                },
+              );
+            }
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 64, right: 64),
+                child: Flex(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  direction: Axis.vertical,
+                  children: [
+                    Icon(Icons.bookmark_add),
+                    SizedBox(height: 16,),
+                    Text("Swipe articles to the right on the feed page to save them.")
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
-    );
-  }
-
-  Future<void> refresh() async {
-    setState(() {
-      newsArticles = [];
-      page = 0;
-      isLoading = true;
-    });
-    articleProvider.reset();
-    loadMore();
-  }
-
-  void loadMore() {
-    setState(() {
-      page += 1;
-      isLoading = true;
-    });
-    articleProvider.loadPage(page, query: widget.query).then((value) async {
-      if (Store.shouldTranslate) {
-        var originalTitles =
-            value.map((e) => e.title.replaceAll("\n", "")).join("\n");
-        var translated = await SimplyTranslate()
-            .translate(originalTitles, Store.languageSetting);
-        var translatedTitles = translated.split("\n");
-        if (value.length == translatedTitles.length) {
-          for (var i = 0; i < value.length; i++) {
-            value[i].title = translatedTitles[i];
-          }
-        }
-      }
-      setState(() {
-        newsArticles += value;
-      });
-    }).whenComplete(
-      () {
-        setState(() {
-          isLoading = false;
-        });
-      },
     );
   }
 }

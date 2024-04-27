@@ -51,7 +51,7 @@ class ArticleProvider {
                 collectPublisherArticles(
                   subscriptionArticles,
                   value,
-                  "${value.first.publisher.name}~${value.first.category}",
+                  "${value.first.publisher}~${value.first.category}",
                   page,
                 );
               },
@@ -67,7 +67,7 @@ class ArticleProvider {
               collectPublisherArticles(
                 subscriptionArticles,
                 value,
-                "${value.first.publisher.name}~${value.first.category}",
+                "${value.first.publisher}~${value.first.category}",
                 page,
               );
             },

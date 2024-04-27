@@ -2,6 +2,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:raven/model/article.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/pages/home.dart';
 import 'package:raven/utils/store.dart';
@@ -10,8 +11,10 @@ import 'package:raven/utils/theme_provider.dart';
 Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UserSubscriptionAdapter());
+  Hive.registerAdapter(NewsArticleAdapter());
   await Hive.openBox('subscriptions');
   await Hive.openBox('settings');
+  await Hive.openBox('saved');
 
   if (Store.sdkVersion==-1) {
     await DeviceInfoPlugin().androidInfo.then((value) {

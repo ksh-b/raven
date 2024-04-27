@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raven/pages/feed.dart';
+import 'package:raven/pages/saved.dart';
 import 'package:raven/pages/settings.dart';
 import 'package:raven/pages/subscription.dart';
 
@@ -27,7 +28,12 @@ class _MyHomePageState extends State<MyHomePage> {
           NavigationDestination(
             icon: Icon(Icons.article_outlined),
             selectedIcon: Icon(Icons.article),
-            label: 'Home',
+            label: 'Feed',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bookmark_outline_rounded),
+            selectedIcon: Icon(Icons.bookmark_rounded),
+            label: 'Saved',
           ),
           NavigationDestination(
             icon: Icon(Icons.favorite_border_rounded),
@@ -45,6 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         index: _selectedIndex,
         children: [
           const FeedPage(),
+          const SavedPage(),
           const SubscriptionsPage(),
           const SettingsPage(),
         ],

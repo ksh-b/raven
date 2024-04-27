@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:raven/model/article.dart';
 import 'package:raven/model/trends.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/utils/theme_provider.dart';
@@ -11,6 +12,8 @@ class Store {
     "archive.ph": "https://archive.ph",
     "Web Archive": "https://web.archive.org/web/*",
   };
+
+  //// Subscriptions ////
 
   static Box get subscriptions {
     return Hive.box("subscriptions");
@@ -32,6 +35,8 @@ class Store {
   static set customSubscriptions(List newSubscriptions) {
     subscriptions.put("custom", newSubscriptions);
   }
+
+  //// Settings ////
 
   static Box get settings {
     return Hive.box("settings");
@@ -120,4 +125,24 @@ class Store {
   static set shouldTranslate(bool should) {
     settings.put("translate", should);
   }
+
+  //// Saved ////
+
+  static Box get saved {
+    return Hive.box("saved");
+  }
+
+  static void saveArticle(NewsArticle article) {
+    print(saved.values.toList());
+    saved.put(article.url, article);
+  }
+
+  static void deleteArticle(NewsArticle article) {
+    saved.delete(article.url);
+  }
+
+  static List<dynamic> getSavedArticles(NewsArticle article) {
+    return saved.values.toList();
+  }
+
 }
