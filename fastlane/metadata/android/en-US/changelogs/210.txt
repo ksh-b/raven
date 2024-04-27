@@ -1,0 +1,14 @@
+## [0.10.0] - 2024-04-27
+
+### Added
+- Save articles
+- Translation on feed page
+- Fallback to use smort.io when loading full article fails
+- Flags to language selector
+
+### Fixed
+- Extractors
+- Language selector popup not scrollable
+
+### Removed
+- Trend: Brave
