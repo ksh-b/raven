@@ -84,4 +84,19 @@ class NewsArticle extends HiveObject {
 
   @override
   int get hashCode => url.hashCode ^ title.hashCode;
+
+  Future<NewsArticle> load() async {
+    if(Store.shouldTranslate)
+      return await this.translate();
+    return await publishers[publisher]!.article(this);
+  }
+
+  Future<NewsArticle> translate() async{
+    var translate = SimplyTranslate();
+    this.title = await translate.translate(this.title, Store.languageSetting);
+    this.excerpt = await translate.translate(this.excerpt, Store.languageSetting);
+    this.content = await translate.translate(this.content, Store.languageSetting);
+    return this;
+  }
+
 }
