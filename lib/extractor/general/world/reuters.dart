@@ -77,7 +77,7 @@ class Reuters extends Publisher {
         var excerpt = element['description'];
         var tags = element['kicker']['names'];
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt,

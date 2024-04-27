@@ -99,7 +99,7 @@ class TheHindu extends Publisher {
         var excerpt = article.querySelector(".sub-text")?.text;
         title = title.replaceFirst("Morning Digest | ", "").replaceFirst("Top news of the day: ", "");
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt ?? "",

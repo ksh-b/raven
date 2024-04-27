@@ -101,7 +101,7 @@ class TheVerge extends Publisher {
         var time = timeElement?.attributes["datetime"];
         var articleUrl = articleUrlElement?.attributes["href"];
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: "",
@@ -133,7 +133,7 @@ class TheVerge extends Publisher {
         var time = element["snippet"].split("...")[0];
         var dateEntry = stringToUnix(time, format: 'MMM d, yyyy');
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt,

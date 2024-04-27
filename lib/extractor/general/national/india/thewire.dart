@@ -86,7 +86,7 @@ class TheWire extends Publisher {
         var excerpt = element['post_excerpt'];
         var tags = element['categories'].map((e) => e['name']).toList();
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt,
@@ -94,7 +94,7 @@ class TheWire extends Publisher {
             url: articleUrl,
             thumbnail: thumbnail ?? "",
             category: category,
-            publishedAt: stringToUnix(time?.trim() ?? ""),
+            publishedAt: stringToUnix(time),
             tags: List<String>.from(tags)));
       }
     }

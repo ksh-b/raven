@@ -108,7 +108,7 @@ class CNN extends Publisher {
           ?.querySelectorAll(".container__item--type-section");
       for (var article in data!) {
         articles.add(NewsArticle(
-          publisher: this,
+          publisher: name,
           title:
               article.querySelector(".container__headline-text")?.text.trim() ??
                   "",
@@ -151,7 +151,7 @@ class CNN extends Publisher {
         var articleUrl = element['url'];
         var excerpt = element['body'];
         articles.add(NewsArticle(
-          publisher: this,
+          publisher: name,
           title: title ?? "",
           content: "",
           excerpt: excerpt,

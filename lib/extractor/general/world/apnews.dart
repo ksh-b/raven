@@ -108,7 +108,7 @@ class APNews extends Publisher {
       var data = document.querySelectorAll(".PageListStandardH .PagePromo");
       for (var article in data) {
         articles.add(NewsArticle(
-          publisher: this,
+          publisher: name,
           title: article.querySelector(".PagePromo-title")?.text.trim() ?? "",
           content: "",
           excerpt:
@@ -148,7 +148,7 @@ class APNews extends Publisher {
                 ?.attributes['data-timestamp'] ??
             "0");
         articles.add(NewsArticle(
-          publisher: this,
+          publisher: name,
           title: article.querySelector(".PagePromo-title")?.text.trim() ?? "",
           content: "",
           excerpt:

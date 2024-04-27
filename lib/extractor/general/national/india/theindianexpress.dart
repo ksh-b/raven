@@ -99,7 +99,7 @@ class TheIndianExpress extends Publisher {
         var excerpt = article.querySelector(".date+p")?.text ?? "";
         timestamp = timestamp.contains("Updated:")?timestamp.split("Updated:")[1].trim():timestamp;
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title,
             content: "",
             excerpt: excerpt,

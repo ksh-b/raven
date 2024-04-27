@@ -87,7 +87,7 @@ class TheQuint extends Publisher {
           tags.add(section["name"]);
         }
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt,
@@ -126,7 +126,7 @@ class TheQuint extends Publisher {
           tags.add(section["name"]);
         }
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: "",

@@ -107,7 +107,7 @@ class TorrentFreak extends Publisher {
         }
 
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: "",

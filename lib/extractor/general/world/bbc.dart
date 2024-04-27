@@ -75,7 +75,7 @@ class BBC extends Publisher {
         var time = article["lastPublished"];
         var excerpt = article['summary'];
         articlesData.add(NewsArticle(
-          publisher: this,
+          publisher: name,
           title: title ?? "",
           content: "",
           excerpt: excerpt,
@@ -116,7 +116,7 @@ class BBC extends Publisher {
         var articleUrl = article['url'];
         var excerpt = "";
         articlesData.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt,
@@ -240,7 +240,7 @@ class BBC extends Publisher {
         }
 
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt ?? "",

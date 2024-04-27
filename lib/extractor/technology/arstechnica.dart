@@ -72,7 +72,7 @@ class ArsTechnica extends Publisher {
             articleElement.querySelector("figure div")?.attributes["style"];
 
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt ?? "",

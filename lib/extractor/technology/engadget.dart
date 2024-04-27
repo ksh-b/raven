@@ -70,7 +70,7 @@ class Engadget extends Publisher {
         int parsedTime = stringToUnix(date, format: "MM.dd.yyyy");
 
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt ?? "",
@@ -108,7 +108,7 @@ class Engadget extends Publisher {
         int parsedTime = stringToUnix(date??"", format: "MM.dd.yyyy");
 
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt ?? "",

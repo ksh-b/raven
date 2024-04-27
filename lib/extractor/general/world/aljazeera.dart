@@ -115,7 +115,7 @@ class AlJazeera extends Publisher {
         var articleUrl = element['link'];
         var excerpt = element['excerpt'];
         articles.add(NewsArticle(
-            publisher: this,
+            publisher: name,
             title: title ?? "",
             content: "",
             excerpt: excerpt,

@@ -88,7 +88,7 @@ class TheGuardian extends Publisher {
       var data = document.querySelectorAll(".fc-item__container");
       for (var article in data) {
         articles.add(NewsArticle(
-          publisher: this,
+          publisher: name,
           title: article
                   .querySelector(".fc-item__header a .js-headline-text")
                   ?.text
