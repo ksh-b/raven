@@ -1,3 +1,4 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:raven/pages/feed.dart';
 import 'package:raven/pages/saved.dart';

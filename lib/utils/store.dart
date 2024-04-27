@@ -133,7 +133,6 @@ class Store {
   }
 
   static void saveArticle(NewsArticle article) {
-    print(saved.values.toList());
     saved.put(article.url, article);
   }
 
