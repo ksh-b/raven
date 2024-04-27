@@ -10,7 +10,7 @@ class Smort {
   Future<NewsArticle> fallback(NewsArticle article) async {
     String url = "${publishers[article.publisher]!.homePage}${article.url}";
     var response = await http.get(
-        Uri.parse("https://www.smort.io/article?smortParseAdvanced=true&url=$url"),
+      Uri.parse("https://www.smort.io/article?smortParseAdvanced=true&url=$url"),
     );
     if (response.statusCode == 200) {
       var document = html_parser.parse(utf8.decode(response.bodyBytes));
