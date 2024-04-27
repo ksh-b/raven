@@ -37,24 +37,26 @@ class _ArticlePageState extends State<ArticlePage> {
   TextStyle excerptStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
 
   Stream<NewsArticle> customArticle(
-      NewsArticle newsArticle, BuildContext context) async* {
-    NewsArticle cArticle = await newsArticle.load();
-    yield cArticle;
+      NewsArticle newsArticle, BuildContext context,) async* {
+    if(newsArticle.content.isNotEmpty) {
+      yield newsArticle;
+    } else {
+      NewsArticle cArticle = await newsArticle.load();
+      yield cArticle;
 
-    if (Store.shouldTranslate) {
-      var translator = SimplyTranslate();
-      cArticle.title =
-          await translator.translate(cArticle.title, Store.languageSetting);
-      yield cArticle;
-      cArticle.content =
-          await translator.translate(cArticle.content, Store.languageSetting);
-      yield cArticle;
-      cArticle.excerpt =
-          await translator.translate(cArticle.excerpt, Store.languageSetting);
-      yield cArticle;
+      if (Store.shouldTranslate) {
+        var translator = SimplyTranslate();
+        cArticle.title =
+        await translator.translate(cArticle.title, Store.languageSetting);
+        yield cArticle;
+        cArticle.content =
+        await translator.translate(cArticle.content, Store.languageSetting);
+        yield cArticle;
+        cArticle.excerpt =
+        await translator.translate(cArticle.excerpt, Store.languageSetting);
+        yield cArticle;
+      }
     }
-
-    yield cArticle;
   }
 
   @override
@@ -90,7 +92,6 @@ class _ArticlePageState extends State<ArticlePage> {
       future: Smort().fallback(widget.article),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          print("Used fallback");
           return _successArticle(snapshot);
         } else if (snapshot.hasError) {
           return _failArticle(fullUrl);
