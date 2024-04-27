@@ -32,19 +32,7 @@ class _SavedPageState extends State<SavedPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: Text("x"),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: MySearchDelegate(),
-                );
-              },
-            ),
-          ],),
-
+        appBar: AppBar(title: Text("Saved"),),
         body: ValueListenableBuilder(
           valueListenable: Store.saved.listenable(),
           builder: (BuildContext context, box, Widget? child) {
@@ -93,8 +81,12 @@ class _SavedPageState extends State<SavedPage> {
                   direction: Axis.vertical,
                   children: [
                     Icon(Icons.bookmark_add),
-                    SizedBox(height: 16,),
-                    Text("Swipe articles to the right on the feed page to save them.")
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Text(
+                      "Swipe articles to the right on the feed page to save them.",
+                    )
                   ],
                 ),
               ),
