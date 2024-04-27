@@ -17,10 +17,6 @@ Get it on
 - [![Github releases](https://img.shields.io/github/v/release/ksh-b/raven?label=Github)](https://github.com/ksh-b/raven/releases/latest)
 - Or via [Obtanium](https://github.com/ImranR98/Obtainium)
 
-> [!WARNING]  
-> If you are using v0.8.1, please uninstall it and install latest version from one of the above. You may not be able to see future updates on your app store client otherwise.
-
-
 ## Screenshots
 <table>
   <tr>
