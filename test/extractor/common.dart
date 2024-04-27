@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:raven/api/smort.dart';
 import 'package:test/test.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
@@ -13,7 +14,7 @@ class ExtractorTest {
   }
 
   static Future<void> categoryArticlesTest(Publisher publisher,
-      {String? category, bool skipDateCheck=false}) async {
+      {String? category, bool skipDateCheck = false}) async {
     if (category == null) {
       final Map<String, String> categories = await publisher.categories;
 
@@ -31,18 +32,27 @@ class ExtractorTest {
         expect(article, isA<NewsArticle>());
         expect(article.title, isNotEmpty, reason: "$article");
 
-        await publisher.article(article).then((value) {
-          print(article);
-          expect(value, isNotNull);
-          expect(value.publishedAt, isNonNegative, reason: article.url, skip: skipDateCheck);
-          expect(value.content, isNotEmpty, reason: article.url);
-        },);
+        await publisher.article(article).then(
+          (value) {
+            print(article);
+            expect(value, isNotNull);
+            expect(value.publishedAt, isNonNegative,
+                reason: article.url, skip: skipDateCheck);
+            if (value.content.isEmpty) {
+              Smort().fallback(article).then((value) {
+                expect(value.content, isNotEmpty, reason: article.url);
+              });
+            } else {
+              expect(value.content, isNotEmpty, reason: article.url);
+            }
+          },
+        );
       }
     }
   }
 
-  static Future<void> searchedArticlesTest(
-      Publisher publisher, String query, {bool ignoreDateCheck=false}) async {
+  static Future<void> searchedArticlesTest(Publisher publisher, String query,
+      {bool ignoreDateCheck = false}) async {
     if (publisher.hasSearchSupport) {
       final searchArticles =
           await publisher.searchedArticles(searchQuery: query, page: 1);
