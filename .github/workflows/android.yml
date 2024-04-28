@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt update && apt upgrade
+          sudo apt update && sudo apt upgrade
           submodules/flutter/bin/flutter config --no-analytics
           submodules/flutter/bin/flutter pub get
 
