@@ -1,0 +1,23 @@
+name: Dart
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout all the submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install dependencies
+        run: submodules/flutter/bin/flutter pub get
+
+      - name: Build
+        run: submodules/flutter/bin/flutter build apk --split-per-abi
