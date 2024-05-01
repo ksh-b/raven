@@ -64,8 +64,13 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
                         motion: ScrollMotion(),
                         children: [
                           SlidableAction(
-                            backgroundColor: ThemeProvider().getCurrentTheme().cardColor,
-                            foregroundColor: ThemeProvider().getCurrentTheme().textTheme.titleMedium!.color,
+                            backgroundColor:
+                                ThemeProvider().getCurrentTheme().cardColor,
+                            foregroundColor: ThemeProvider()
+                                .getCurrentTheme()
+                                .textTheme
+                                .titleMedium!
+                                .color,
                             onPressed: (context) {
                               article.load().then((value) {
                                 Store.saveArticle(value);

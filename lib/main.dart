@@ -16,11 +16,12 @@ Future<void> main() async {
   await Hive.openBox('settings');
   await Hive.openBox('saved');
 
-  if (Store.sdkVersion==-1) {
+  if (Store.sdkVersion == -1) {
     await DeviceInfoPlugin().androidInfo.then((value) {
       Store.sdkVersion = value.version.sdkInt;
     });
   }
+
   runApp(const MyApp());
 }
 

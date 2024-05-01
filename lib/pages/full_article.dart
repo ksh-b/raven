@@ -3,16 +3,15 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:raven/api/simplytranslate.dart';
 import 'package:raven/api/smort.dart';
+import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'package:raven/utils/theme_provider.dart';
+import 'package:raven/utils/network.dart';
+import 'package:raven/utils/store.dart';
 import 'package:raven/utils/time.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:raven/api/simplytranslate.dart';
-import 'package:raven/model/article.dart';
-import 'package:raven/utils/network.dart';
-import 'package:raven/utils/store.dart';
 
 class ArticlePage extends StatefulWidget {
   final NewsArticle article;
@@ -37,8 +36,10 @@ class _ArticlePageState extends State<ArticlePage> {
   TextStyle excerptStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
 
   Stream<NewsArticle> customArticle(
-      NewsArticle newsArticle, BuildContext context,) async* {
-    if(newsArticle.content.isNotEmpty) {
+    NewsArticle newsArticle,
+    BuildContext context,
+  ) async* {
+    if (newsArticle.content.isNotEmpty) {
       yield newsArticle;
     } else {
       NewsArticle cArticle = await newsArticle.load();
@@ -47,13 +48,13 @@ class _ArticlePageState extends State<ArticlePage> {
       if (Store.shouldTranslate) {
         var translator = SimplyTranslate();
         cArticle.title =
-        await translator.translate(cArticle.title, Store.languageSetting);
+            await translator.translate(cArticle.title, Store.languageSetting);
         yield cArticle;
         cArticle.content =
-        await translator.translate(cArticle.content, Store.languageSetting);
+            await translator.translate(cArticle.content, Store.languageSetting);
         yield cArticle;
         cArticle.excerpt =
-        await translator.translate(cArticle.excerpt, Store.languageSetting);
+            await translator.translate(cArticle.excerpt, Store.languageSetting);
         yield cArticle;
       }
     }
@@ -128,10 +129,6 @@ class _ArticlePageState extends State<ArticlePage> {
                 Share.shareUri(Uri.parse(fallbackUrl));
               },
             ),
-            // SizedBox(height: 16,),
-            // Text("Error loading article", style: TextStyle(fontSize: 20)),
-            // SizedBox(height: 8,),
-            // Text(""),
           ],
         ),
       ),
