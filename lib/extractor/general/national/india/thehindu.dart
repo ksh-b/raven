@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:html/dom.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:http/http.dart' as http;
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/time.dart';
 
 class TheHindu extends Publisher {
@@ -34,8 +35,7 @@ class TheHindu extends Publisher {
         map.putIfAbsent(
           element.text.trim(),
           () {
-            return element.attributes["href"]!
-                .replaceFirst(homePage, "");
+            return element.attributes["href"]!.replaceFirst(homePage, "");
           },
         );
       });
@@ -48,7 +48,7 @@ class TheHindu extends Publisher {
     var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
-      var isLive = document.querySelector(".live-span") !=null;
+      var isLive = document.querySelector(".live-span") != null;
       var content = [];
       if (isLive) {
         content.add(document.querySelector("div[itemprop='articleBody']"));
@@ -57,17 +57,30 @@ class TheHindu extends Publisher {
       } else
         content = document.querySelectorAll("div[itemprop='articleBody']");
       var related = document.querySelector(".related-topics")?.innerHtml ?? "";
-      var thumbnail = document.querySelector("meta property='og:image'")?.attributes["content"];
+      var thumbnail = document
+          .querySelector("meta property='og:image'")
+          ?.attributes["content"];
       var excerpt = document.querySelector(".sub-title")?.text;
-      var timestamp = document.querySelector(".publish-time")?.text.split(" | ")[0].trim();
-      var tags = document.querySelectorAll(".breadcrumb li a[itemprop=item]").sublist(1).map((e) => e.text).toList();
+      var timestamp =
+          document.querySelector(".publish-time")?.text.split(" | ")[0].trim();
+      var tags = document
+          .querySelectorAll(".breadcrumb li a[itemprop=item]")
+          .sublist(1)
+          .map((e) => e.text)
+          .toList();
       return newsArticle.fill(
-        content: content.map((e) => e.innerHtml,).join().replaceFirst(related, "").trim(),
-        thumbnail: thumbnail,
-        excerpt: excerpt,
-        publishedAt: stringToUnix(timestamp??"", format: "MMMM d, yyyy hh:mm a"),
-        tags: tags
-      );
+          content: content
+              .map(
+                (e) => e.innerHtml,
+              )
+              .join()
+              .replaceFirst(related, "")
+              .trim(),
+          thumbnail: thumbnail,
+          excerpt: excerpt,
+          publishedAt:
+              stringToUnix(timestamp ?? "", format: "MMMM d, yyyy hh:mm a"),
+          tags: tags);
     }
     return newsArticle;
   }
@@ -81,23 +94,29 @@ class TheHindu extends Publisher {
     if (category == "/") {
       category = "/news/";
     }
-    String url = "$homePage$category?page=$page";
+    String url = "$homePage$category/fragment/showmoredesked?page=$page";
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       Document document = html_parser.parse(utf8.decode(response.bodyBytes));
       var articleElements = [];
       articleElements = document.querySelectorAll(".result .element");
-      if(articleElements.isEmpty)
+      if (articleElements.isEmpty)
         articleElements = document.querySelectorAll(".element");
       for (var article in articleElements) {
         List<String> tags = [];
         var title = article.querySelector(".title a")?.text.trim();
-        var articleUrl = article.querySelector(".title a")?.attributes["href"] ?? "";
+        var articleUrl =
+            article.querySelector(".title a")?.attributes["href"] ?? "";
         var author = article.querySelector(".author-name")?.text;
-        var thumbnail = article.querySelector(".picture img")?.attributes["data-original"].replaceFirst("SQUARE_80", "LANDSCAPE_1200");
+        var thumbnail = article
+            .querySelector(".picture img")
+            ?.attributes["data-original"]
+            .replaceFirst("SQUARE_80", "LANDSCAPE_1200");
         var excerpt = article.querySelector(".sub-text")?.text;
-        title = title.replaceFirst("Morning Digest | ", "").replaceFirst("Top news of the day: ", "");
+        title = title
+            .replaceFirst("Morning Digest | ", "")
+            .replaceFirst("Top news of the day: ", "");
         articles.add(NewsArticle(
             publisher: name,
             title: title ?? "",

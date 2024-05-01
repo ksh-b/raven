@@ -1,7 +1,8 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:raven/utils/time.dart';
 
 class TheWire extends Publisher {
@@ -79,7 +80,8 @@ class TheWire extends Publisher {
       for (var element in data) {
         var title = element['post_title'];
         var author = element['post_author_name'][0]["author_name"];
-        var thumbnail = element['hero_image'][0];
+        var thumbnail =
+            element['hero_image'] == false ? "" : element['hero_image'][0];
         var time = element["post_date_gmt"];
         var articleUrl =
             '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
