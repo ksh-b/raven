@@ -50,6 +50,23 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SizedBox(height: 20),
+          ListTile(
+            leading: Icon(Icons.format_size_rounded),
+            title: Text('Font size'),
+            subtitle: Slider(
+              value: Store.fontScale,
+              min: 0.8,
+              max: 1.5,
+              divisions: 7,
+              label: (Store.fontScale * 100).round().toString(),
+              onChanged: (double value) {
+                setState(() {
+                  Store.fontScale = value;
+                });
+              },
+            ),
+          ),
+          SizedBox(height: 20),
         ],
       ),
     );
@@ -255,10 +272,10 @@ class _OptionsPopupState extends State<OptionsPopup> {
                     )
                   : SizedBox.shrink();
             }
-            var languageFlag = SimplyTranslate.languageFlags[filteredOptions[index - 1]] ??
-                "";
+            var languageFlag =
+                SimplyTranslate.languageFlags[filteredOptions[index - 1]] ?? "";
             return ListTile(
-              leading: languageFlag.isNotEmpty?Text(languageFlag):null,
+              leading: languageFlag.isNotEmpty ? Text(languageFlag) : null,
               title: Text(filteredOptions[index - 1]),
               onTap: () {
                 widget.callback(filteredOptions[index - 1]);

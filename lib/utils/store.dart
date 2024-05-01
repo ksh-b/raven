@@ -126,6 +126,14 @@ class Store {
     settings.put("translate", should);
   }
 
+  static double get fontScale {
+    return settings.get("scale", defaultValue: 1);
+  }
+
+  static set fontScale(double scale) {
+    settings.put("scale", scale);
+  }
+
   //// Saved ////
 
   static Box get saved {
@@ -143,5 +151,4 @@ class Store {
   static List<dynamic> getSavedArticles(NewsArticle article) {
     return saved.values.toList();
   }
-
 }

@@ -1,9 +1,9 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:raven/pages/feed.dart';
 import 'package:raven/pages/saved.dart';
 import 'package:raven/pages/settings.dart';
 import 'package:raven/pages/subscription.dart';
+import 'package:raven/utils/store.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -24,8 +24,11 @@ class _MyHomePageState extends State<MyHomePage> {
             _selectedIndex = index;
           });
         },
+        labelBehavior: Store.fontScale > 1
+            ? NavigationDestinationLabelBehavior.alwaysHide
+            : NavigationDestinationLabelBehavior.alwaysShow,
         selectedIndex: _selectedIndex,
-        destinations: const <Widget>[
+        destinations: <Widget>[
           NavigationDestination(
             icon: Icon(Icons.article_outlined),
             selectedIcon: Icon(Icons.article),
