@@ -127,7 +127,7 @@ class Store {
   }
 
   static double get fontScale {
-    return settings.get("scale", defaultValue: 1);
+    return settings.get("scale", defaultValue: 1.0);
   }
 
   static set fontScale(double scale) {
