@@ -22,7 +22,7 @@ dependencies:
   html: ^0.15.4
   http: ^1.1.2
   intl: ^0.19.0
-  share_plus: ^8.0.2
+  share_plus: ^9.0.0
   url_launcher: ^6.2.2
 
 dev_dependencies:
