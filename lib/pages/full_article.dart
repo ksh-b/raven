@@ -75,9 +75,6 @@ class _ArticlePageState extends State<ArticlePage> {
       initialData: widget.article,
       stream: customArticle(widget.article, context),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        }
         return Scaffold(
           appBar: AppBar(
             title: Text(publishers[widget.article.publisher]!.name),
