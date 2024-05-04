@@ -1,0 +1,7 @@
+## [0.12.0] - 2024-05-04
+
+### Fixed
+- Article content not loading when translation is on
+
+### Added
+- Option to choose translator instance
