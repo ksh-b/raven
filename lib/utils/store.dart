@@ -54,6 +54,35 @@ class Store {
     settings.put("language", language);
   }
 
+  static String get languageSetting {
+    return settings.get("language", defaultValue: "English");
+  }
+
+  static set translatorSetting(String translator) {
+    settings.put("translator", translator);
+  }
+
+  static String get translatorSetting {
+    return settings.get("translator", defaultValue: "SimplyTranslate");
+  }
+
+  static set translatorInstanceSetting(String translatorInstance) {
+    settings.put("translatorInstance", translatorInstance);
+  }
+
+  static String get translatorInstanceSetting {
+    return settings.get("translatorInstance",
+        defaultValue: "simplytranslate.org");
+  }
+
+  static set translatorEngineSetting(String translatorEngine) {
+    settings.put("translatorEngine", translatorEngine);
+  }
+
+  static String get translatorEngineSetting {
+    return settings.get("translatorEngine", defaultValue: "google");
+  }
+
   static bool get loadImagesSetting {
     return settings.get("loadImages", defaultValue: true);
   }
@@ -112,10 +141,6 @@ class Store {
 
   static String get ladderUrl {
     return ladders[ladderSetting] ?? ladders.keys.first;
-  }
-
-  static String get languageSetting {
-    return settings.get("language", defaultValue: "English");
   }
 
   static bool get shouldTranslate {

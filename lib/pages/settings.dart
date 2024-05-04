@@ -110,7 +110,6 @@ class _SettingsPageState extends State<SettingsPage> {
           SwitchListTile(
             secondary: Icon(Icons.translate_rounded),
             title: Text('Translate'),
-            subtitle: Text('simplytranslate.org'),
             value: Store.shouldTranslate,
             onChanged: (value) {
               setState(() {
@@ -120,7 +119,13 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           Store.shouldTranslate
               ? ListTile(
-                  leading: Icon(Icons.language_rounded),
+                  title: Text('Translator'),
+                  subtitle: Text(Store.translatorSetting),
+                  enabled: false,
+                )
+              : SizedBox.shrink(),
+          Store.shouldTranslate
+              ? ListTile(
                   title: Text('Translate language'),
                   subtitle: Text(Store.languageSetting),
                   onTap: () {
@@ -133,6 +138,43 @@ class _SettingsPageState extends State<SettingsPage> {
                       SimplyTranslate().languages.keys.toList(),
                     );
                   },
+                )
+              : SizedBox.shrink(),
+          Store.shouldTranslate
+              ? ListTile(
+                  title: Text('Translator instance'),
+                  subtitle: Text(Store.translatorInstanceSetting),
+                  onTap: () {
+                    _showPopup(
+                      context,
+                      "Translator instance",
+                      (String option) {
+                        Store.translatorInstanceSetting = option;
+                        Store.translatorEngineSetting = SimplyTranslate()
+                            .instances[Store.translatorInstanceSetting]!
+                            .first;
+                      },
+                      SimplyTranslate().instances.keys.toList(),
+                    );
+                  },
+                )
+              : SizedBox.shrink(),
+          Store.shouldTranslate
+              ? ListTile(
+                  title: Text('Translator engine'),
+                  subtitle: Text(Store.translatorEngineSetting),
+                  onTap: () {
+                    _showPopup(
+                      context,
+                      "Translate engine",
+                      (String option) {
+                        Store.translatorEngineSetting = option;
+                      },
+                      SimplyTranslate()
+                          .instances[Store.translatorInstanceSetting]!,
+                    );
+                  },
+                  enabled: false,
                 )
               : SizedBox.shrink(),
           SizedBox(height: 20),
@@ -259,12 +301,12 @@ class _OptionsPopupState extends State<OptionsPopup> {
           itemCount: filteredOptions.length + 1,
           itemBuilder: (BuildContext context, int index) {
             if (index == 0) {
-              return widget.options.length > 5
+              return widget.options.length > 10
                   ? TextField(
                       onChanged: _filterOptions,
                       decoration: InputDecoration(
                         icon: Icon(Icons.search_rounded),
-                        hintText: "Search with flag or text",
+                        hintText: "Search...",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
