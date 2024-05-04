@@ -7,16 +7,26 @@ part 'article.g.dart';
 
 @HiveType(typeId: 1)
 class NewsArticle extends HiveObject {
-  @HiveField(0) String publisher;
-  @HiveField(1) String title;
-  @HiveField(2) String content;
-  @HiveField(3) String excerpt;
-  @HiveField(4) String author;
-  @HiveField(5) String url;
-  @HiveField(6) String thumbnail;
-  @HiveField(7) String category;
-  @HiveField(8) List<String> tags;
-  @HiveField(9) int publishedAt;
+  @HiveField(0)
+  String publisher;
+  @HiveField(1)
+  String title;
+  @HiveField(2)
+  String content;
+  @HiveField(3)
+  String excerpt;
+  @HiveField(4)
+  String author;
+  @HiveField(5)
+  String url;
+  @HiveField(6)
+  String thumbnail;
+  @HiveField(7)
+  String category;
+  @HiveField(8)
+  List<String> tags;
+  @HiveField(9)
+  int publishedAt;
 
   NewsArticle({
     required this.publisher,
@@ -91,11 +101,20 @@ class NewsArticle extends HiveObject {
     return await publishers[publisher]!.article(this);
   }
 
-  Future<NewsArticle> translate() async{
+  Future<NewsArticle> translate() async {
     var translate = SimplyTranslate();
-    this.title = await translate.translate(this.title, Store.languageSetting);
-    this.excerpt = await translate.translate(this.excerpt, Store.languageSetting);
-    this.content = await translate.translate(this.content, Store.languageSetting);
+    this.title = await translate.translate(
+      this.title,
+      Store.languageSetting,
+    );
+    this.excerpt = await translate.translate(
+      this.excerpt,
+      Store.languageSetting,
+    );
+    this.content = await translate.translate(
+      this.content,
+      Store.languageSetting,
+    );
     return this;
   }
 

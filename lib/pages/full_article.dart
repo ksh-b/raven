@@ -47,14 +47,20 @@ class _ArticlePageState extends State<ArticlePage> {
 
       if (Store.shouldTranslate) {
         var translator = SimplyTranslate();
-        cArticle.title =
-            await translator.translate(cArticle.title, Store.languageSetting);
+        cArticle.title = await translator.translate(
+          cArticle.title,
+          Store.languageSetting,
+        );
         yield cArticle;
-        cArticle.content =
-            await translator.translate(cArticle.content, Store.languageSetting);
+        cArticle.content = await translator.translate(
+          cArticle.content,
+          Store.languageSetting,
+        );
         yield cArticle;
-        cArticle.excerpt =
-            await translator.translate(cArticle.excerpt, Store.languageSetting);
+        cArticle.excerpt = await translator.translate(
+          cArticle.excerpt,
+          Store.languageSetting,
+        );
         yield cArticle;
       }
     }
@@ -135,7 +141,7 @@ class _ArticlePageState extends State<ArticlePage> {
     );
   }
 
-  Padding _successArticle(AsyncSnapshot<NewsArticle> snapshot) {
+  Widget _successArticle(AsyncSnapshot<NewsArticle> snapshot) {
     return Padding(
       padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       child: ListView(

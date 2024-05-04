@@ -135,8 +135,10 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
       if (Store.shouldTranslate) {
         var originalTitles =
             value.map((e) => e.title.replaceAll("\n", "")).join("\n");
-        var translated = await SimplyTranslate()
-            .translate(originalTitles, Store.languageSetting);
+        var translated = await SimplyTranslate().translate(
+          originalTitles,
+          Store.languageSetting,
+        );
         var translatedTitles = translated.split("\n");
         if (value.length == translatedTitles.length) {
           for (var i = 0; i < value.length; i++) {
