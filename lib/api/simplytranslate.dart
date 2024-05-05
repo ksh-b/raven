@@ -179,7 +179,8 @@ class SimplyTranslate {
       }).then(
         (value) {
           var document = parse(value.body);
-          outputParts[i] = document.getElementById('output')?.text ?? "";
+          outputParts[i] =
+              document.getElementById('output')?.text ?? inputTextParts[i];
         },
       ));
     }
