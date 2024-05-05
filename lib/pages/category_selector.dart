@@ -35,6 +35,9 @@ class _CategorySelectorState extends State<CategorySelector> {
   }
 
   String convertString(String input) {
+    if (input.startsWith("https://") || input.startsWith("http://"))
+      return input.split("/").sublist(2).join("/");
+
     List<String> parts = input.split('/');
     parts.removeWhere((part) => part.isEmpty);
     List<String> capitalizedParts = parts.map((part) {
@@ -76,7 +79,8 @@ class _CategorySelectorState extends State<CategorySelector> {
                   }
                   if (index - 1 < snapshot.data!.length) {
                     subCategoryKey = snapshot.data!.keys.toList()[index - 1];
-                    subCategoryValue = snapshot.data!.values.toList()[index - 1];
+                    subCategoryValue =
+                        snapshot.data!.values.toList()[index - 1];
                     userSubscription =
                         UserSubscription(widget.newsSource, subCategoryValue);
                     return _buildCategorySelector(
@@ -187,20 +191,20 @@ class _CategorySelectorState extends State<CategorySelector> {
 
   Widget _buildCustomSourceSelector() {
     return Flexible(
-      flex: 3,
-      fit: FlexFit.tight,
+        flex: 3,
+        fit: FlexFit.tight,
         child: TextField(
-      controller: customCategoryController,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: "Custom category",
-      ),
-      onEditingComplete: () {
-        setState(() {
-          customCategory = customCategoryController.text;
-        });
-      },
-    ));
+          controller: customCategoryController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: "Custom category",
+          ),
+          onChanged: (value) {
+            setState(() {
+              customCategory = value;
+            });
+          },
+        ));
   }
 
   Flexible _buildCustomTester() {
@@ -210,6 +214,9 @@ class _CategorySelectorState extends State<CategorySelector> {
         future: widget.publishers[widget.newsSource]
             ?.articles(category: customCategory),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting)
+            return const CircularProgressIndicator();
+          if (snapshot.hasError) return const Icon(Icons.cancel);
           if (snapshot.hasData) {
             return snapshot.data!.isNotEmpty
                 ? IconButton(
@@ -229,10 +236,8 @@ class _CategorySelectorState extends State<CategorySelector> {
                     },
                     icon: const Icon(Icons.save_alt))
                 : const Icon(Icons.cancel);
-          } else if (snapshot.hasError) {
-            const Icon(Icons.cancel);
           }
-          return const CircularProgressIndicator();
+          return SizedBox.shrink();
         },
       ),
     );
