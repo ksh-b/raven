@@ -314,10 +314,7 @@ class _OptionsPopupState extends State<OptionsPopup> {
                     )
                   : SizedBox.shrink();
             }
-            var languageFlag =
-                SimplyTranslate.languageFlags[filteredOptions[index - 1]] ?? "";
             return ListTile(
-              leading: languageFlag.isNotEmpty ? Text(languageFlag) : null,
               title: Text(filteredOptions[index - 1]),
               onTap: () {
                 widget.callback(filteredOptions[index - 1]);
@@ -338,14 +335,6 @@ class _OptionsPopupState extends State<OptionsPopup> {
         filteredOptions = widget.options
             .where((entry) => entry.toLowerCase().contains(query.toLowerCase()))
             .toList();
-        if (filteredOptions.isEmpty) {
-          filteredOptions = SimplyTranslate.languageFlags.entries
-              .where((element) => element.value == query)
-              .map(
-                (e) => e.key,
-              )
-              .toList();
-        }
       }
     });
   }
