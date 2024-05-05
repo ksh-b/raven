@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Option to choose translator instance
+- Extractor: RSS/Atom feeds
+- Extractor: Morss
 
 ### Fixed
 - Article content not loading when translation is on
+
+### Removed
+- Flags from language selector (#flagsarenotlanguages)
 
 ## [0.11.0] - 2024-05-01
 
