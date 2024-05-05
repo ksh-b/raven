@@ -1,6 +1,8 @@
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:raven/utils/store.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 class SimplyTranslate {
   Map<String, String> languages = {
@@ -154,51 +156,34 @@ class SimplyTranslate {
     ],
   };
 
-  Future<String> translate(String inputText, String language) async {
-    if (!languages.containsKey(language)) {
+  Future<List<String>> translate(
+    List<String> inputText,
+    String language,
+  ) async {
+    if (!languages.containsKey(language) || inputText.join().isEmpty) {
       return inputText;
     }
-    String translatedText = "";
     String url =
         'https://${Store.translatorInstanceSetting}/?engine=${Store.translatorEngineSetting}';
-    inputText = removeHtmlAttributes(inputText);
-    List<String> inputTextParts = splitString(inputText, 500);
-    for (String inputTextPart in inputTextParts) {
+    List<String> inputTextParts = inputText;
+    List<String> outputParts = inputTextParts;
+    List<Future> futures = [];
+    for (int i = 0; i < inputTextParts.length; i++) {
       Map<String, String> payload = {
         'from': 'auto',
         'to': languages[language]!,
-        'text': inputTextPart
+        'text': inputTextParts[i]
       };
-      var response = await http.post(Uri.parse(url), body: payload);
-      var document = parse(response.body);
-      translatedText += document.getElementById('output')?.text ?? "";
+      futures.add(workerManager.execute<Response>(() {
+        return http.post(Uri.parse(url), body: payload);
+      }).then(
+        (value) {
+          var document = parse(value.body);
+          outputParts[i] = document.getElementById('output')?.text ?? "";
+        },
+      ));
     }
-    return translatedText.isEmpty ? inputText : translatedText;
-  }
-
-  List<String> splitString(String text, int wordsPerString) {
-    List<String> result = [];
-    List<String> words = text.split(' ');
-    int start = 0;
-
-    while (start < words.length) {
-      int end = start + wordsPerString;
-      if (end > words.length) {
-        end = words.length;
-      }
-      result.add(words.sublist(start, end).join(' '));
-      start = end;
-    }
-
-    return result;
-  }
-
-  String removeHtmlAttributes(String htmlString) {
-    RegExp exp = RegExp(r'<[^>]+>');
-    return htmlString.replaceAllMapped(exp, (match) {
-      String tag = match.group(0)!;
-      return tag.replaceAll(
-          RegExp(r'\s\S+?="[^"]*?"'), ''); // Removes attributes
-    });
+    await Future.wait(futures);
+    return outputParts;
   }
 }

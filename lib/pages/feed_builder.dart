@@ -131,15 +131,18 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
       page += 1;
       isLoading = true;
     });
+
     articleProvider.loadPage(page, query: widget.query).then((value) async {
       if (Store.shouldTranslate) {
-        var originalTitles =
-            value.map((e) => e.title.replaceAll("\n", "")).join("\n");
+        var originalTitles = value.map((e) {
+          if (e.title.isEmpty) e.title = ".";
+          return e.title.replaceAll("\n", "");
+        }).toList();
         var translated = await SimplyTranslate().translate(
           originalTitles,
           Store.languageSetting,
         );
-        var translatedTitles = translated.split("\n");
+        var translatedTitles = translated;
         if (value.length == translatedTitles.length) {
           for (var i = 0; i < value.length; i++) {
             value[i].title = translatedTitles[i];

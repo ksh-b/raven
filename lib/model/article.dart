@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:raven/api/simplytranslate.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/utils/html_helper.dart';
 import 'package:raven/utils/store.dart';
 
 part 'article.g.dart';
@@ -95,22 +96,25 @@ class NewsArticle extends HiveObject {
   @override
   int get hashCode => url.hashCode ^ title.hashCode;
 
-  Future<NewsArticle> load() async {
+  Future<NewsArticle> load({bool translate = false}) async {
     var newsArticle = await publishers[publisher]!.article(this);
-    if (Store.shouldTranslate) {
+    if (Store.shouldTranslate && translate) {
       var translate = SimplyTranslate();
-      newsArticle.title = await translate.translate(
-        newsArticle.title,
+      newsArticle.title = (await translate.translate(
+        [newsArticle.title],
         Store.languageSetting,
-      );
-      newsArticle.excerpt = await translate.translate(
-        newsArticle.excerpt,
+      ))
+          .first;
+      newsArticle.excerpt = (await translate.translate(
+        [newsArticle.excerpt],
         Store.languageSetting,
-      );
-      newsArticle.content = await translate.translate(
-        newsArticle.content,
+      ))
+          .first;
+      newsArticle.content = (await translate.translate(
+        cleanHtml(newsArticle.content),
         Store.languageSetting,
-      );
+      ))
+          .join();
     }
     return newsArticle;
   }

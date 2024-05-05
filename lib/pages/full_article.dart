@@ -7,6 +7,7 @@ import 'package:raven/api/simplytranslate.dart';
 import 'package:raven/api/smort.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/utils/html_helper.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/time.dart';
@@ -39,7 +40,7 @@ class _ArticlePageState extends State<ArticlePage> {
     NewsArticle newsArticle,
     BuildContext context,
   ) async* {
-    if (newsArticle.content.isNotEmpty) {
+    if (newsArticle.content.isNotEmpty && !Store.shouldTranslate) {
       yield newsArticle;
     } else {
       NewsArticle cArticle = await newsArticle.load();
@@ -47,20 +48,18 @@ class _ArticlePageState extends State<ArticlePage> {
 
       if (Store.shouldTranslate) {
         var translator = SimplyTranslate();
-        cArticle.title = await translator.translate(
-          cArticle.title,
+        cArticle.excerpt = (await translator.translate(
+          [cArticle.excerpt],
           Store.languageSetting,
-        );
+        ))
+            .first;
         yield cArticle;
-        cArticle.content = await translator.translate(
-          cArticle.content,
+
+        cArticle.content = (await translator.translate(
+          cleanHtml(cArticle.content),
           Store.languageSetting,
-        );
-        yield cArticle;
-        cArticle.excerpt = await translator.translate(
-          cArticle.excerpt,
-          Store.languageSetting,
-        );
+        ))
+            .join();
         yield cArticle;
       }
     }
@@ -100,7 +99,15 @@ class _ArticlePageState extends State<ArticlePage> {
         } else if (snapshot.hasError) {
           return _failArticle(fullUrl);
         }
-        return CircularProgressIndicator();
+        return Center(
+            child: Flex(
+          mainAxisAlignment: MainAxisAlignment.center,
+          direction: Axis.vertical,
+          children: [
+            CircularProgressIndicator(),
+            Text("Failed to load article. Trying fallback."),
+          ],
+        ));
       },
     );
   }
@@ -268,31 +275,44 @@ class HtmlWidget extends StatelessWidget {
               .then((value) => launchUrl(Uri.parse(url)));
         }
       },
-      doNotRenderTheseTags: const {"noscript"},
+      // doNotRenderTheseTags: const {"noscript"},
       extensions: [
         TagExtension(
-          tagsToExtend: {"img"},
+          tagsToExtend: {"noscript"},
           builder: (extensionContext) {
-            var src = extensionContext.attributes.containsKey("data-lazy-src")
-                ? "data-lazy-src"
-                : "src";
-            return extensionContext.attributes[src] != null &&
-                    Network.shouldLoadImage(extensionContext.attributes[src]!)
-                ? CachedNetworkImage(
-                    imageUrl: extensionContext.attributes[src]!,
-                    progressIndicatorBuilder: (context, url, downloadProgress) {
-                      return CircularProgressIndicator(
-                        value: downloadProgress.progress,
-                      );
-                    },
-                    errorWidget: (context, url, error) {
-                      return const Icon(Icons.error);
-                    },
-                  )
-                : SizedBox.shrink();
+            return Html(
+              data: extensionContext.innerHtml,
+              extensions: [imageExtension()],
+            );
           },
         ),
+        imageExtension(),
       ],
+    );
+  }
+
+  TagExtension imageExtension() {
+    return TagExtension(
+      tagsToExtend: {"img"},
+      builder: (extensionContext) {
+        var src = extensionContext.attributes.containsKey("data-lazy-src")
+            ? "data-lazy-src"
+            : "src";
+        return extensionContext.attributes[src] != null &&
+                Network.shouldLoadImage(extensionContext.attributes[src]!)
+            ? CachedNetworkImage(
+                imageUrl: extensionContext.attributes[src]!,
+                progressIndicatorBuilder: (context, url, downloadProgress) {
+                  return CircularProgressIndicator(
+                    value: downloadProgress.progress,
+                  );
+                },
+                errorWidget: (context, url, error) {
+                  return const Icon(Icons.error);
+                },
+              )
+            : SizedBox.shrink();
+      },
     );
   }
 }

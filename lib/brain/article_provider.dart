@@ -1,8 +1,10 @@
 import 'dart:collection';
+
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/utils/store.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 class ArticleProvider {
   int few = 5;
@@ -42,41 +44,53 @@ class ArticleProvider {
             : page;
 
         if (query != null) {
-          futures.add(publisher.searchedArticles(
-              searchQuery: query,
-              page: page_,
+          futures.add(
+            workerManager.execute<Set<NewsArticle>>(
+              () {
+                return publisher.searchedArticles(
+                  searchQuery: query,
+                  page: page_,
+                );
+              },
             ).then(
               (value) {
                 if (value.isNotEmpty)
-                collectPublisherArticles(
-                  subscriptionArticles,
-                  value,
-                  "${value.first.publisher}~${value.first.category}",
-                  page,
-                );
+                  collectPublisherArticles(
+                    subscriptionArticles,
+                    value,
+                    "${value.first.publisher}~${value.first.category}",
+                    page,
+                  );
               },
             ),
           );
         } else {
-          futures.add(publisher.categoryArticles(
-            category: subscription.category,
-            page: page_,
-          ).then(
-            (value) {
-              if (value.isNotEmpty)
-              collectPublisherArticles(
-                subscriptionArticles,
-                value,
-                "${value.first.publisher}~${value.first.category}",
-                page,
-              );
-            },
-          ),);
+          futures.add(
+            workerManager.execute<Set<NewsArticle>>(
+              () {
+                return publisher.categoryArticles(
+                  category: subscription.category,
+                  page: page_,
+                );
+              },
+            ).then(
+              (value) {
+                if (value.isNotEmpty)
+                  collectPublisherArticles(
+                    subscriptionArticles,
+                    value,
+                    "${value.first.publisher}~${value.first.category}",
+                    page,
+                  );
+              },
+            ),
+          );
         }
       }
     }
-    if (needFresh)
+    if (needFresh) {
       await Future.wait(futures);
+    }
     newsArticles.addAll(subscriptionArticles);
     return newsArticles;
   }
@@ -97,7 +111,6 @@ class ArticleProvider {
     }
 
     // sort - show most recent first
-    subscriptionArticles
-        .sort((a, b) => a.publishedAt.compareTo(b.publishedAt));
+    subscriptionArticles.sort((a, b) => a.publishedAt.compareTo(b.publishedAt));
   }
 }
