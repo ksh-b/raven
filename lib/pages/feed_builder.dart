@@ -72,7 +72,7 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
                                 .titleMedium!
                                 .color,
                             onPressed: (context) {
-                              article.load().then((value) {
+                              article.load(translate: true).then((value) {
                                 Store.saveArticle(value);
                               });
                             },
