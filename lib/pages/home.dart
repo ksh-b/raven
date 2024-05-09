@@ -29,24 +29,24 @@ class _MyHomePageState extends State<MyHomePage> {
             : NavigationDestinationLabelBehavior.alwaysShow,
         selectedIndex: _selectedIndex,
         destinations: <Widget>[
-          NavigationDestination(
-            icon: Icon(Icons.article_outlined),
-            selectedIcon: Icon(Icons.article),
+          const NavigationDestination(
+            icon: const Icon(Icons.article_outlined),
+            selectedIcon: const Icon(Icons.article),
             label: 'Feed',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.bookmark_outline_rounded),
-            selectedIcon: Icon(Icons.bookmark_rounded),
+          const NavigationDestination(
+            icon: const Icon(Icons.bookmark_outline_rounded),
+            selectedIcon: const Icon(Icons.bookmark_rounded),
             label: 'Saved',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite_border_rounded),
-            selectedIcon: Icon(Icons.favorite_rounded),
+          const NavigationDestination(
+            icon: const Icon(Icons.favorite_border_rounded),
+            selectedIcon: const Icon(Icons.favorite_rounded),
             label: 'Subscriptions',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
+          const NavigationDestination(
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings),
             label: 'Settings',
           ),
         ],

@@ -21,22 +21,22 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text(
+            child: const Text(
               'Theme',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           SwitchListTile(
-            secondary: Icon(Icons.brightness_6_rounded),
-            title: Text('Dark Mode'),
+            secondary: const Icon(Icons.brightness_6_rounded),
+            title: const Text('Dark Mode'),
             value: Store.darkThemeSetting,
             onChanged: (value) {
               Store.darkThemeSetting = value;
             },
           ),
           ListTile(
-            leading: Icon(Icons.format_paint_rounded),
-            title: Text('Color'),
+            leading: const Icon(Icons.format_paint_rounded),
+            title: const Text('Color'),
             subtitle: Text(Store.themeColorSetting),
             onTap: () {
               _showPopup(
@@ -51,8 +51,8 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           SizedBox(height: 20),
           ListTile(
-            leading: Icon(Icons.format_size_rounded),
-            title: Text('Font size'),
+            leading: const Icon(Icons.format_size_rounded),
+            title: const Text('Font size'),
             subtitle: Slider(
               value: Store.fontScale,
               min: 0.8,
@@ -79,14 +79,14 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text(
+            child: const Text(
               'Article',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.image),
-            title: Text('Load images'),
+            title: const Text('Load images'),
             value: Store.loadImagesSetting,
             onChanged: (bool value) {
               Store.loadImagesSetting = value;
@@ -94,7 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ListTile(
             leading: Icon(Icons.alt_route_rounded),
-            title: Text('Alternate URL (Long tap)'),
+            title: const Text('Alternate URL (Long tap)'),
             subtitle: Text(Store.ladderSetting),
             onTap: () {
               _showPopup(
@@ -109,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           SwitchListTile(
             secondary: Icon(Icons.translate_rounded),
-            title: Text('Translate'),
+            title: const Text('Translate'),
             value: Store.shouldTranslate,
             onChanged: (value) {
               setState(() {
@@ -119,14 +119,14 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           Store.shouldTranslate
               ? ListTile(
-                  title: Text('Translator'),
+                  title: const Text('Translator'),
                   subtitle: Text(Store.translatorSetting),
                   enabled: false,
                 )
               : SizedBox.shrink(),
           Store.shouldTranslate
               ? ListTile(
-                  title: Text('Translate language'),
+                  title: const Text('Translate language'),
                   subtitle: Text(Store.languageSetting),
                   onTap: () {
                     _showPopup(
@@ -142,7 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
               : SizedBox.shrink(),
           Store.shouldTranslate
               ? ListTile(
-                  title: Text('Translator instance'),
+                  title: const Text('Translator instance'),
                   subtitle: Text(Store.translatorInstanceSetting),
                   onTap: () {
                     _showPopup(
@@ -161,7 +161,7 @@ class _SettingsPageState extends State<SettingsPage> {
               : SizedBox.shrink(),
           Store.shouldTranslate
               ? ListTile(
-                  title: Text('Translator engine'),
+                  title: const Text('Translator engine'),
                   subtitle: Text(Store.translatorEngineSetting),
                   onTap: () {
                     _showPopup(
@@ -176,8 +176,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   enabled: false,
                 )
-              : SizedBox.shrink(),
-          SizedBox(height: 20),
+              : const SizedBox.shrink(),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -190,14 +190,14 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text(
+            child: const Text(
               'Search',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           ListTile(
-            leading: Icon(Icons.trending_up_rounded),
-            title: Text('Suggestions provider'),
+            leading: const Icon(Icons.trending_up_rounded),
+            title: const Text('Suggestions provider'),
             subtitle: Text(Store.trendsProviderSetting),
             onTap: () {
               _showPopup(
@@ -212,17 +212,17 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           Store.trendsProviderSetting == "Google"
               ? ListTile(
-                  leading: Icon(Icons.location_on_rounded),
+                  leading: const Icon(Icons.location_on_rounded),
                   onTap: () {
                     _showPopup(context, "Trends Provider", (String option) {
                       Store.countrySetting = option;
                     }, GoogleTrend.locations);
                   },
-                  title: Text("Google Trends location"),
+                  title: const Text("Google Trends location"),
                   subtitle: Text(Store.countrySetting),
                 )
-              : SizedBox.shrink(),
-          SizedBox(height: 20),
+              : const SizedBox.shrink(),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -232,7 +232,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -312,7 +312,7 @@ class _OptionsPopupState extends State<OptionsPopup> {
                         ),
                       ),
                     )
-                  : SizedBox.shrink();
+                  : const SizedBox.shrink();
             }
             return ListTile(
               title: Text(filteredOptions[index - 1]),

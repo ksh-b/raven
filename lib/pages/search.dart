@@ -29,7 +29,7 @@ class MySearchDelegate extends SearchDelegate<String> {
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
-        icon: Icon(Icons.clear),
+        icon: const Icon(Icons.clear),
         onPressed: () {
           query = '';
         },
@@ -40,7 +40,7 @@ class MySearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back),
       onPressed: () {
         close(context, '');
       },
@@ -61,7 +61,7 @@ class MySearchDelegate extends SearchDelegate<String> {
           return ListView(
             children: snapshot.data!
                 .map((e) => ListTile(
-                      leading: Icon(Icons.trending_up_rounded),
+                      leading: const Icon(Icons.trending_up_rounded),
                       title: Text(e),
                       onTap: () {
                         query = e;
@@ -72,12 +72,12 @@ class MySearchDelegate extends SearchDelegate<String> {
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
-            child: CircularProgressIndicator(),
+            child: const CircularProgressIndicator(),
           );
         } else if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
         } else {
-          return Center(child: Text("No data"));
+          return const Center(child: Text("No data"));
         }
       },
     );

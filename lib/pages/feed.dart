@@ -17,10 +17,10 @@ class _FeedPageState extends State<FeedPage>
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('What\'s happening?'),
+          title: const Text('What\'s happening?'),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
               onPressed: () {
                 showSearch(
                   context: context,
@@ -30,7 +30,7 @@ class _FeedPageState extends State<FeedPage>
             ),
           ],
         ),
-        body: FeedPageBuilder(),
+        body: const FeedPageBuilder(),
       ),
     );
   }

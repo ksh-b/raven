@@ -196,7 +196,7 @@ class _CategorySelectorState extends State<CategorySelector> {
         child: TextField(
           controller: customCategoryController,
           decoration: const InputDecoration(
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
             hintText: "Custom category",
           ),
           onChanged: (value) {

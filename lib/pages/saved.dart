@@ -5,7 +5,6 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/pages/full_article.dart';
-import 'package:raven/pages/search.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/string.dart';
@@ -32,7 +31,9 @@ class _SavedPageState extends State<SavedPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: Text("Saved"),),
+        appBar: AppBar(
+          title: Text("Saved"),
+        ),
         body: ValueListenableBuilder(
           valueListenable: Store.saved.listenable(),
           builder: (BuildContext context, box, Widget? child) {
@@ -46,7 +47,7 @@ class _SavedPageState extends State<SavedPage> {
                     child: Slidable(
                       key: Key(article.url),
                       endActionPane: ActionPane(
-                        motion: ScrollMotion(),
+                        motion: const ScrollMotion(),
                         children: [
                           SlidableAction(
                             backgroundColor:
@@ -72,19 +73,19 @@ class _SavedPageState extends State<SavedPage> {
                 },
               );
             }
-            return Center(
+            return const Center(
               child: Padding(
                 padding: const EdgeInsets.only(left: 64, right: 64),
-                child: Flex(
+                child: const Flex(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   direction: Axis.vertical,
                   children: [
-                    Icon(Icons.bookmark_add),
-                    SizedBox(
+                    const Icon(Icons.bookmark_add),
+                    const SizedBox(
                       height: 16,
                     ),
-                    Text(
+                    const Text(
                       "Swipe articles to the right on the feed page to save them.",
                     )
                   ],

@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:raven/api/simplytranslate.dart';
 import 'package:raven/brain/article_provider.dart';
 import 'package:raven/model/article.dart';
@@ -42,17 +41,14 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: refresh,
-      child: ValueListenableBuilder(
-        valueListenable: Store.subscriptions.listenable(),
-        builder: (BuildContext context, box, Widget? child) {
-          if (Store.selectedSubscriptions.isNotEmpty) {
-            return ListView.builder(
+      child: Store.selectedSubscriptions.isNotEmpty
+          ? ListView.builder(
               itemCount: newsArticles.length + 2,
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return isLoading
-                      ? LinearProgressIndicator()
-                      : SizedBox.shrink();
+                      ? const LinearProgressIndicator()
+                      : const SizedBox.shrink();
                 }
                 if (index - 1 < newsArticles.length) {
                   var article = newsArticles[index - 1];
@@ -94,25 +90,22 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
                   );
                 }
               },
-            );
-          }
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 64, right: 64),
-              child: Flex(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                direction: Axis.vertical,
-                children: [
-                  Icon(Icons.checklist_rounded),
-                  SizedBox(height: 32),
-                  Text("Select some subscriptions to get started")
-                ],
+            )
+          : Center(
+              child: const Padding(
+                padding: const EdgeInsets.only(left: 64, right: 64),
+                child: const Flex(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  direction: Axis.vertical,
+                  children: [
+                    Icon(Icons.checklist_rounded),
+                    SizedBox(height: 32),
+                    Text("Select some subscriptions to get started")
+                  ],
+                ),
               ),
             ),
-          );
-        },
-      ),
     );
   }
 
@@ -174,7 +167,7 @@ class FeedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
+        borderRadius: BorderRadius.circular(8.0),
         child: InkWell(
           child: Flex(
             direction: Axis.vertical,
@@ -194,7 +187,7 @@ class FeedCard extends StatelessWidget {
                     ? Text(
                         unixToString(article.publishedAt),
                       )
-                    : SizedBox.shrink(),
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -262,7 +255,7 @@ class ArticleTags extends StatelessWidget {
                       // avatar: Icon(Icons.tag),
                       label: Text(
                         createTag(e),
-                        style: TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 10),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
@@ -289,21 +282,23 @@ class ArticleThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!Network.shouldLoadImage(article.thumbnail)) {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
     return CachedNetworkImage(
       width: MediaQuery.of(context).size.width,
       fit: BoxFit.fill,
       imageUrl: article.thumbnail,
-      progressIndicatorBuilder: (context, url, progress) =>
-          Stack(alignment: AlignmentDirectional.bottomCenter, children: [
-        SizedBox(
-          height: 200,
-        ),
-        LinearProgressIndicator()
-      ]),
+      progressIndicatorBuilder: (context, url, progress) => const Stack(
+        alignment: AlignmentDirectional.bottomCenter,
+        children: [
+          const SizedBox(
+            height: 200,
+          ),
+          const LinearProgressIndicator(),
+        ],
+      ),
       errorWidget: (context, url, error) {
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       },
     );
   }

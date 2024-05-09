@@ -38,7 +38,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                 controller: searchController,
                 onChanged: (value) => searchSubscriptions(),
               )
-            : Text('Subscriptions'),
+            : const Text('Subscriptions'),
         actions: <Widget>[
           IconButton(
             icon: Icon(_isSearching ? Icons.close : Icons.search),
@@ -63,7 +63,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
               (int index) {
                 if (index == 0) {
                   return ChoiceChip(
-                    label: Text("all"),
+                    label: const Text("all"),
                     selected: _value == index,
                     onSelected: (bool selected) {
                       setState(() {
@@ -115,8 +115,8 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                         const Icon(Icons.error),
                   ),
                   trailing: categories.isEmpty
-                      ? SizedBox.shrink()
-                      : Icon(Icons.check_circle),
+                      ? const SizedBox.shrink()
+                      : const Icon(Icons.check_circle),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -156,7 +156,9 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
   String getSelectedCategories(String newsSource) {
     var categories = Store.selectedSubscriptions
         .where((element) => element.publisher == newsSource)
-        .map((e) => e.category != "/" ? e.category.split("/").where((i) => i.isNotEmpty).last : e.category)
+        .map((e) => e.category != "/"
+            ? e.category.split("/").where((i) => i.isNotEmpty).last
+            : e.category)
         .join(", ");
     return categories;
   }
