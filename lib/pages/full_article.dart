@@ -24,18 +24,6 @@ class ArticlePage extends StatefulWidget {
 }
 
 class _ArticlePageState extends State<ArticlePage> {
-  TextStyle metadataStyle = const TextStyle(
-    fontStyle: FontStyle.italic,
-    color: Colors.grey,
-  );
-
-  TextStyle titleStyle = const TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-  );
-
-  TextStyle excerptStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-
   Stream<NewsArticle> customArticle(
     NewsArticle newsArticle,
     BuildContext context,
@@ -48,6 +36,7 @@ class _ArticlePageState extends State<ArticlePage> {
 
       if (Store.shouldTranslate) {
         var translator = SimplyTranslate();
+
         cArticle.excerpt = (await translator.translate(
           [cArticle.excerpt],
           Store.languageSetting,
@@ -67,9 +56,9 @@ class _ArticlePageState extends State<ArticlePage> {
 
   @override
   Widget build(BuildContext context) {
-    String fullUrl =
+    final String fullUrl =
         "${publishers[widget.article.publisher]!.homePage}${widget.article.url}";
-    String altUrl = "${Store.ladderUrl}/$fullUrl";
+    final String altUrl = "${Store.ladderUrl}/$fullUrl";
     return StreamBuilder<NewsArticle>(
       initialData: widget.article,
       stream: customArticle(widget.article, context),
@@ -78,13 +67,13 @@ class _ArticlePageState extends State<ArticlePage> {
           appBar: AppBar(
             title: Text(publishers[widget.article.publisher]!.name),
             actions: [
-              _shareButton(altUrl: altUrl, fullUrl: fullUrl),
-              _openButton(altUrl: altUrl, fullUrl: fullUrl),
+              ShareButton(altUrl: altUrl, fullUrl: fullUrl),
+              OpenButton(altUrl: altUrl, fullUrl: fullUrl),
             ],
           ),
           body: snapshot.hasData
-              ? _successArticle(snapshot)
-              : _fallBackArticle(fullUrl),
+              ? SuccessArticle(snapshot)
+              : FallbackArticle(widget.article, fullUrl),
         );
       },
     );
@@ -95,118 +84,27 @@ class _ArticlePageState extends State<ArticlePage> {
       future: Smort().fallback(widget.article),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return _successArticle(snapshot);
+          return SuccessArticle(snapshot);
         } else if (snapshot.hasError) {
-          return _failArticle(fullUrl);
+          return FailArticle(fullUrl);
         }
-        return Center(
-            child: Flex(
-          mainAxisAlignment: MainAxisAlignment.center,
-          direction: Axis.vertical,
-          children: [
-            CircularProgressIndicator(),
-            Text("Failed to load article. Trying fallback."),
-          ],
-        ));
+        return const Center(
+          child: const Flex(
+            mainAxisAlignment: MainAxisAlignment.center,
+            direction: Axis.vertical,
+            children: [
+              const CircularProgressIndicator(),
+              const Text("Failed to load article. Trying fallback."),
+            ],
+          ),
+        );
       },
     );
   }
-
-  Center _failArticle(String fallbackUrl) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 64, right: 64),
-        child: Flex(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          direction: Axis.vertical,
-          children: [
-            ListTile(
-              title: Text("Error loading article"),
-              subtitle: Text("You can try opening the url in your browser"),
-            ),
-            ListTile(
-              leading: Icon(Icons.open_in_browser),
-              title: Text("Open in browser"),
-              onTap: () {
-                launchUrl(Uri.parse(fallbackUrl));
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.share),
-              title: Text("Share"),
-              onTap: () {
-                Share.shareUri(Uri.parse(fallbackUrl));
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _successArticle(AsyncSnapshot<NewsArticle> snapshot) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      child: ListView(
-        children: [
-          snapshot.connectionState != ConnectionState.done
-              ? LinearProgressIndicator()
-              : SizedBox.shrink(),
-          textWidget("", snapshot.data!.title, titleStyle),
-          textWidget("Author", snapshot.data!.author, metadataStyle),
-          textWidget("Published", unixToString(snapshot.data!.publishedAt),
-              metadataStyle),
-          if (Network.shouldLoadImage(snapshot.data!.thumbnail))
-            image(snapshot),
-          textWidget("", snapshot.data!.excerpt, excerptStyle),
-          HtmlWidget(snapshot.data!.content),
-        ],
-      ),
-    );
-  }
-
-  Padding image(AsyncSnapshot<NewsArticle> snapshot) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: CachedNetworkImage(
-        fit: BoxFit.fitWidth,
-        imageUrl: snapshot.data!.thumbnail,
-        progressIndicatorBuilder: (context, url, downloadProgress) {
-          return Center(
-            child: LinearProgressIndicator(
-              value: downloadProgress.progress,
-            ),
-          );
-        },
-        errorWidget: (context, url, error) {
-          return const Icon(Icons.error);
-        },
-      ),
-    );
-  }
-
-  Widget textWidget(
-    String label,
-    String value,
-    TextStyle style,
-  ) {
-    if (value.isNotEmpty) {
-      return Padding(
-        padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-        child: Text(
-          label.isNotEmpty ? '$label: $value' : value,
-          style: style,
-        ),
-      );
-    } else {
-      return SizedBox.shrink();
-    }
-  }
 }
 
-class _openButton extends StatelessWidget {
-  const _openButton({
+class OpenButton extends StatelessWidget {
+  const OpenButton({
     super.key,
     required this.altUrl,
     required this.fullUrl,
@@ -231,8 +129,8 @@ class _openButton extends StatelessWidget {
   }
 }
 
-class _shareButton extends StatelessWidget {
-  const _shareButton({
+class ShareButton extends StatelessWidget {
+  const ShareButton({
     super.key,
     required this.altUrl,
     required this.fullUrl,
@@ -252,6 +150,52 @@ class _shareButton extends StatelessWidget {
         onPressed: () {
           Share.shareUri(Uri.parse(fullUrl));
         },
+      ),
+    );
+  }
+}
+
+class SuccessArticle extends StatelessWidget {
+  final AsyncSnapshot<NewsArticle> snapshot;
+
+  SuccessArticle(this.snapshot, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle metadataStyle = const TextStyle(
+      fontStyle: FontStyle.italic,
+      color: Colors.grey,
+    );
+
+    TextStyle titleStyle = const TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+    );
+
+    TextStyle excerptStyle = const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+    );
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      child: ListView(
+        children: [
+          snapshot.connectionState != ConnectionState.done
+              ? LinearProgressIndicator()
+              : SizedBox.shrink(),
+          TextWidget("", snapshot.data!.title, titleStyle),
+          TextWidget("Author", snapshot.data!.author, metadataStyle),
+          TextWidget(
+            "Published",
+            unixToString(snapshot.data!.publishedAt),
+            metadataStyle,
+          ),
+          if (Network.shouldLoadImage(snapshot.data!.thumbnail))
+            Image(snapshot),
+          TextWidget("", snapshot.data!.excerpt, excerptStyle),
+          HtmlWidget(snapshot.data!.content),
+        ],
       ),
     );
   }
@@ -313,6 +257,131 @@ class HtmlWidget extends StatelessWidget {
               )
             : SizedBox.shrink();
       },
+    );
+  }
+}
+
+class TextWidget extends StatelessWidget {
+  final String label;
+  final String value;
+  final TextStyle style;
+
+  const TextWidget(this.label, this.value, this.style, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var displayText = label.isNotEmpty && value.isNotEmpty;
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+      child: value.isNotEmpty
+          ? Text(
+              displayText
+                  ? '$label: $value'
+                  : value.isNotEmpty
+                      ? value
+                      : "",
+              style: style,
+            )
+          : SizedBox.shrink(),
+    );
+  }
+}
+
+class Image extends StatelessWidget {
+  final AsyncSnapshot<NewsArticle> snapshot;
+
+  const Image(this.snapshot, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: CachedNetworkImage(
+        fit: BoxFit.fitWidth,
+        imageUrl: snapshot.data!.thumbnail,
+        progressIndicatorBuilder: (context, url, downloadProgress) {
+          return Center(
+            child: LinearProgressIndicator(
+              value: downloadProgress.progress,
+            ),
+          );
+        },
+        errorWidget: (context, url, error) {
+          return const Icon(Icons.error);
+        },
+      ),
+    );
+  }
+}
+
+class FallbackArticle extends StatelessWidget {
+  final String fullUrl;
+  final NewsArticle article;
+
+  const FallbackArticle(this.article, this.fullUrl, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Smort().fallback(article),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return SuccessArticle(snapshot);
+        } else if (snapshot.hasError) {
+          return FailArticle(fullUrl);
+        }
+        return const Center(
+          child: const Flex(
+            mainAxisAlignment: MainAxisAlignment.center,
+            direction: Axis.vertical,
+            children: [
+              const CircularProgressIndicator(),
+              const Text("Failed to load article. Trying fallback."),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class FailArticle extends StatelessWidget {
+  final String fallbackUrl;
+
+  const FailArticle(this.fallbackUrl, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 64, right: 64),
+        child: Flex(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          direction: Axis.vertical,
+          children: [
+            const ListTile(
+              title: const Text("Error loading article"),
+              subtitle:
+                  const Text("You can try opening the url in your browser"),
+            ),
+            ListTile(
+              leading: const Icon(Icons.open_in_browser),
+              title: const Text("Open in browser"),
+              onTap: () {
+                launchUrl(Uri.parse(fallbackUrl));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share),
+              title: const Text("Share"),
+              onTap: () {
+                Share.shareUri(Uri.parse(fallbackUrl));
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
