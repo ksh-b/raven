@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:raven/api/simplytranslate.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:raven/brain/article_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/pages/full_article.dart';
+import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/string.dart';
@@ -137,7 +138,7 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
           if (e.title.isEmpty) e.title = ".";
           return e.title.replaceAll("\n", "");
         }).toList();
-        var translated = await SimplyTranslate().translate(
+        var translated = await SimplyTranslate().translateSentences(
           originalTitles,
           Store.languageSetting,
         );
@@ -258,7 +259,6 @@ class ArticleTags extends StatelessWidget {
               .map((e) => Padding(
                     padding: const EdgeInsets.only(left: 4, right: 4),
                     child: Chip(
-                      // avatar: Icon(Icons.tag),
                       label: Text(
                         createTag(e),
                         style: const TextStyle(fontSize: 10),
