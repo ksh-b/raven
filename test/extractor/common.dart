@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:raven/api/smort.dart';
-import 'package:test/test.dart';
+import 'package:raven/brain/fallback_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:test/test.dart';
 
 class ExtractorTest {
   static Future<void> categoriesTest(Publisher publisher) async {
@@ -39,7 +39,7 @@ class ExtractorTest {
             expect(value.publishedAt, isNonNegative,
                 reason: article.url, skip: skipDateCheck);
             if (value.content.isEmpty) {
-              Smort().fallback(article).then((value) {
+              FallbackProvider().get(article).then((value) {
                 expect(value.content, isNotEmpty, reason: article.url);
               });
             } else {
