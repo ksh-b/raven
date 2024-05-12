@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
-import 'package:raven/api/simplytranslate.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/html_helper.dart';
 import 'package:raven/utils/store.dart';
 
@@ -101,20 +101,17 @@ class NewsArticle extends HiveObject {
     if (Store.shouldTranslate && translate) {
       var translate = SimplyTranslate();
       newsArticle.title = (await translate.translate(
-        [newsArticle.title],
+        newsArticle.title,
         Store.languageSetting,
-      ))
-          .first;
+      ));
       newsArticle.excerpt = (await translate.translate(
-        [newsArticle.excerpt],
+        newsArticle.excerpt,
         Store.languageSetting,
-      ))
-          .first;
-      newsArticle.content = (await translate.translate(
-        cleanHtml(newsArticle.content),
+      ));
+      newsArticle.content = (await translate.translateParagraph(
+        cleanHtml(newsArticle.content).join(),
         Store.languageSetting,
-      ))
-          .join();
+      ));
     }
     return newsArticle;
   }

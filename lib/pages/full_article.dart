@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:raven/api/simplytranslate.dart';
-import 'package:raven/api/smort.dart';
+import 'package:raven/brain/fallback_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/html_helper.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
@@ -28,7 +28,11 @@ class _ArticlePageState extends State<ArticlePage> {
     NewsArticle newsArticle,
     BuildContext context,
   ) async* {
-    if (newsArticle.content.isNotEmpty && !Store.shouldTranslate) {
+    if(newsArticle.markers.contains("saved"))
+      yield newsArticle;
+    else if (newsArticle.content.isNotEmpty &&
+        !Store.shouldTranslate &&
+        publishers[newsArticle.publisher]!.mainCategory != Category.custom) {
       yield newsArticle;
     } else {
       NewsArticle cArticle = await newsArticle.load();
@@ -37,18 +41,17 @@ class _ArticlePageState extends State<ArticlePage> {
       if (Store.shouldTranslate) {
         var translator = SimplyTranslate();
 
-        cArticle.excerpt = (await translator.translate(
+        var excerpt = (await translator.translateSentences(
           [cArticle.excerpt],
           Store.languageSetting,
-        ))
-            .first;
+        ));
+        cArticle.excerpt = excerpt.isNotEmpty ? excerpt.first : "";
         yield cArticle;
 
-        cArticle.content = (await translator.translate(
-          cleanHtml(cArticle.content),
+        cArticle.content = (await translator.translateParagraph(
+          cleanHtml(cArticle.content).join(),
           Store.languageSetting,
-        ))
-            .join();
+        ));
         yield cArticle;
       }
     }
@@ -74,29 +77,6 @@ class _ArticlePageState extends State<ArticlePage> {
           body: snapshot.hasData
               ? SuccessArticle(snapshot)
               : FallbackArticle(widget.article, fullUrl),
-        );
-      },
-    );
-  }
-
-  FutureBuilder<NewsArticle> _fallBackArticle(String fullUrl) {
-    return FutureBuilder(
-      future: Smort().fallback(widget.article),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return SuccessArticle(snapshot);
-        } else if (snapshot.hasError) {
-          return FailArticle(fullUrl);
-        }
-        return const Center(
-          child: const Flex(
-            mainAxisAlignment: MainAxisAlignment.center,
-            direction: Axis.vertical,
-            children: [
-              const CircularProgressIndicator(),
-              const Text("Failed to load article. Trying fallback."),
-            ],
-          ),
         );
       },
     );
@@ -219,7 +199,6 @@ class HtmlWidget extends StatelessWidget {
               .then((value) => launchUrl(Uri.parse(url)));
         }
       },
-      // doNotRenderTheseTags: const {"noscript"},
       extensions: [
         TagExtension(
           tagsToExtend: {"noscript"},
@@ -323,7 +302,7 @@ class FallbackArticle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Smort().fallback(article),
+      future: FallbackProvider().get(article),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return SuccessArticle(snapshot);
