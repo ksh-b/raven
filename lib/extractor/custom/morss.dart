@@ -6,6 +6,7 @@ import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/brain/fallback_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/utils/html_helper.dart';
 import 'package:raven/utils/time.dart';
 
 class Morss extends Publisher {
@@ -55,15 +56,21 @@ class Morss extends Publisher {
       url = "$homePage/:format=json:cors/$category";
     final response = await dio().get(url);
     if (response.statusCode == 200) {
-      var data = json.decode(response.data);
+      var data = response.data;
       var items = data["items"];
       for (var item in items) {
+        var content = item["content"];
+        var excerpt = item.containsKey("desc") ? item["desc"] : "";
+        if(isHTML(excerpt)) {
+          content = "<b>" + excerpt+ r"</b>"+ content;
+          excerpt = "";
+        }
         articles.add(
           NewsArticle(
             publisher: name,
             title: item["title"] ?? "",
-            content: item["content"],
-            excerpt: item.containsKey("desc") ? item["desc"] : "",
+            content: content,
+            excerpt: excerpt,
             author: "",
             url: item["url"],
             tags: [],
