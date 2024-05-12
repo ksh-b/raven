@@ -36,7 +36,7 @@ class _CategorySelectorState extends State<CategorySelector> {
 
   String convertString(String input) {
     if (input.startsWith("https://") || input.startsWith("http://"))
-      return input.split("/").sublist(2).join("/");
+      return input.split("/").sublist(2).join("/").replaceAll("www.", "");
 
     List<String> parts = input.split('/');
     parts.removeWhere((part) => part.isEmpty);
@@ -61,7 +61,7 @@ class _CategorySelectorState extends State<CategorySelector> {
         title: Text("${widget.newsSource} categories"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: FutureBuilder(
           future: future,
           builder: (context, snapshot) {
@@ -161,21 +161,22 @@ class _CategorySelectorState extends State<CategorySelector> {
       int index, AsyncSnapshot<Map<String, String>> snapshot) {
     return CheckboxListTile(
       secondary: IconButton(
-          icon: const Icon(Icons.delete_forever),
-          onPressed: () {
-            var subscription =
-                customSubscriptions[index - (snapshot.data!.length + 1)];
-            setState(() {
-              customSubscriptions.remove(subscription);
-              selectedSubscriptions.remove(subscription);
-            });
-            var cs = Store.customSubscriptions;
-            cs.remove(subscription);
-            Store.customSubscriptions = cs;
-            var ss = Store.selectedSubscriptions;
-            ss.remove(subscription);
-            Store.selectedSubscriptions = ss;
-          }),
+        icon: const Icon(Icons.delete_forever),
+        onPressed: () {
+          var subscription =
+              customSubscriptions[index - (snapshot.data!.length + 1)];
+          setState(() {
+            customSubscriptions.remove(subscription);
+            selectedSubscriptions.remove(subscription);
+          });
+          var cs = Store.customSubscriptions;
+          cs.remove(subscription);
+          Store.customSubscriptions = cs;
+          var ss = Store.selectedSubscriptions;
+          ss.remove(subscription);
+          Store.selectedSubscriptions = ss;
+        },
+      ),
       title: Text(convertString(
           (customSubscriptions[index - (snapshot.data!.length + 1)]
                   as UserSubscription)
@@ -191,20 +192,21 @@ class _CategorySelectorState extends State<CategorySelector> {
 
   Widget _buildCustomSourceSelector() {
     return Flexible(
-        flex: 3,
-        fit: FlexFit.tight,
-        child: TextField(
-          controller: customCategoryController,
-          decoration: const InputDecoration(
-            border: const OutlineInputBorder(),
-            hintText: "Custom category",
-          ),
-          onChanged: (value) {
-            setState(() {
-              customCategory = value;
-            });
-          },
-        ));
+      flex: 3,
+      fit: FlexFit.tight,
+      child: TextField(
+        controller: customCategoryController,
+        decoration: const InputDecoration(
+          border: const OutlineInputBorder(),
+          hintText: "Custom category",
+        ),
+        onChanged: (value) {
+          setState(() {
+            customCategory = value;
+          });
+        },
+      ),
+    );
   }
 
   Flexible _buildCustomTester() {
@@ -217,11 +219,14 @@ class _CategorySelectorState extends State<CategorySelector> {
           if (snapshot.connectionState == ConnectionState.waiting)
             return const CircularProgressIndicator();
           if (snapshot.hasError) return const Icon(Icons.cancel);
+          if (customCategoryController.text.isEmpty)
+            return const SizedBox.shrink();
           if (snapshot.hasData) {
             return snapshot.data!.isNotEmpty
                 ? IconButton(
                     onPressed: () {
                       setState(() {
+                        customCategoryController.text = "";
                         customSubscriptions.add(UserSubscription(
                           widget.newsSource,
                           customCategory,
@@ -234,7 +239,8 @@ class _CategorySelectorState extends State<CategorySelector> {
                         )
                       ];
                     },
-                    icon: const Icon(Icons.save_alt))
+                    icon: const Icon(Icons.save_alt),
+                  )
                 : const Icon(Icons.cancel);
           }
           return SizedBox.shrink();
