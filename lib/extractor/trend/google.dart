@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -20,7 +21,9 @@ class GoogleTrend extends Trend {
     var country = "US";
     if (Hive.isBoxOpen("settings"))
       country = "${countryCodes[Store.countrySetting]}";
-    var response = await dio().get(url + country);
+    var response = await dio().get(url + country, options: Options(
+      responseType: ResponseType.plain,
+    ));
     List<String> queries = [];
     if (response.statusCode == 200) {
       Document document = html_parser.parse(response.data);
@@ -28,6 +31,7 @@ class GoogleTrend extends Trend {
           .replaceFirst(")]}',", "")
           .replaceFirst("<html><head></head><body>", "")
           .replaceFirst("</body></html>", "");
+      print(jsonText);
       var somethings = json.decode(jsonText)["default"]["trendingSearchesDays"];
       for (var something in somethings) {
         var searches = something["trendingSearches"];

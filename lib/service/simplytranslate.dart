@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
-import 'package:html/parser.dart' as html_parser;
 import 'package:html/parser.dart';
 import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/utils/store.dart';
@@ -163,13 +162,12 @@ class SimplyTranslate {
     String language,
   ) async {
     List<String> translated = [];
-    var mSentences = mergeSentences(sentences);
-    for (var ms in mSentences) {
+    for (var ms in sentences) {
       var s = await translate(
         ms,
         language,
       );
-      translated.addAll(s.split("~~~"));
+      translated.add(s);
     }
     return translated;
   }
@@ -223,7 +221,7 @@ class SimplyTranslate {
     for (String sentence in sentences) {
       if (currentMergedSentence.length + sentence.length <= 4000) {
         if (currentMergedSentence.isNotEmpty) {
-          currentMergedSentence += "~~~";
+          currentMergedSentence += " ";
         }
         currentMergedSentence += sentence;
       } else {
@@ -241,30 +239,40 @@ class SimplyTranslate {
         (element) => element.isEmpty,
       )
       ..map(
-        (e) => e + "~~~",
+        (e) => e + " ",
       );
   }
+
+  List<String> splitParagraph(String paragraph, [int wordsPerSentence = 500]) {
+    final List<String> words = paragraph.replaceAll(" <", "<").replaceAll("> ", ">").split(new RegExp(r'\s+'));
+    final List<List<String>> groupedWords = _groupLists(words, wordsPerSentence);
+    final List<String> sentences = groupedWords.map((wordList) => wordList.join(' ')).toList();
+
+    return sentences;
+  }
+
+  List<List<String>> _groupLists(List<String> items, int groupSize) {
+    final List<List<String>> groups = [];
+    for (int i = 0; i < items.length; i += groupSize) {
+      groups.add(items.sublist(i, i + groupSize > items.length ? items.length : i + groupSize));
+    }
+    return groups;
+  }
+
 
   Future<String> translateParagraph(
     String paragraph,
     String language,
   ) async {
     if(paragraph.isEmpty) return paragraph;
-    Document document = html_parser.parse(paragraph.replaceAll("<", " <").replaceAll(">", "> "));
-    var html = document.outerHtml;
-    List<String> smallParas = mergeSentences(extractTextFromDocument(document));
+    var translatedHtml = "";
+    List<String> smallParas = splitParagraph(paragraph);
     List<String> translatedSmallParas = List.filled(smallParas.length, '');
     for (int i = 0; i < smallParas.length; i++) {
       translatedSmallParas[i] = await translate(smallParas[i], language);
+      translatedHtml +=translatedSmallParas[i];
     }
-    for (int i = 0; i < translatedSmallParas.length; i++) {
-      for (int j = 0; j < translatedSmallParas[i].split("~~~").length; j++) {
-        html = html.replaceFirst(
-          smallParas[i].split("~~~")[j],
-          translatedSmallParas[i].split("~~~")[j],
-        );
-      }
-    }
-    return html;
+
+    return translatedHtml;
   }
 }
