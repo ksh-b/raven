@@ -2,7 +2,7 @@
 
 News Reader
 
-This app uses APIs and web scraping to fetch news articles. RSS feeds are not supported.
+This app uses APIs and web scraping to fetch news articles.
 
 ## Features
 - Multiple sources
