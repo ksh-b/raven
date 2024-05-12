@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:raven/api/simplytranslate.dart';
 import 'package:raven/extractor/trend/google.dart';
 import 'package:raven/model/trends.dart';
+import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/theme_provider.dart';
 

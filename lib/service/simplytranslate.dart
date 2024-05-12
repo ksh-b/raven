@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
+import 'package:html/dom.dart';
+import 'package:html/parser.dart' as html_parser;
 import 'package:html/parser.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/utils/store.dart';
 import 'package:worker_manager/worker_manager.dart';
 
@@ -156,35 +158,113 @@ class SimplyTranslate {
     ],
   };
 
-  Future<List<String>> translate(
-    List<String> inputText,
+  Future<List<String>> translateSentences(
+    List<String> sentences,
     String language,
   ) async {
-    if (!languages.containsKey(language) || inputText.join().isEmpty) {
-      return inputText;
+    List<String> translated = [];
+    var mSentences = mergeSentences(sentences);
+    for (var ms in mSentences) {
+      var s = await translate(
+        ms,
+        language,
+      );
+      translated.addAll(s.split("~~~"));
     }
+    return translated;
+  }
+
+  Future<String> translate(String inputText, String language) async {
     String url =
         'https://${Store.translatorInstanceSetting}/?engine=${Store.translatorEngineSetting}';
-    List<String> inputTextParts = inputText;
-    List<String> outputParts = inputTextParts;
-    List<Future> futures = [];
-    for (int i = 0; i < inputTextParts.length; i++) {
-      Map<String, String> payload = {
-        'from': 'auto',
-        'to': languages[language]!,
-        'text': inputTextParts[i]
-      };
-      futures.add(workerManager.execute<Response>(() {
-        return http.post(Uri.parse(url), body: payload);
-      }).then(
-        (value) {
-          var document = parse(value.body);
-          outputParts[i] =
-              document.getElementById('output')?.text ?? inputTextParts[i];
-        },
-      ));
+    Map<String, String> payload = {
+      'from': 'auto',
+      'to': languages[language]!,
+      'text': inputText
+    };
+    return workerManager.execute<String>(() async {
+      var response = await dio().post(url, data: FormData.fromMap(payload));
+      var document = parse(response.data);
+      return document.getElementById('output')?.text ?? inputText;
+    });
+  }
+
+  List<String> extractTextFromDocument(Document doc) {
+    List<String> text = [];
+
+    void extractTextFromNode(Node node) {
+      if (node.nodeType == Node.TEXT_NODE) {
+        text += [(node.text ?? "")];
+      } else if (node.nodeType == Node.DOCUMENT_NODE) {
+        Document element = node as Document;
+        for (var child in element.nodes) {
+          extractTextFromNode(child);
+        }
+      } else if (node.nodeType == Node.ELEMENT_NODE) {
+        Element element = node as Element;
+        for (var child in element.nodes) {
+          extractTextFromNode(child);
+        }
+      }
     }
-    await Future.wait(futures);
-    return outputParts;
+
+    extractTextFromNode(doc);
+    text.removeWhere(
+      (element) => element.trim().isEmpty,
+    );
+
+    return text;
+  }
+
+  List<String> mergeSentences(List<String> sentences) {
+    List<String> mergedSentences = [];
+    String currentMergedSentence = '';
+
+    for (String sentence in sentences) {
+      if (currentMergedSentence.length + sentence.length <= 4000) {
+        if (currentMergedSentence.isNotEmpty) {
+          currentMergedSentence += "~~~";
+        }
+        currentMergedSentence += sentence;
+      } else {
+        mergedSentences.add(currentMergedSentence);
+        currentMergedSentence = sentence;
+      }
+    }
+
+    if (currentMergedSentence.isNotEmpty) {
+      mergedSentences.add(currentMergedSentence);
+    }
+
+    return mergedSentences
+      ..removeWhere(
+        (element) => element.isEmpty,
+      )
+      ..map(
+        (e) => e + "~~~",
+      );
+  }
+
+  Future<String> translateParagraph(
+    String paragraph,
+    String language,
+  ) async {
+    // if(paragraph.isEmpty)return paragraph;
+    Document document = html_parser.parse(paragraph.replaceAll("<", " <").replaceAll(">", "> "));
+    var html = document.outerHtml;
+    List<String> smallParas = mergeSentences(extractTextFromDocument(document));
+    List<String> translatedSmallParas = List.filled(smallParas.length, '');
+    for (int i = 0; i < smallParas.length; i++) {
+      translatedSmallParas[i] = await translate(smallParas[i], language);
+    }
+    for (int i = 0; i < translatedSmallParas.length; i++) {
+      for (int j = 0; j < translatedSmallParas[i].split("~~~").length; j++) {
+        html = html.replaceFirst(
+          smallParas[i].split("~~~")[j],
+          translatedSmallParas[i].split("~~~")[j],
+        );
+      }
+    }
+    return html;
   }
 }
