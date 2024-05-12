@@ -28,7 +28,7 @@ class _ArticlePageState extends State<ArticlePage> {
     NewsArticle newsArticle,
     BuildContext context,
   ) async* {
-    if(newsArticle.markers.contains("saved"))
+    if(newsArticle.tags.contains("saved"))
       yield newsArticle;
     else if (newsArticle.content.isNotEmpty &&
         !Store.shouldTranslate &&
