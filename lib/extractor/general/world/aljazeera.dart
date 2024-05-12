@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
@@ -97,22 +98,20 @@ class AlJazeera extends Publisher {
     var url =
         'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"where","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
     var headers = {'wp-site': 'aje'};
-
-    var response = await dio().get(url, data: headers);
-    if (json.decode(response.data)["data"]["articles"] == null) {
-      url =
-          'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"categories","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
-      response = await dio().get(url, data: headers);
+    var response = await dio().get(url, options:  Options(headers: headers));
+    if ((response.data)["data"]["articles"] == null) {
+      url = 'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"categories","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
+      response = await dio().get(url, data: Options(headers: headers));
     }
 
-    if (json.decode(response.data)["data"]["articles"] == null) {
+    if ((response.data)["data"]["articles"] == null) {
       url =
           'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"tags","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
-      response = await dio().get(url, data: headers);
+      response = await dio().get(url, data: Options(headers: headers));
     }
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.data);
+      final Map<String, dynamic> data = (response.data);
       var articlesData = data["data"]["articles"] ?? [];
       for (var element in articlesData) {
         var title = element['title'];

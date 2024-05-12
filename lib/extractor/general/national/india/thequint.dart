@@ -71,7 +71,7 @@ class TheQuint extends Publisher {
 
     final response = await dio().get(url);
     if (response.statusCode == 200) {
-      List data = json.decode(response.data)["items"];
+      List data = (response.data)["items"];
 
       for (var element in data) {
         if (element["story"] == null) continue;
@@ -112,7 +112,7 @@ class TheQuint extends Publisher {
     String apiUrl = '$homePage/route-data.json?path=/search&q=$searchQuery';
     final response = await dio().get(apiUrl);
     if (response.statusCode == 200) {
-      List data = json.decode(response.data)["data"]["stories"];
+      List data = (response.data)["data"]["stories"];
 
       for (var element in data) {
         List<String> tags = [];

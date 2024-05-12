@@ -62,7 +62,7 @@ class BBC extends Publisher {
     final response = await dio().get(apiUrl);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.data);
+      final Map<String, dynamic> data = (response.data);
       var articles = data["payload"][0]["body"]["results"];
       for (var article in articles) {
         var articleUrl = article['url'];
@@ -107,7 +107,7 @@ class BBC extends Publisher {
         '&urn=urn:bbc:vivo:curation:$groupResourceId';
     final response = await dio().get(apiUrl);
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.data);
+      final Map<String, dynamic> data = (response.data);
       var articles = data["posts"];
       for (var article in articles) {
         var title = article['headline'];

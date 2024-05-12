@@ -141,7 +141,7 @@ class CNN extends Publisher {
     var response = await dio().get(url);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.data);
+      final Map<String, dynamic> data = (response.data);
       if (data["message"] != "success") {
         return {};
       }

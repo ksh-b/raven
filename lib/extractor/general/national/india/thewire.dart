@@ -69,10 +69,10 @@ class TheWire extends Publisher {
     if (response.statusCode == 200) {
       List data;
       if (isSearch) {
-        data = json.decode(response.data)["generic"];
+        data = (response.data)["generic"];
       } else {
         try {
-          data = json.decode(response.data);
+          data = (response.data);
         } catch (e) {
           data = [];
         }
@@ -107,7 +107,7 @@ class TheWire extends Publisher {
   Future<NewsArticle> article(NewsArticle newsArticle) async {
     var response = await dio().get('$homePage${newsArticle.url}');
     if (response.statusCode == 200) {
-      var data = json.decode(response.data);
+      var data = (response.data);
       var postDetail = data["post-detail"][0];
       var content = postDetail["post_content"];
       var thumbnail = postDetail["featured_image"][0];

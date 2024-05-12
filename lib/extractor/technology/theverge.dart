@@ -123,7 +123,7 @@ class TheVerge extends Publisher {
         await dio().get('$homePage/api/search?q=$searchQuery&page=${page - 1}');
 
     if (response.statusCode == 200) {
-      var document = json.decode(response.data);
+      var document = (response.data);
 
       var articleElements = document["items"];
       for (var element in articleElements) {
