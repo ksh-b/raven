@@ -249,7 +249,7 @@ class SimplyTranslate {
     String paragraph,
     String language,
   ) async {
-    // if(paragraph.isEmpty)return paragraph;
+    if(paragraph.isEmpty) return paragraph;
     Document document = html_parser.parse(paragraph.replaceAll("<", " <").replaceAll(">", "> "));
     var html = document.outerHtml;
     List<String> smallParas = mergeSentences(extractTextFromDocument(document));
