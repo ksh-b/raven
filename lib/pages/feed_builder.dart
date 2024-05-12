@@ -41,71 +41,77 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: refresh,
-      child: Store.selectedSubscriptions.isNotEmpty
-          ? ListView.builder(
-              itemCount: newsArticles.length + 2,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return isLoading
-                      ? const LinearProgressIndicator()
-                      : const SizedBox.shrink();
-                }
-                if (index - 1 < newsArticles.length) {
-                  var article = newsArticles[index - 1];
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                    child: Slidable(
-                      key: Key(article.url),
-                      startActionPane: ActionPane(
-                        motion: ScrollMotion(),
-                        children: [
-                          SlidableAction(
-                            backgroundColor:
-                                ThemeProvider().getCurrentTheme().cardColor,
-                            foregroundColor: ThemeProvider()
-                                .getCurrentTheme()
-                                .textTheme
-                                .titleMedium!
-                                .color,
-                            onPressed: (context) {
-                              article.load(translate: true).then((value) {
-                                Store.saveArticle(value);
-                              });
-                            },
-                            icon: Icons.save,
-                            label: "Save",
-                          )
-                        ],
-                      ),
-                      child: FeedCard(article: article),
+      child: ValueListenableBuilder(
+        valueListenable: Store.subscriptions.listenable(),
+        builder: (BuildContext context, value, Widget? child) {
+          return Store.selectedSubscriptions.isNotEmpty
+              ? ListView.builder(
+                  itemCount: newsArticles.length + 2,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return isLoading
+                          ? const LinearProgressIndicator()
+                          : const SizedBox.shrink();
+                    }
+                    if (index - 1 < newsArticles.length) {
+                      var article = newsArticles[index - 1];
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                        child: Slidable(
+                          key: Key(article.url),
+                          startActionPane: ActionPane(
+                            motion: ScrollMotion(),
+                            children: [
+                              SlidableAction(
+                                backgroundColor:
+                                    ThemeProvider().getCurrentTheme().cardColor,
+                                foregroundColor: ThemeProvider()
+                                    .getCurrentTheme()
+                                    .textTheme
+                                    .titleMedium!
+                                    .color,
+                                onPressed: (context) {
+                                  article.load(translate: true).then((value) {
+                                    value.tags += ["saved"];
+                                    Store.saveArticle(value);
+                                  });
+                                },
+                                icon: Icons.save,
+                                label: "Save",
+                              )
+                            ],
+                          ),
+                          child: FeedCard(article: article),
+                        ),
+                      );
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : loadMore,
+                          child: Text(isLoading ? "Loading" : "Load more"),
+                        ),
+                      );
+                    }
+                  },
+                )
+              : Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 64, right: 64),
+                    child: Flex(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      direction: Axis.vertical,
+                      children: [
+                        Icon(Icons.checklist_rounded),
+                        SizedBox(height: 32),
+                        Text("Select some subscriptions to get started"),
+                      ],
                     ),
-                  );
-                } else {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : loadMore,
-                      child: Text(isLoading ? "Loading" : "Load more"),
-                    ),
-                  );
-                }
-              },
-            )
-          : Center(
-              child: const Padding(
-                padding: const EdgeInsets.only(left: 64, right: 64),
-                child: const Flex(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  direction: Axis.vertical,
-                  children: [
-                    Icon(Icons.checklist_rounded),
-                    SizedBox(height: 32),
-                    Text("Select some subscriptions to get started")
-                  ],
-                ),
-              ),
-            ),
+                  ),
+                );
+        },
+      ),
     );
   }
 
