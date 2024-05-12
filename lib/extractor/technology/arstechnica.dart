@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:html/dom.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/time.dart';
 
 class ArsTechnica extends Publisher {
@@ -18,9 +19,9 @@ class ArsTechnica extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await dio().get("$homePage${newsArticle.url}");
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       String? thumbnail =
           document.querySelector(".figure img")?.attributes["href"];
       String? content = document
@@ -56,9 +57,9 @@ class ArsTechnica extends Publisher {
       category = "/$category";
     }
 
-    var response = await http.get(Uri.parse("$homePage$category/page/$page"));
+    var response = await dio().get("$homePage$category/page/$page");
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       List<Element> articleElements = document.querySelectorAll(".article");
       for (Element articleElement in articleElements) {
         String? title = articleElement.querySelector("h2 a")?.text;

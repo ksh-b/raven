@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:html/dom.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/time.dart';
 
 class Engadget extends Publisher {
@@ -18,9 +19,9 @@ class Engadget extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage/${newsArticle.url}"));
+    var response = await dio().get("$homePage/${newsArticle.url}");
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       Element? articleElement = document.querySelector(".caas-body");
       String? thumbnail =
           articleElement?.querySelector("p img")?.attributes["src"];
@@ -47,12 +48,12 @@ class Engadget extends Publisher {
       {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
     if (category == "/" || category.isEmpty) category = "/news";
-    var response = await http.get(
-      Uri.parse("$homePage/$category/page/$page"),
+    var response = await dio().get(
+      "$homePage/$category/page/$page",
     );
 
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       List<Element> articleElements =
           document.querySelectorAll("div[data-component=HorizontalCard]");
 
@@ -89,10 +90,10 @@ class Engadget extends Publisher {
   Future<Set<NewsArticle>> searchedArticles(
       {required String searchQuery, int page = 1}) async {
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse(
-        "https://search.engadget.com/search;?p=$searchQuery&pz=10&fr=engadget&fr2=sb-top&bct=0&b=${(page * 10) + 1}&pz=10&bct=0&xargs=0"));
+    var response = await dio().get(
+        "https://search.engadget.com/search;?p=$searchQuery&pz=10&fr=engadget&fr2=sb-top&bct=0&b=${(page * 10) + 1}&pz=10&bct=0&xargs=0");
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       List<Element> articleElements =
           document.querySelectorAll(".compArticleList li");
       for (Element articleElement in articleElements) {
@@ -105,7 +106,7 @@ class Engadget extends Publisher {
         String? url = articleElement.querySelector("h4 a")?.attributes["href"];
         String? thumbnail =
             articleElement.querySelector(".thmb")?.attributes["src"];
-        int parsedTime = stringToUnix(date??"", format: "MM.dd.yyyy");
+        int parsedTime = stringToUnix(date ?? "", format: "MM.dd.yyyy");
 
         articles.add(NewsArticle(
             publisher: name,
@@ -113,8 +114,7 @@ class Engadget extends Publisher {
             content: "",
             excerpt: excerpt ?? "",
             author: author ?? "",
-            url: Uri.parse(url!)
-                .path, // Parse URL and get path, use "" if url is null
+            url: url!, // Parse URL and get path, use "" if url is null
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             category: searchQuery));

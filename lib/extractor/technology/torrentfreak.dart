@@ -1,9 +1,10 @@
+import 'dart:convert';
+
+import 'package:html/parser.dart' as html_parser;
 import 'package:intl/intl.dart';
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/time.dart';
 
 class TorrentFreak extends Publisher {
@@ -21,9 +22,9 @@ class TorrentFreak extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
+    var response = await dio().get(homePage);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
 
       document.querySelectorAll('.sub-menu a').forEach((element) {
         map.putIfAbsent(
@@ -43,9 +44,9 @@ class TorrentFreak extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
+    var response = await dio().get('$homePage${newsArticle.url}');
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
 
       var articleElement = document.querySelector('.article__body');
       var excerptElement = document.querySelector('.article__excerpt');
@@ -70,9 +71,9 @@ class TorrentFreak extends Publisher {
 
   Future<Set<NewsArticle>> extract(String url, String category) async {
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse(url));
+    var response = await dio().get(url);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
 
       var articleElements = document.querySelectorAll('.preview-article');
       for (var element in articleElements) {

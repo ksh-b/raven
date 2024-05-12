@@ -1,8 +1,10 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/string.dart';
 import 'package:raven/utils/time.dart';
 
@@ -36,10 +38,9 @@ class Reuters extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response =
-        await http.get(Uri.parse('https://neuters.de${newsArticle.url}'));
+    var response = await dio().get('https://neuters.de${newsArticle.url}');
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var articleElement = document.querySelectorAll('p:not(.byline)');
       var content = articleElement.map((e) => "<p>${e.text}</p>").join();
       return newsArticle.fill(
@@ -61,10 +62,10 @@ class Reuters extends Publisher {
     Set<NewsArticle> articles = {};
 
     List articlesData = [];
-    final response = await http.get(Uri.parse(apiUrl));
+    final Response response = await dio().get(apiUrl);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
+      final data = response.data;
       articlesData = data["result"]["articles"];
       for (var element in articlesData) {
         var title = element['title'];

@@ -1,9 +1,8 @@
 import 'package:dart_rss/dart_rss.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:http/http.dart' as http;
-import 'package:raven/api/smort.dart';
-import 'package:raven/brain/html_content_extractor.dart';
+import 'package:raven/brain/dio_manager.dart';
+import 'package:raven/brain/fallback_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/utils/time.dart';
@@ -25,21 +24,21 @@ class RSSFeed extends Publisher {
   bool get hasSearchSupport => false;
 
   @override
-  String get iconUrl => "https://www.rssboard.org/favicon.ico";
+  String get iconUrl {
+    return "https://www.rssboard.org/images/rss-feed-icon-96-by-96.png";
+  }
+
+  String _thumbnail(String content) {
+    if (content.isEmpty) return "";
+    Document document = html_parser.parse(content);
+    return document.querySelector("img[src]")?.attributes["src"] ?? "";
+  }
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    if (newsArticle.content.isEmpty) {
-      newsArticle = await HtmlContentExtractor().fallback(newsArticle);
-      if (newsArticle.content.isEmpty) {
-        newsArticle = await Smort().fallback(newsArticle);
-      }
-      if (newsArticle.thumbnail.isEmpty && newsArticle.content.isNotEmpty) {
-        Document document = html_parser.parse(newsArticle.content);
-        newsArticle.thumbnail =
-            document.querySelector("img[src]")?.attributes["src"] ?? "";
-      }
-    }
+    newsArticle = await FallbackProvider().get(newsArticle);
+    if (newsArticle.thumbnail == _thumbnail(newsArticle.content))
+      newsArticle.thumbnail = "";
     return newsArticle;
   }
 
@@ -50,33 +49,32 @@ class RSSFeed extends Publisher {
   }) async {
     if (page > 1) return {};
     Set<NewsArticle> articles = {};
-    final response = await http.get(Uri.parse(category));
+    final response = await dio().get(category);
     if (response.statusCode == 200) {
-      WebFeed feed = WebFeed.fromXmlString(response.body);
+      WebFeed feed = WebFeed.fromXmlString(response.data);
       RssFeed rssFeed = RssFeed();
       Rss1Feed rss1Feed = Rss1Feed();
       AtomFeed atomFeed = AtomFeed();
       if (feed.rssVersion == RssVersion.rss2) {
-        rssFeed = RssFeed.parse(response.body);
+        rssFeed = RssFeed.parse(response.data);
         for (var item in rssFeed.items) {
-          articles.add(
-            NewsArticle(
-              publisher: name,
-              title: item.title ?? "",
-              content: item.content?.value ?? "",
-              excerpt: item.description ?? "",
-              author: item.author ?? "",
-              url: item.link ?? "",
-              tags: item.categories.map((e) => e.value ?? "").toList(),
-              thumbnail: item.content?.images.first ?? "",
-              publishedAt:
-                  item.pubDate != null ? stringToUnix(item.pubDate!) : -1,
-              category: category,
-            ),
-          );
+          articles.add(NewsArticle(
+            publisher: name,
+            title: item.title ?? "",
+            content: item.description ?? "",
+            excerpt: "",
+            author: item.author ?? "",
+            url: item.link?.trim() ?? "",
+            tags: item.categories.map((e) => e.value ?? "").toList(),
+            thumbnail: item.content?.images.first ??
+                _thumbnail(item.description ?? ""),
+            publishedAt:
+                item.pubDate != null ? stringToUnix(item.pubDate!) : -1,
+            category: category,
+          ));
         }
       } else if (feed.rssVersion == RssVersion.atom) {
-        atomFeed = AtomFeed.parse(response.body);
+        atomFeed = AtomFeed.parse(response.data);
         for (var item in atomFeed.items) {
           articles.add(
             NewsArticle(
@@ -85,9 +83,10 @@ class RSSFeed extends Publisher {
               content: item.content ?? "",
               excerpt: item.summary ?? "",
               author: item.authors.join(", "),
-              url: item.links.first.href ?? "",
+              url: item.links.first.href?.trim() ?? "",
               tags: item.categories.map((e) => e.label ?? "").toList(),
-              thumbnail: item.media?.thumbnails.first.url ?? "",
+              thumbnail: item.media?.thumbnails.first.url ??
+                  _thumbnail(item.content ?? ""),
               publishedAt:
                   item.published != null ? stringToUnix(item.published!) : -1,
               category: category,
@@ -95,18 +94,19 @@ class RSSFeed extends Publisher {
           );
         }
       } else if (feed.rssVersion == RssVersion.rss1) {
-        rss1Feed = Rss1Feed.parse(response.body);
+        rss1Feed = Rss1Feed.parse(response.data);
         for (var item in rss1Feed.items) {
           articles.add(
             NewsArticle(
               publisher: name,
               title: item.title ?? "",
-              content: item.content?.value ?? "",
-              excerpt: item.description ?? "",
+              content: item.description ?? "",
+              excerpt: "",
               author: item.dc?.contributor ?? "",
-              url: item.link ?? "",
+              url: item.link?.trim() ?? "",
               tags: item.dc?.subjects ?? [],
-              thumbnail: item.content?.images.first ?? "",
+              thumbnail: item.content?.images.first ??
+                  _thumbnail(item.description ?? ""),
               publishedAt:
                   item.dc?.date != null ? stringToUnix(item.dc!.date!) : -1,
               category: category,
@@ -122,9 +122,9 @@ class RSSFeed extends Publisher {
               content: item.body,
               excerpt: "",
               author: "",
-              url: item.links.first ?? "",
+              url: item.links.first?.trim() ?? "",
               tags: [],
-              thumbnail: "",
+              thumbnail: _thumbnail(item.body),
               publishedAt: item.updated?.millisecondsSinceEpoch ?? -1,
               category: category,
             ),

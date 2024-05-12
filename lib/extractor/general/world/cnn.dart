@@ -1,8 +1,9 @@
+import 'dart:convert';
+
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/time.dart';
 
 class CNN extends Publisher {
@@ -20,9 +21,9 @@ class CNN extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
+    var response = await dio().get(homePage);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       document
           .querySelectorAll(
               ".header__nav-container a[class='header__nav-item-link'][href]")
@@ -40,14 +41,14 @@ class CNN extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    http.Response response;
+    var response;
     if (newsArticle.url.startsWith("http")) {
-      response = await http.get(Uri.parse(newsArticle.url));
+      response = await dio().get(newsArticle.url);
     } else {
-      response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+      response = await dio().get("$homePage${newsArticle.url}");
     }
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var timestamp =
           document.querySelector('.timestamp')?.text.split("\n")[2].trim() ??
               "";
@@ -60,7 +61,8 @@ class CNN extends Publisher {
           content: live != null
               ? live.outerHtml
               : document
-                      .querySelector('.article__content,.video-resource,article[data-position]')
+                      .querySelector(
+                          '.article__content,.video-resource,article[data-position]')
                       ?.outerHtml ??
                   "",
           author: document.querySelector('.byline__name')?.text ?? "",
@@ -70,7 +72,8 @@ class CNN extends Publisher {
               "",
           publishedAt: live != null
               ? stringToUnix(timestamp)
-              : stringToUnix(timestamp.trim(), format: "h:mm a 'EDT', EEE MMMM d, yyyy"),
+              : stringToUnix(timestamp.trim(),
+                  format: "h:mm a 'EDT', EEE MMMM d, yyyy"),
           tags: document
               .querySelectorAll(
                   ".header__nav-container a[class='header__nav-item-link'][href]")
@@ -100,9 +103,9 @@ class CNN extends Publisher {
       return {};
     }
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse("$homePage$category"));
+    var response = await dio().get("$homePage$category");
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var data = document
           .querySelector(".has-pseudo-class-fix-layout--wide-left-balanced-2")
           ?.querySelectorAll(".container__item--type-section");
@@ -133,12 +136,12 @@ class CNN extends Publisher {
   }) async {
     Set<NewsArticle> articles = {};
 
-    var url = Uri.parse(
-        'https://search.prod.di.api.cnn.io/content?q=$searchQuery&size=5&from=${(page - 1) * 5}&page=$page&sort=newest&request_id=0');
-    var response = await http.get(url);
+    var url =
+        'https://search.prod.di.api.cnn.io/content?q=$searchQuery&size=5&from=${(page - 1) * 5}&page=$page&sort=newest&request_id=0';
+    var response = await dio().get(url);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
+      final Map<String, dynamic> data = json.decode(response.data);
       if (data["message"] != "success") {
         return {};
       }

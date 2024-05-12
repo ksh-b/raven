@@ -1,8 +1,9 @@
+import 'dart:convert';
+
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/string.dart';
 import 'package:raven/utils/time.dart';
 
@@ -24,15 +25,15 @@ class AlJazeera extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
+    var response = await dio().get(homePage);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       document
           .querySelectorAll(".header-menu .menu__item--aje a")
           .forEach((element) {
         map.putIfAbsent(
           element.text.trim(),
-              () {
+          () {
             return element.attributes["href"]!
                 .replaceAll(homePage, "")
                 .replaceAll("tag/", "")
@@ -41,19 +42,26 @@ class AlJazeera extends Publisher {
         );
       });
     }
-    var unsupported = ["Opinion","Investigations","Interactives","In Pictures","Podcasts",];
+    var unsupported = [
+      "Opinion",
+      "Investigations",
+      "Interactives",
+      "In Pictures",
+      "Podcasts",
+    ];
     return map..removeWhere((key, value) => unsupported.contains(key));
   }
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
+    var response = await dio().get('$homePage${newsArticle.url}');
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var more = document.querySelector(".more-on")?.innerHtml ?? "";
       var article = document.querySelector("#main-content-area");
       var thumbnailElement = article?.querySelector('img');
-      var content = document.querySelector('.wysiwyg--all-content')?.innerHtml ?? "";
+      var content =
+          document.querySelector('.wysiwyg--all-content')?.innerHtml ?? "";
       if (content.isEmpty) {
         content = article?.querySelector(".article__subhead")?.innerHtml ?? "";
       }
@@ -86,25 +94,25 @@ class AlJazeera extends Publisher {
       category = "news";
     }
 
-    var url = Uri.parse(
-        'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"where","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}');
+    var url =
+        'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"where","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
     var headers = {'wp-site': 'aje'};
 
-    var response = await http.get(url, headers: headers);
-    if (json.decode(response.body)["data"]["articles"] == null) {
-      url = Uri.parse(
-          'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"categories","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}');
-      response = await http.get(url, headers: headers);
+    var response = await dio().get(url, data: headers);
+    if (json.decode(response.data)["data"]["articles"] == null) {
+      url =
+          'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"categories","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
+      response = await dio().get(url, data: headers);
     }
 
-    if (json.decode(response.body)["data"]["articles"] == null) {
-      url = Uri.parse(
-          'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"tags","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}');
-      response = await http.get(url, headers: headers);
+    if (json.decode(response.data)["data"]["articles"] == null) {
+      url =
+          'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"tags","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
+      response = await dio().get(url, data: headers);
     }
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
+      final Map<String, dynamic> data = json.decode(response.data);
       var articlesData = data["data"]["articles"] ?? [];
       for (var element in articlesData) {
         var title = element['title'];

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:http/http.dart' as http;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/utils/time.dart';
@@ -25,9 +25,9 @@ class TheHindu extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
+    var response = await dio().get(homePage);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       document
           .querySelectorAll(".header-menu .nav-link")
           .sublist(1)
@@ -45,9 +45,9 @@ class TheHindu extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await dio().get("$homePage${newsArticle.url}");
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       var isLive = document.querySelector(".live-span") != null;
       var content = [];
       if (isLive) {
@@ -96,9 +96,9 @@ class TheHindu extends Publisher {
     }
     String url = "$homePage$category/fragment/showmoredesked?page=$page";
 
-    final response = await http.get(Uri.parse(url));
+    final response = await dio().get(url);
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       var articleElements = [];
       articleElements = document.querySelectorAll(".result .element");
       if (articleElements.isEmpty)

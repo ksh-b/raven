@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:html/dom.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/time.dart';
 
 class BleepingComputer extends Publisher {
@@ -18,9 +19,9 @@ class BleepingComputer extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await dio().get("$homePage${newsArticle.url}");
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       String? thumbnail = "";
       String? content = document
           .querySelectorAll(".articleBody > :not(.cz-related-article-wrapp)")
@@ -45,10 +46,10 @@ class BleepingComputer extends Publisher {
   Future<Set<NewsArticle>> categoryArticles(
       {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    var response = await http.get(
-        Uri.parse(page != 1 ? "$homePage/news/page/$page" : "$homePage/news/"));
+    var response = await dio()
+        .get(page != 1 ? "$homePage/news/page/$page" : "$homePage/news/");
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       List<Element> articleElements =
           document.querySelectorAll("#bc-home-news-main-wrap > li");
       for (Element articleElement in articleElements) {

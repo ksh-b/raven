@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/utils/time.dart';
@@ -65,14 +65,14 @@ class TheWire extends Publisher {
   Future<Set<NewsArticle>> extract(
       String apiUrl, bool isSearch, String category) async {
     Set<NewsArticle> articles = {};
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await dio().get(apiUrl);
     if (response.statusCode == 200) {
       List data;
       if (isSearch) {
-        data = json.decode(response.body)["generic"];
+        data = json.decode(response.data)["generic"];
       } else {
         try {
-          data = json.decode(response.body);
+          data = json.decode(response.data);
         } catch (e) {
           data = [];
         }
@@ -105,9 +105,9 @@ class TheWire extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
+    var response = await dio().get('$homePage${newsArticle.url}');
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
+      var data = json.decode(response.data);
       var postDetail = data["post-detail"][0];
       var content = postDetail["post_content"];
       var thumbnail = postDetail["featured_image"][0];

@@ -1,8 +1,9 @@
+import 'dart:convert';
+
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/time.dart';
 
 class TheVerge extends Publisher {
@@ -20,9 +21,9 @@ class TheVerge extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
+    var response = await dio().get(homePage);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
 
       document
           .querySelectorAll('.duet--navigation--navigation li a[class]')
@@ -44,9 +45,9 @@ class TheVerge extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse('$homePage${newsArticle.url}'));
+    var response = await dio().get('$homePage${newsArticle.url}');
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
 
       var articleElement = document.querySelector(
               '.duet--article--article-body-component-container') ??
@@ -80,10 +81,10 @@ class TheVerge extends Publisher {
   Future<Set<NewsArticle>> extractCategoryArticles(
       String url, String category) async {
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse(url));
+    var response = await dio().get(url);
 
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
 
       var articleElements =
           document.querySelectorAll('.duet--content-cards--content-card');
@@ -118,16 +119,16 @@ class TheVerge extends Publisher {
   Future<Set<NewsArticle>> extractSearchArticles(
       String searchQuery, int page) async {
     Set<NewsArticle> articles = {};
-    var response = await http
-        .get(Uri.parse('$homePage/api/search?q=$searchQuery&page=${page - 1}'));
+    var response =
+        await dio().get('$homePage/api/search?q=$searchQuery&page=${page - 1}');
 
     if (response.statusCode == 200) {
-      var document = json.decode(response.body);
+      var document = json.decode(response.data);
 
       var articleElements = document["items"];
       for (var element in articleElements) {
         var title = element["title"];
-        var url = Uri.parse(element["link"]).path;
+        var url = element["link"].path;
         var excerpt = element["htmlSnippet"];
         var thumbnail = element["pagemap"]["cse_image"][0]["src"];
         var time = element["snippet"].split("...")[0];

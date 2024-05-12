@@ -2,9 +2,8 @@ import 'dart:convert';
 
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:http/http.dart' as http;
-import 'package:raven/api/smort.dart';
-import 'package:raven/brain/html_content_extractor.dart';
+import 'package:raven/brain/dio_manager.dart';
+import 'package:raven/brain/fallback_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/utils/time.dart';
@@ -31,10 +30,7 @@ class Morss extends Publisher {
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
     if (newsArticle.content.isEmpty) {
-      newsArticle = await HtmlContentExtractor().fallback(newsArticle);
-      if (newsArticle.content.isEmpty) {
-        newsArticle = await Smort().fallback(newsArticle);
-      }
+      newsArticle = await FallbackProvider().get(newsArticle);
       if (newsArticle.thumbnail.isEmpty && newsArticle.content.isNotEmpty) {
         Document document = html_parser.parse(newsArticle.content);
         newsArticle.thumbnail =
@@ -57,9 +53,9 @@ class Morss extends Publisher {
       url = category;
     else
       url = "$homePage/:format=json:cors/$category";
-    final response = await http.get(Uri.parse(url));
+    final response = await dio().get(url);
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
+      var data = json.decode(response.data);
       var items = data["items"];
       for (var item in items) {
         articles.add(

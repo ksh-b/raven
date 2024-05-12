@@ -1,8 +1,9 @@
+import 'dart:convert';
+
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 
 class TheGuardian extends Publisher {
   @override
@@ -22,9 +23,9 @@ class TheGuardian extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
+    var response = await dio().get(homePage);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       document
           .querySelectorAll('.dcr-1xyuhwc gu-island .dcr-qxru8z')
           .forEach((element) {
@@ -41,9 +42,9 @@ class TheGuardian extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await dio().get("$homePage${newsArticle.url}");
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var article = document.querySelector('article');
       var isLive =
           document.querySelectorAll("gu-island[name=PulsingDot]").isNotEmpty;
@@ -82,9 +83,9 @@ class TheGuardian extends Publisher {
       category = "/world";
     }
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse("$homePage$category?page=$page"));
+    var response = await dio().get("$homePage$category?page=$page");
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var data = document.querySelectorAll(".fc-item__container");
       for (var article in data) {
         articles.add(NewsArticle(

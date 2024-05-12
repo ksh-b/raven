@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:html/dom.dart';
-import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/extractor/trend/apnews.dart';
 import 'package:raven/extractor/trend/google.dart';
 import 'package:raven/extractor/trend/none.dart';
@@ -20,9 +20,9 @@ abstract class Trend {
   String get locator;
 
   Future<List<String>> get topics async {
-    var response = await http.get(Uri.parse(url));
+    var response = await dio().get(url);
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       return document.querySelectorAll(locator).map((e) => e.text).toList();
     }
     return [];

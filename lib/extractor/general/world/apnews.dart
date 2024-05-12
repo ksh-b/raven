@@ -1,9 +1,10 @@
+import 'dart:convert';
+
+import 'package:html/parser.dart' as html_parser;
 import 'package:intl/intl.dart';
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 
 class APNews extends Publisher {
   @override
@@ -20,9 +21,9 @@ class APNews extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
+    var response = await dio().get(homePage);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       document
           .querySelectorAll('.Page-header-navigation .AnClick-MainNav')
           .forEach((element) {
@@ -53,9 +54,9 @@ class APNews extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await dio().get("$homePage${newsArticle.url}");
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var isLive =
           document.querySelectorAll("gu-island[name=PulsingDot]").isNotEmpty;
       var content = isLive
@@ -102,9 +103,9 @@ class APNews extends Publisher {
       return {};
     }
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse("$homePage$category"));
+    var response = await dio().get("$homePage$category");
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var data = document.querySelectorAll(".PageListStandardH .PagePromo");
       for (var article in data) {
         articles.add(NewsArticle(
@@ -136,10 +137,9 @@ class APNews extends Publisher {
     int page = 1,
   }) async {
     Set<NewsArticle> articles = {};
-    var response =
-        await http.get(Uri.parse("$homePage/search?q=$searchQuery&p=$page"));
+    var response = await dio().get("$homePage/search?q=$searchQuery&p=$page");
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var data =
           document.querySelectorAll(".SearchResultsModule-results .PagePromo");
       for (var article in data) {

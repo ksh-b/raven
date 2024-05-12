@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:html/dom.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 
 class TheQuint extends Publisher {
   @override
@@ -20,9 +21,9 @@ class TheQuint extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await http.get(Uri.parse(homePage));
+    var response = await dio().get(homePage);
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       document
           .querySelectorAll('#second-nav-bar a[id*=ga4-header]')
           .forEach((element) {
@@ -42,9 +43,9 @@ class TheQuint extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await dio().get("$homePage${newsArticle.url}");
     if (response.statusCode == 200) {
-      Document document = html_parser.parse(utf8.decode(response.bodyBytes));
+      Document document = html_parser.parse(response.data);
       var content =
           document.querySelectorAll(".story-element-text p,blockquote");
       return newsArticle.fill(
@@ -68,9 +69,9 @@ class TheQuint extends Publisher {
     String url =
         "$homePage/api/v1/collections/$category?limit=$limit&offset=$offset";
 
-    final response = await http.get(Uri.parse(url));
+    final response = await dio().get(url);
     if (response.statusCode == 200) {
-      List data = json.decode(response.body)["items"];
+      List data = json.decode(response.data)["items"];
 
       for (var element in data) {
         if (element["story"] == null) continue;
@@ -95,7 +96,7 @@ class TheQuint extends Publisher {
             url: articleUrl.replaceFirst(homePage, ""),
             tags: tags,
             thumbnail: thumbnail,
-            publishedAt:time,
+            publishedAt: time,
             category: category));
       }
     }
@@ -109,9 +110,9 @@ class TheQuint extends Publisher {
   }) async {
     Set<NewsArticle> articles = {};
     String apiUrl = '$homePage/route-data.json?path=/search&q=$searchQuery';
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await dio().get(apiUrl);
     if (response.statusCode == 200) {
-      List data = json.decode(response.body)["data"]["stories"];
+      List data = json.decode(response.data)["data"]["stories"];
 
       for (var element in data) {
         List<String> tags = [];

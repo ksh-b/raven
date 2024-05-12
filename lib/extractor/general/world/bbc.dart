@@ -1,9 +1,10 @@
+import 'dart:convert';
+
+import 'package:html/parser.dart' as html_parser;
 import 'package:intl/intl.dart';
+import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' as html_parser;
 import 'package:raven/utils/time.dart';
 
 class BBC extends Publisher {
@@ -58,10 +59,10 @@ class BBC extends Publisher {
     String apiUrl = "https://push.api.bbci.co.uk/batch?"
         "t=/data/bbc-morph-lx-commentary-data-paged/about/$id/"
         "isUk/false/limit/5/nitroKey/lx-nitro/pageNumber/$page/version/1.5.6";
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await dio().get(apiUrl);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
+      final Map<String, dynamic> data = json.decode(response.data);
       var articles = data["payload"][0]["body"]["results"];
       for (var article in articles) {
         var articleUrl = article['url'];
@@ -104,14 +105,14 @@ class BBC extends Publisher {
         '"groupResourceId":"urn:bbc:vivo:curation:$groupResourceId",'
         '"groupPosition":5,"topicId":"$topicId"}'
         '&urn=urn:bbc:vivo:curation:$groupResourceId';
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await dio().get(apiUrl);
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
+      final Map<String, dynamic> data = json.decode(response.data);
       var articles = data["posts"];
       for (var article in articles) {
         var title = article['headline'];
         var author = article['contributor'] ?? "";
-        var thumbnail = article["image"]!=null? article["image"]["src"] : "";
+        var thumbnail = article["image"] != null ? article["image"]["src"] : "";
         var time = convertToIso8601(article["timestamp"]);
         var articleUrl = article['url'];
         var excerpt = "";
@@ -168,9 +169,9 @@ class BBC extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await http.get(Uri.parse("$homePage${newsArticle.url}"));
+    var response = await dio().get("$homePage${newsArticle.url}");
     if (response.statusCode == 200) {
-      var document = html_parser.parse(utf8.decode(response.bodyBytes));
+      var document = html_parser.parse(response.data);
       var jsonContent = jsonDecode(
           document.querySelector('script[type="application/json"]')?.text ??
               "{}");
@@ -221,10 +222,10 @@ class BBC extends Publisher {
     int page = 1,
   }) async {
     Set<NewsArticle> articles = {};
-    var response = await http.get(Uri.parse(
-        "https://web-cdn.api.bbci.co.uk/xd/search?terms=$searchQuery&page=$page"));
+    var response = await dio().get(
+        "https://web-cdn.api.bbci.co.uk/xd/search?terms=$searchQuery&page=$page");
     if (response.statusCode == 200) {
-      var document = jsonDecode(utf8.decode(response.bodyBytes))['data'];
+      var document = jsonDecode(response.data)['data'];
       for (var element in document) {
         var title = element['title'];
         var thumbnail = element['indexImage']['model']['blocks']['src'];
@@ -233,7 +234,6 @@ class BBC extends Publisher {
         var time = element['lastPublishedAt'];
         var tags = element['topics'].cast<String>();
         var author = "";
-
 
         if (time != null) {
           time = convertToIso8601(time);
