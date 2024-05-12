@@ -1,16 +1,60 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 
+bool isHTML(String text) {
+  RegExp htmlTags = RegExp(r'<[^>]*>');
+  return htmlTags.hasMatch(text);
+}
+
+// inspired by Readability.js
+// https://github.com/mozilla/readability/blob/main/Readability.js
 List<String> cleanHtml(String htmlString) {
+  if (!isHTML(htmlString)) return [htmlString];
+
   Document document = html_parser.parse(htmlString);
 
   document.querySelectorAll('*').forEach((element) {
-    List<String> attributesToKeep = [];
+    List<String> attributesToKeep = ["href", "src"];
     List<String> attributesToRemove = [];
-    if ((!element.hasContent() ||
-        element.text.isEmpty ||
-        element.localName == "noscript")) {
-      element.remove();
+
+    var unlikelyAttributes = [
+      "menu",
+      "menubar",
+      "complementary",
+      "navigation",
+      "alert",
+      "alertdialog",
+      "dialog"
+    ];
+
+    var unlikelyTags = [
+      "object",
+      "embed",
+      "footer",
+      "aside",
+      "iframe",
+      "input",
+      "textarea",
+      "select",
+      "button",
+      "style",
+    ];
+
+    if (!element.hasContent() || element.text.isEmpty) {
+      if(element.localName!="br")
+        element.remove();
+    }
+
+    unlikelyAttributes.forEach(
+      (ul) {
+        if (element.attributes.toString().contains(ul)) element.remove();
+      },
+    );
+
+    if (unlikelyTags.contains(element.localName)) element.remove();
+
+    if (element.attributes.containsKey("href")) {
+      element.attributes["href"] = element.attributes["href"]!.split("&")[0];
     }
     element.attributes.forEach((key, value) {
       if (!attributesToKeep.contains(key)) {
@@ -22,14 +66,12 @@ List<String> cleanHtml(String htmlString) {
     });
   });
 
-  var splitHtml = document.querySelectorAll("html body").first.children.map(
-    (e) {
-      if (e.attributes.containsKey("href") &&
-          e.attributes["href"]!.contains("&"))
-        e.attributes["href"] = e.attributes["href"]!.split("&")[0];
-      return e.outerHtml;
-    },
-  ).toList();
+  var splitHtml = document
+      .querySelectorAll("html body")
+      .map(
+        (e) => e.outerHtml,
+        )
+      .toList();
   return chunks(splitHtml);
 }
 
