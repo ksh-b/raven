@@ -58,6 +58,7 @@ class RSSFeed extends Publisher {
       if (feed.rssVersion == RssVersion.rss2) {
         rssFeed = RssFeed.parse(response.data);
         for (var item in rssFeed.items) {
+          var images = item.content?.images.toList() ?? [];
           articles.add(NewsArticle(
             publisher: name,
             title: item.title ?? "",
@@ -66,16 +67,17 @@ class RSSFeed extends Publisher {
             author: item.author ?? "",
             url: item.link?.trim() ?? "",
             tags: item.categories.map((e) => e.value ?? "").toList(),
-            thumbnail: item.content?.images.first ??
+            thumbnail: images.isNotEmpty ? images.first :
                 _thumbnail(item.description ?? ""),
             publishedAt:
-                item.pubDate != null ? stringToUnix(item.pubDate!) : -1,
+            item.pubDate != null ? stringToUnix(item.pubDate!) : -1,
             category: category,
           ));
         }
       } else if (feed.rssVersion == RssVersion.atom) {
         atomFeed = AtomFeed.parse(response.data);
         for (var item in atomFeed.items) {
+          var images = item.media?.thumbnails.toList() ?? [];
           articles.add(
             NewsArticle(
               publisher: name,
@@ -85,7 +87,7 @@ class RSSFeed extends Publisher {
               author: item.authors.join(", "),
               url: item.links.first.href?.trim() ?? "",
               tags: item.categories.map((e) => e.label ?? "").toList(),
-              thumbnail: item.media?.thumbnails.first.url ??
+              thumbnail: images.isNotEmpty ? images.first.url??"" :
                   _thumbnail(item.content ?? ""),
               publishedAt:
                   item.published != null ? stringToUnix(item.published!) : -1,
@@ -96,6 +98,7 @@ class RSSFeed extends Publisher {
       } else if (feed.rssVersion == RssVersion.rss1) {
         rss1Feed = Rss1Feed.parse(response.data);
         for (var item in rss1Feed.items) {
+          var images = item.content?.images.toList() ?? [];
           articles.add(
             NewsArticle(
               publisher: name,
@@ -105,7 +108,7 @@ class RSSFeed extends Publisher {
               author: item.dc?.contributor ?? "",
               url: item.link?.trim() ?? "",
               tags: item.dc?.subjects ?? [],
-              thumbnail: item.content?.images.first ??
+              thumbnail: images.isNotEmpty ? images.first :
                   _thumbnail(item.description ?? ""),
               publishedAt:
                   item.dc?.date != null ? stringToUnix(item.dc!.date!) : -1,
@@ -122,7 +125,7 @@ class RSSFeed extends Publisher {
               content: item.body,
               excerpt: "",
               author: "",
-              url: item.links.first?.trim() ?? "",
+              url: item.links.isNotEmpty? (item.links.first?.trim() ?? ""):"",
               tags: [],
               thumbnail: _thumbnail(item.body),
               publishedAt: item.updated?.millisecondsSinceEpoch ?? -1,
