@@ -98,16 +98,16 @@ class AlJazeera extends Publisher {
     var url =
         'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"where","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
     var headers = {'wp-site': 'aje'};
-    var response = await dio().get(url, options:  Options(headers: headers));
+    var response = await dio().get(url, options: Options(headers: headers));
     if ((response.data)["data"]["articles"] == null) {
       url = 'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"categories","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
-      response = await dio().get(url, data: Options(headers: headers));
+      response = await dio().get(url, options: Options(headers: headers));
     }
 
     if ((response.data)["data"]["articles"] == null) {
       url =
           'https://www.aljazeera.com/graphql?wp-site=aje&operationName=ArchipelagoAjeSectionPostsQuery&variables={"category":"$category","categoryType":"tags","postTypes":["blog","episode","opinion","post","video","external-article","gallery","podcast","longform","liveblog"],"quantity":5,"offset":${(page - 1) * 5}}&extensions={}';
-      response = await dio().get(url, data: Options(headers: headers));
+      response = await dio().get(url, options: Options(headers: headers));
     }
 
     if (response.statusCode == 200) {
