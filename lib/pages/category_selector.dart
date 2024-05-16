@@ -200,7 +200,7 @@ class _CategorySelectorState extends State<CategorySelector> {
         controller: customCategoryController,
         decoration: const InputDecoration(
           border: const OutlineInputBorder(),
-          hintText: "Custom category",
+          hintText: "Custom URL",
         ),
         onChanged: (value) {
           setState(() {
