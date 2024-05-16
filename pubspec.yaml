@@ -2,7 +2,7 @@ name: raven
 description: "News aggregator"
 publish_to: 'none'
 
-version: 0.12.0+212
+version: 0.12.1+213
 
 environment:
   sdk: '>=3.2.1 <4.0.0'
@@ -40,4 +40,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-

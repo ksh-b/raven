@@ -1,0 +1,7 @@
+### Fixed
+- Sorting (#22)
+- Some RSS feeds not loading
+- Source: AlJazeera
+
+### Removed
+- "All" checkbox from custom category selector

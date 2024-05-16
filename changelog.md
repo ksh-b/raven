@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.12.0] - 2024-05-24
+## [0.12.1] - 2024-05-17
+
+### Fixed
+- Sorting (#22)
+- Some RSS feeds not loading
+- Source: AlJazeera
+
+### Removed
+- "All" checkbox from custom category selector
+
+## [0.12.0] - 2024-05-12
 
 ### Added
 - Option to choose translator instance
@@ -168,7 +178,8 @@ Fdroid release
 
 ### First Release
 
-[unreleased]: https://github.com/ksh-b/raven/compare/v0.12.0...HEAD
+[unreleased]: https://github.com/ksh-b/raven/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/ksh-b/raven/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/ksh-b/raven/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/ksh-b/raven/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/ksh-b/raven/compare/v0.9.0...v0.10.0
