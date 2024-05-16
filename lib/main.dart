@@ -16,6 +16,16 @@ Future<void> main() async {
   await Hive.openBox('settings');
   await Hive.openBox('saved');
 
+  // TODO: Remove this in future version
+  Store.selectedSubscriptions = Store.selectedSubscriptions
+    ..removeWhere(
+      (element) {
+        return
+          element.toString() == "RSS Feed~/" ||
+          element.toString() == "morss~/";
+      },
+    );
+
   if (Store.sdkVersion == -1) {
     await DeviceInfoPlugin().androidInfo.then((value) {
       Store.sdkVersion = value.version.sdkInt;

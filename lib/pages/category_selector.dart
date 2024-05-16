@@ -75,6 +75,8 @@ class _CategorySelectorState extends State<CategorySelector> {
                   var userSubscription =
                       UserSubscription(widget.newsSource, subCategoryValue);
                   if (index == 0) {
+                    if(publishers[widget.newsSource]!.mainCategory==Category.custom)
+                      return SizedBox.shrink();
                     return _buildAllCheckbox(subCategoryKey, userSubscription);
                   }
                   if (index - 1 < snapshot.data!.length) {
