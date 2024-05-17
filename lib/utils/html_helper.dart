@@ -41,15 +41,14 @@ List<String> cleanHtml(String htmlString) {
     ];
 
     if (!element.hasContent() || element.text.isEmpty) {
-      if(element.localName!="br")
+      if(element.localName!="br") {
         element.remove();
+      }
     }
 
-    unlikelyAttributes.forEach(
-      (ul) {
+    for (var ul in unlikelyAttributes) {
         if (element.attributes.toString().contains(ul)) element.remove();
-      },
-    );
+      }
 
     if (unlikelyTags.contains(element.localName)) element.remove();
 
@@ -61,9 +60,9 @@ List<String> cleanHtml(String htmlString) {
         attributesToRemove.add("$key");
       }
     });
-    attributesToRemove.forEach((key) {
+    for (var key in attributesToRemove) {
       element.attributes.remove(key);
-    });
+    }
   });
 
   var splitHtml = document
@@ -95,7 +94,7 @@ List<String> chunks(List<String> sentences) {
         if ((currentSentence.split(' ').length +
                 nextSentence.split(' ').length) <=
             threshold) {
-          currentSentence += ' ' + nextSentence;
+          currentSentence += ' $nextSentence';
           i++;
         }
       }

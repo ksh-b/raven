@@ -10,6 +10,7 @@ class Smort extends Fallback {
   @override
   String get name => "Smort";
 
+  @override
   Future<MapEntry<bool, NewsArticle>> fallback(NewsArticle article) async {
     String url = "${publishers[article.publisher]!.homePage}${article.url}";
     var response = await dio().get(

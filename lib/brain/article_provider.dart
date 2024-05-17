@@ -54,13 +54,14 @@ class ArticleProvider {
               },
             ).then(
               (value) {
-                if (value.isNotEmpty)
+                if (value.isNotEmpty) {
                   collectPublisherArticles(
                     subscriptionArticles,
                     value,
                     "${value.first.publisher}~${value.first.category}",
                     page,
                   );
+                }
               },
             ),
           );
@@ -75,13 +76,14 @@ class ArticleProvider {
               },
             ).then(
               (value) {
-                if (value.isNotEmpty)
+                if (value.isNotEmpty) {
                   collectPublisherArticles(
                     subscriptionArticles,
                     value,
                     "${value.first.publisher}~${value.first.category}",
                     page,
                   );
+                }
               },
             ),
           );

@@ -239,12 +239,12 @@ class SimplyTranslate {
         (element) => element.isEmpty,
       )
       ..map(
-        (e) => e + " ",
+        (e) => "$e ",
       );
   }
 
   List<String> splitParagraph(String paragraph, [int wordsPerSentence = 500]) {
-    final List<String> words = paragraph.replaceAll(" <", "<").replaceAll("> ", ">").split(new RegExp(r'\s+'));
+    final List<String> words = paragraph.replaceAll(" <", "<").replaceAll("> ", ">").split(RegExp(r'\s+'));
     final List<List<String>> groupedWords = _groupLists(words, wordsPerSentence);
     final List<String> sentences = groupedWords.map((wordList) => wordList.join(' ')).toList();
 

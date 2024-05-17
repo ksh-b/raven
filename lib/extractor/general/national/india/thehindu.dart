@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -54,8 +53,9 @@ class TheHindu extends Publisher {
         content.add(document.querySelector("div[itemprop='articleBody']"));
         content.add(document.querySelector("#liveentryListskeyevent"));
         content.add(document.querySelector(".article-live-blocker"));
-      } else
+      } else {
         content = document.querySelectorAll("div[itemprop='articleBody']");
+      }
       var related = document.querySelector(".related-topics")?.innerHtml ?? "";
       var thumbnail = document
           .querySelector("meta property='og:image'")
@@ -101,8 +101,9 @@ class TheHindu extends Publisher {
       Document document = html_parser.parse(response.data);
       var articleElements = [];
       articleElements = document.querySelectorAll(".result .element");
-      if (articleElements.isEmpty)
+      if (articleElements.isEmpty) {
         articleElements = document.querySelectorAll(".element");
+      }
       for (var article in articleElements) {
         List<String> tags = [];
         var title = article.querySelector(".title a")?.text.trim();

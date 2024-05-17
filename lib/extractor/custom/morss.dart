@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/brain/dio_manager.dart';
@@ -25,8 +23,6 @@ class Morss extends Publisher {
   @override
   bool get hasSearchSupport => false;
 
-  @override
-  String get iconUrl => super.iconUrl;
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
@@ -50,10 +46,11 @@ class Morss extends Publisher {
     Set<NewsArticle> articles = {};
     category = category.replaceAll("http://", "").replaceAll("https://", "");
     String url;
-    if (category.startsWith(homePage))
+    if (category.startsWith(homePage)) {
       url = category;
-    else
+    } else {
       url = "$homePage/:format=json:cors/$category";
+    }
     final response = await dio().get(url);
     if (response.statusCode == 200) {
       var data = response.data;
@@ -62,7 +59,7 @@ class Morss extends Publisher {
         var content = item["content"];
         var excerpt = item.containsKey("desc") ? item["desc"] : "";
         if(isHTML(excerpt)) {
-          content = "<b>" + excerpt+ r"</b>"+ content;
+          content = "<b>$excerpt</b>$content";
           excerpt = "";
         }
         articles.add(

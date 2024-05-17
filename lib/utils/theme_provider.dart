@@ -18,7 +18,6 @@ class ThemeProvider {
     if (Store.sdkVersion >= 31) {
       options.add("Material You");
     }
-    ;
     return options;
   }
 
@@ -91,8 +90,9 @@ class ThemeProvider {
         Store.materialYouColor = lightScheme.primary.value;
         return _get(lightScheme.primary, false);
       }
-      if (Store.materialYouColor != -1)
+      if (Store.materialYouColor != -1) {
         return _get(Color(Store.materialYouColor), Store.darkThemeSetting);
+      }
       return _get(colors.values.first, Store.darkThemeSetting);
     }
     return _get(

@@ -35,8 +35,9 @@ class _CategorySelectorState extends State<CategorySelector> {
   }
 
   String convertString(String input) {
-    if (input.startsWith("https://") || input.startsWith("http://"))
+    if (input.startsWith("https://") || input.startsWith("http://")) {
       return input.split("/").sublist(2).join("/").replaceAll("www.", "");
+    }
 
     List<String> parts = input.split('/');
     parts.removeWhere((part) => part.isEmpty);
@@ -75,8 +76,9 @@ class _CategorySelectorState extends State<CategorySelector> {
                   var userSubscription =
                       UserSubscription(widget.newsSource, subCategoryValue);
                   if (index == 0) {
-                    if(publishers[widget.newsSource]!.mainCategory==Category.custom)
+                    if(publishers[widget.newsSource]!.mainCategory==Category.custom) {
                       return SizedBox.shrink();
+                    }
                     return _buildAllCheckbox(subCategoryKey, userSubscription);
                   }
                   if (index - 1 < snapshot.data!.length) {
@@ -199,7 +201,7 @@ class _CategorySelectorState extends State<CategorySelector> {
       child: TextField(
         controller: customCategoryController,
         decoration: const InputDecoration(
-          border: const OutlineInputBorder(),
+          border: OutlineInputBorder(),
           hintText: "Custom URL",
         ),
         onChanged: (value) {
@@ -218,11 +220,13 @@ class _CategorySelectorState extends State<CategorySelector> {
         future: widget.publishers[widget.newsSource]
             ?.articles(category: customCategory),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
+          }
           if (snapshot.hasError) return const Icon(Icons.cancel);
-          if (customCategoryController.text.isEmpty)
+          if (customCategoryController.text.isEmpty) {
             return const SizedBox.shrink();
+          }
           if (snapshot.hasData) {
             return snapshot.data!.isNotEmpty
                 ? IconButton(

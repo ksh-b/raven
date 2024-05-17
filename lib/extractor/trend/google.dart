@@ -19,8 +19,9 @@ class GoogleTrend extends Trend {
   @override
   Future<List<String>> get topics async {
     var country = "US";
-    if (Hive.isBoxOpen("settings"))
+    if (Hive.isBoxOpen("settings")) {
       country = "${countryCodes[Store.countrySetting]}";
+    }
     var response = await dio().get(url + country, options: Options(
       responseType: ResponseType.plain,
     ));

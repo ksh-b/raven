@@ -75,17 +75,17 @@ class _SavedPageState extends State<SavedPage> {
             }
             return const Center(
               child: Padding(
-                padding: const EdgeInsets.only(left: 64, right: 64),
-                child: const Flex(
+                padding: EdgeInsets.only(left: 64, right: 64),
+                child: Flex(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   direction: Axis.vertical,
                   children: [
-                    const Icon(Icons.bookmark_add),
-                    const SizedBox(
+                    Icon(Icons.bookmark_add),
+                    SizedBox(
                       height: 16,
                     ),
-                    const Text(
+                    Text(
                       "Swipe articles to the right on the feed page to save them.",
                     )
                   ],

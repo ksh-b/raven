@@ -30,23 +30,23 @@ class _MyHomePageState extends State<MyHomePage> {
         selectedIndex: _selectedIndex,
         destinations: <Widget>[
           const NavigationDestination(
-            icon: const Icon(Icons.article_outlined),
-            selectedIcon: const Icon(Icons.article),
+            icon: Icon(Icons.article_outlined),
+            selectedIcon: Icon(Icons.article),
             label: 'Feed',
           ),
           const NavigationDestination(
-            icon: const Icon(Icons.bookmark_outline_rounded),
-            selectedIcon: const Icon(Icons.bookmark_rounded),
+            icon: Icon(Icons.bookmark_outline_rounded),
+            selectedIcon: Icon(Icons.bookmark_rounded),
             label: 'Saved',
           ),
           const NavigationDestination(
-            icon: const Icon(Icons.favorite_border_rounded),
-            selectedIcon: const Icon(Icons.favorite_rounded),
+            icon: Icon(Icons.favorite_border_rounded),
+            selectedIcon: Icon(Icons.favorite_rounded),
             label: 'Subscriptions',
           ),
           const NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
             label: 'Settings',
           ),
         ],

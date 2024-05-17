@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -101,16 +100,18 @@ class TheIndianExpress extends Publisher {
     if (response.statusCode == 200) {
       Document document = html_parser.parse(response.data);
       List<Element> articleElements = [];
-      if (page == 1)
+      if (page == 1) {
         articleElements = document.querySelectorAll(".swiper-slide") +
             document.querySelectorAll(".nation .articles");
-      else
+      } else {
         articleElements = document.querySelectorAll(".nation .articles");
+      }
       for (var article in articleElements) {
         List<String> tags = [];
         var title = article.querySelector("a")?.text.trim() ?? "";
-        if (title.trim().isEmpty)
+        if (title.trim().isEmpty) {
           title = article.querySelector("h2 a")?.text.trim() ?? "";
+        }
         var articleUrl = article.querySelector("a")?.attributes["href"] ?? "";
         var thumbnail = article.querySelector("img")?.attributes["src"];
         var timestamp =

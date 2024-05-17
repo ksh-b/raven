@@ -28,9 +28,9 @@ class _ArticlePageState extends State<ArticlePage> {
     NewsArticle newsArticle,
     BuildContext context,
   ) async* {
-    if(newsArticle.tags.contains("saved"))
+    if(newsArticle.tags.contains("saved")) {
       yield newsArticle;
-    else if (newsArticle.content.isNotEmpty &&
+    } else if (newsArticle.content.isNotEmpty &&
         !Store.shouldTranslate &&
         publishers[newsArticle.publisher]!.mainCategory != Category.custom) {
       yield newsArticle;
@@ -310,12 +310,12 @@ class FallbackArticle extends StatelessWidget {
           return FailArticle(fullUrl);
         }
         return const Center(
-          child: const Flex(
+          child: Flex(
             mainAxisAlignment: MainAxisAlignment.center,
             direction: Axis.vertical,
             children: [
-              const CircularProgressIndicator(),
-              const Text("Failed to load article. Trying fallback."),
+              CircularProgressIndicator(),
+              Text("Failed to load article. Trying fallback."),
             ],
           ),
         );
@@ -340,9 +340,9 @@ class FailArticle extends StatelessWidget {
           direction: Axis.vertical,
           children: [
             const ListTile(
-              title: const Text("Error loading article"),
+              title: Text("Error loading article"),
               subtitle:
-                  const Text("You can try opening the url in your browser"),
+                  Text("You can try opening the url in your browser"),
             ),
             ListTile(
               leading: const Icon(Icons.open_in_browser),

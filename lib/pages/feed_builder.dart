@@ -297,10 +297,10 @@ class ArticleThumbnail extends StatelessWidget {
       progressIndicatorBuilder: (context, url, progress) => const Stack(
         alignment: AlignmentDirectional.bottomCenter,
         children: [
-          const SizedBox(
+          SizedBox(
             height: 200,
           ),
-          const LinearProgressIndicator(),
+          LinearProgressIndicator(),
         ],
       ),
       errorWidget: (context, url, error) {

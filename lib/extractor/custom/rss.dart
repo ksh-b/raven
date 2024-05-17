@@ -37,8 +37,9 @@ class RSSFeed extends Publisher {
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
     newsArticle = await FallbackProvider().get(newsArticle);
-    if (newsArticle.thumbnail == _thumbnail(newsArticle.content))
+    if (newsArticle.thumbnail == _thumbnail(newsArticle.content)) {
       newsArticle.thumbnail = "";
+    }
     return newsArticle;
   }
 

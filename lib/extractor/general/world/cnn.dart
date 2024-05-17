@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
@@ -41,7 +40,7 @@ class CNN extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response;
+    Response response;
     if (newsArticle.url.startsWith("http")) {
       response = await dio().get(newsArticle.url);
     } else {
@@ -108,8 +107,8 @@ class CNN extends Publisher {
       var document = html_parser.parse(response.data);
       var data = document
           .querySelector(".has-pseudo-class-fix-layout--wide-left-balanced-2")
-          ?.querySelectorAll(".container__item--type-section");
-      for (var article in data!) {
+          ?.querySelectorAll(".container__item--type-section") ?? [];
+      for (var article in data) {
         articles.add(NewsArticle(
           publisher: name,
           title:
