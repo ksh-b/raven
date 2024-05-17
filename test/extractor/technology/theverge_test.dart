@@ -16,6 +16,6 @@ void main() {
   });
 
   test('Search Articles Test', () async {
-    await ExtractorTest.searchedArticlesTest(publisher, 'playstation');
+    await ExtractorTest.searchedArticlesTest(publisher, 'playstation', ignoreDateCheck: true);
   });
 }

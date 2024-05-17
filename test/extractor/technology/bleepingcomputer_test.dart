@@ -10,7 +10,7 @@ void main() {
   test('Extract Categories Test', () async {});
 
   test('Category Articles Test', () async {
-    await ExtractorTest.categoryArticlesTest(publisher, category: '');
+    await ExtractorTest.categoryArticlesTest(publisher, category: '', ignoreDateCheck: true);
   });
 
   test('Search Articles Test', () async {

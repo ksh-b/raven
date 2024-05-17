@@ -16,6 +16,6 @@ void main() {
   });
 
   test('Search Articles Test', () async {
-    await ExtractorTest.searchedArticlesTest(publisher, 'world');
+    await ExtractorTest.searchedArticlesTest(publisher, 'Leclerc fastest in Imola practice');
   });
 }

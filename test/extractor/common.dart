@@ -14,41 +14,47 @@ class ExtractorTest {
   }
 
   static Future<void> categoryArticlesTest(Publisher publisher,
-      {String? category, bool skipDateCheck = false}) async {
+      {String? category, bool ignoreDateCheck = false}) async {
     if (category == null) {
       final Map<String, String> categories = await publisher.categories;
 
       for (String category in categories.values) {
-        sleep(Duration(seconds: 2));
-        print(category);
-        expect(category, isNotNull);
-        final categoryArticles =
-            await publisher.categoryArticles(category: category, page: 1);
-
-        expect(categoryArticles, isNotEmpty, reason: category);
-
-        var article = categoryArticles.first;
-        expect(article, isNotNull);
-        expect(article, isA<NewsArticle>());
-        expect(article.title, isNotEmpty, reason: "$article");
-
-        await publisher.article(article).then(
-          (value) {
-            print(article);
-            expect(value, isNotNull);
-            expect(value.publishedAt, isNonNegative,
-                reason: article.url, skip: skipDateCheck);
-            if (value.content.isEmpty) {
-              FallbackProvider().get(article).then((value) {
-                expect(value.content, isNotEmpty, reason: article.url);
-              });
-            } else {
-              expect(value.content, isNotEmpty, reason: article.url);
-            }
-          },
-        );
+        await testCategory(category, publisher, ignoreDateCheck);
       }
+    } else{
+      await testCategory(category, publisher, ignoreDateCheck);
     }
+  }
+
+  static Future<void> testCategory(String category, Publisher publisher, bool skipDateCheck) async {
+    sleep(Duration(seconds: 2));
+    print(category);
+    expect(category, isNotNull);
+    final categoryArticles =
+        await publisher.categoryArticles(category: category, page: 1);
+
+    expect(categoryArticles, isNotEmpty, reason: category);
+
+    var article = categoryArticles.first;
+    expect(article, isNotNull);
+    expect(article, isA<NewsArticle>());
+    expect(article.title, isNotEmpty, reason: "$article");
+
+    await publisher.article(article).then(
+      (value) {
+        print(article);
+        expect(value, isNotNull);
+        expect(value.publishedAt, isNonNegative,
+            reason: article.url, skip: skipDateCheck);
+        if (value.content.isEmpty) {
+          FallbackProvider().get(article).then((value) {
+            expect(value.content, isNotEmpty, reason: article.url);
+          });
+        } else {
+          expect(value.content, isNotEmpty, reason: article.url);
+        }
+      },
+    );
   }
 
   static Future<void> searchedArticlesTest(Publisher publisher, String query,

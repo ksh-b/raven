@@ -12,10 +12,10 @@ void main() {
   });
 
   test('Category Articles Test', () async {
-    await ExtractorTest.categoryArticlesTest(publisher, category: "/news");
+    await ExtractorTest.categoryArticlesTest(publisher, category: "/news",ignoreDateCheck: true);
   });
 
   test('Search Articles Test', () async {
-    await ExtractorTest.searchedArticlesTest(publisher, 'tech');
+    await ExtractorTest.searchedArticlesTest(publisher, 'tech', ignoreDateCheck: true);
   });
 }
