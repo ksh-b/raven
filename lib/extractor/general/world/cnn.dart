@@ -19,22 +19,18 @@ class CNN extends Publisher {
   Category get mainCategory => Category.world;
 
   Future<Map<String, String>> extractCategories() async {
-    Map<String, String> map = {};
-    var response = await dio().get(homePage);
-    if (response.statusCode == 200) {
-      var document = html_parser.parse(response.data);
-      document
-          .querySelectorAll(
-              ".header__nav-container a[class='header__nav-item-link'][href]")
-          .forEach((element) {
-        map.putIfAbsent(
-          element.text.trim(),
-          () {
-            return element.attributes["href"]!.replaceFirst(homePage, "");
-          },
-        );
-      });
-    }
+    Map<String, String> map = {
+      "US": "/us",
+      "World": "/world",
+      "Politics": "/politics",
+      "Business": "/business",
+      "Opinion": "/opinion",
+      "Health": "/health",
+      "Entertainment": "/entertainment",
+      "Style": "/style",
+      "Travel": "/travel",
+      "Sports": "/sports"
+    };
     return map;
   }
 
@@ -61,7 +57,7 @@ class CNN extends Publisher {
               ? live.outerHtml
               : document
                       .querySelector(
-                          '.article__content,.video-resource,article[data-position]')
+                          '.article__content,.video-resource,article[data-position],.gallery-inline_unfurled__description')
                       ?.outerHtml ??
                   "",
           author: document.querySelector('.byline__name')?.text ?? "",
@@ -106,8 +102,10 @@ class CNN extends Publisher {
     if (response.statusCode == 200) {
       var document = html_parser.parse(response.data);
       var data = document
-          .querySelector(".has-pseudo-class-fix-layout--wide-left-balanced-2")
-          ?.querySelectorAll(".container__item--type-section") ?? [];
+              .querySelector(
+                  ".has-pseudo-class-fix-layout--wide-left-balanced-2")
+              ?.querySelectorAll(".container__item--type-section") ??
+          [];
       for (var article in data) {
         articles.add(NewsArticle(
           publisher: name,

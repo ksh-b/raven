@@ -175,15 +175,20 @@ class BBC extends Publisher {
       var jsonContent = jsonDecode(
           document.querySelector('script[type="application/json"]')?.text ??
               "{}");
-      String content = '<html><body>';
-      var blocks = jsonContent["props"]["pageProps"]["page"]
-          [convertString(newsArticle.url)]["contents"];
-      for (var b in blocks) {
-        if (b["type"] == "text") {
-          content += '<p>${b["model"]["blocks"][0]["model"]["text"]}</p>';
+      String content = '';
+      if(jsonContent is! Map) {
+        content = document.querySelector('main article')?.outerHtml ?? "";
+      } else {
+        content = '<html><body>';
+        var blocks = jsonContent["props"]["pageProps"]["page"]
+        [convertString(newsArticle.url)]["contents"];
+        for (var b in blocks) {
+          if (b["type"] == "text") {
+            content += '<p>${b["model"]["blocks"][0]["model"]["text"]}</p>';
+          }
         }
+        content = "$content</body></html>";
       }
-      content = "$content</body></html>";
       newsArticle.content = content;
     }
     return newsArticle;
@@ -225,7 +230,7 @@ class BBC extends Publisher {
     var response = await dio().get(
         "https://web-cdn.api.bbci.co.uk/xd/search?terms=$searchQuery&page=$page");
     if (response.statusCode == 200) {
-      var document = jsonDecode(response.data)['data'];
+      var document = response.data['data'];
       for (var element in document) {
         var title = element['title'];
         var thumbnail = element['indexImage']['model']['blocks']['src'];

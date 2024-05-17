@@ -60,7 +60,7 @@ class AlJazeera extends Publisher {
       var article = document.querySelector("#main-content-area");
       var thumbnailElement = article?.querySelector('img');
       var content =
-          document.querySelector('.wysiwyg--all-content')?.innerHtml ?? "";
+          document.querySelector('div[class*=wysiwyg]')?.innerHtml ?? "";
       if (content.isEmpty) {
         content = article?.querySelector(".article__subhead")?.innerHtml ?? "";
       }

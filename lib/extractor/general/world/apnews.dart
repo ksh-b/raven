@@ -43,6 +43,8 @@ class APNews extends Publisher {
       "AP Buyline Personal Finance",
       "AP Buyline Shopping",
       "Press Releases",
+      "Press Releases",
+      "My Account",
     ];
     return map
       ..removeWhere(

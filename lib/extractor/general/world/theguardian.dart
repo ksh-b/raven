@@ -22,10 +22,11 @@ class TheGuardian extends Publisher {
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
     var response = await dio().get(homePage);
+    var unsupported = ["Opinion"];
     if (response.statusCode == 200) {
       var document = html_parser.parse(response.data);
       document
-          .querySelectorAll('.dcr-1xyuhwc gu-island .dcr-qxru8z')
+          .querySelectorAll("div[data-component=nav2] ul[data-testid*='pillar-list'] li a")
           .forEach((element) {
         map.putIfAbsent(
           element.text,
@@ -35,7 +36,7 @@ class TheGuardian extends Publisher {
         );
       });
     }
-    return map;
+    return map..removeWhere((key, value) => unsupported.contains(key),);
   }
 
   @override

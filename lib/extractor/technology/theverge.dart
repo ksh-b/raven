@@ -126,7 +126,7 @@ class TheVerge extends Publisher {
       var articleElements = document["items"];
       for (var element in articleElements) {
         var title = element["title"];
-        var url = element["link"].path;
+        var url = element["link"];
         var excerpt = element["htmlSnippet"];
         var thumbnail = element["pagemap"]["cse_image"][0]["src"];
         var time = element["snippet"].split("...")[0];
@@ -136,7 +136,7 @@ class TheVerge extends Publisher {
             title: title ?? "",
             content: "",
             excerpt: excerpt,
-            author: "", // Specify author or use default value
+            author: "",
             url: url.replaceFirst(homePage, ""),
             thumbnail: thumbnail,
             publishedAt: dateEntry,
