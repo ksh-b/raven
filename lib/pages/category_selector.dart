@@ -149,13 +149,7 @@ class _CategorySelectorState extends State<CategorySelector> {
     return CheckboxListTile(
       title: Text(subCategoryKey),
       value: selectedSubscriptions.contains(userSubscription),
-      onChanged: selectedSubscriptions
-              .where((element) =>
-                  element.publisher == userSubscription.publisher &&
-                  element.category == "/")
-              .isNotEmpty
-          ? null
-          : (value) {
+      onChanged: (value) {
               updateList(value, userSubscription);
             },
     );
