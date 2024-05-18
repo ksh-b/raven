@@ -71,7 +71,7 @@ class _CategorySelectorState extends State<CategorySelector> {
                 shrinkWrap: true,
                 itemCount: snapshot.data!.length + 3 + customSubsSize,
                 itemBuilder: (context, index) {
-                  var subCategoryKey = "All";
+                  var subCategoryKey = "Default";
                   var subCategoryValue = "/";
                   var userSubscription =
                       UserSubscription(widget.newsSource, subCategoryValue);
