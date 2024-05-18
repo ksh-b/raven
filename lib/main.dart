@@ -22,7 +22,8 @@ Future<void> main() async {
       (element) {
         return
           element.toString() == "RSS Feed~/" ||
-          element.toString() == "morss~/";
+          element.toString() == "morss~/" ||
+          element.toString() == "Ars Technica~";
       },
     );
 

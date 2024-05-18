@@ -33,7 +33,6 @@ class ArsTechnica extends Publisher {
 
   @override
   Future<Map<String, String>> get categories async => {
-        "News": "/",
         "IT": "/information-technology",
         "Tech": "/gadgets",
         "Science": "/science",
