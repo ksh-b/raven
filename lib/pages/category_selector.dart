@@ -67,33 +67,47 @@ class _CategorySelectorState extends State<CategorySelector> {
           future: future,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              var pubCats = snapshot.data;
               return ListView.builder(
                 shrinkWrap: true,
-                itemCount: snapshot.data!.length + 3 + customSubsSize,
+                itemCount: snapshot.data!.length + customSubsSize + 3 ,
                 itemBuilder: (context, index) {
                   var subCategoryKey = "Default";
                   var subCategoryValue = "/";
                   var userSubscription =
                       UserSubscription(widget.newsSource, subCategoryValue);
+
+                  // all checkbox
                   if (index == 0) {
-                    if(publishers[widget.newsSource]!.mainCategory==Category.custom) {
+                    var mainCat = publishers[widget.newsSource]!.mainCategory;
+                    if (mainCat == Category.custom) {
                       return SizedBox.shrink();
                     }
                     return _buildAllCheckbox(subCategoryKey, userSubscription);
                   }
-                  if (index - 1 < snapshot.data!.length) {
-                    subCategoryKey = snapshot.data!.keys.toList()[index - 1];
-                    subCategoryValue =
-                        snapshot.data!.values.toList()[index - 1];
-                    userSubscription =
-                        UserSubscription(widget.newsSource, subCategoryValue);
+
+                  // publisher categories checkbox
+                  if (index - 1 < pubCats!.length) {
+                    subCategoryKey = pubCats.keys.toList()[index - 1];
+                    subCategoryValue = pubCats.values.toList()[index - 1];
+                    userSubscription = UserSubscription(
+                      widget.newsSource,
+                      subCategoryValue,
+                    );
                     return _buildCategorySelector(
-                        subCategoryKey, userSubscription);
-                  } else if (index > snapshot.data!.length &&
-                      index < customSubsSize + snapshot.data!.length + 1) {
+                      subCategoryKey,
+                      userSubscription,
+                    );
+                  }
+
+                  // custom categories saved by user
+                  else if (index > pubCats.length &&
+                      index < customSubsSize + pubCats.length + 1) {
                     return customCategorySaved(index, snapshot);
-                  } else if (index ==
-                      (snapshot.data!.length + 1 + customSubsSize)) {
+                  }
+
+                  // custom categories selector
+                  else if (index == (pubCats.length + 1 + customSubsSize)) {
                     return Flex(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       direction: Axis.horizontal,
@@ -105,7 +119,10 @@ class _CategorySelectorState extends State<CategorySelector> {
                           _buildCustomTester()
                       ],
                     );
-                  } else {
+                  }
+
+                  // save button
+                  else {
                     return SaveButton(
                       selectedSubscriptions: selectedSubscriptions,
                       widget: widget,
