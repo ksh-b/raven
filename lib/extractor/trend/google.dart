@@ -32,7 +32,6 @@ class GoogleTrend extends Trend {
           .replaceFirst(")]}',", "")
           .replaceFirst("<html><head></head><body>", "")
           .replaceFirst("</body></html>", "");
-      print(jsonText);
       var somethings = json.decode(jsonText)["default"]["trendingSearchesDays"];
       for (var something in somethings) {
         var searches = something["trendingSearches"];

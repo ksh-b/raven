@@ -49,7 +49,6 @@ class ArsTechnica extends Publisher {
       {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
     var tag = category == "/" ? "" : category;
-    print("$homePage/${category}page/$page");
     var response = await dio().get("$homePage$category/page/$page");
     if (response.statusCode == 200) {
       Document document = html_parser.parse(response.data);
