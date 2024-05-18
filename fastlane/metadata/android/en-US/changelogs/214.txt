@@ -1,0 +1,7 @@
+### Fixed
+- Extractors: AlJazeera, APNews, BBC, CNN, The Guardian, The Verge, Ars Technica
+- Next page not loading as intended
+
+### Changed
+- 'All' checkbox label to 'Default'.
+- Removed disabling of checkboxes after selecting 'Default'
