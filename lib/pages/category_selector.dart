@@ -148,6 +148,7 @@ class _CategorySelectorState extends State<CategorySelector> {
       String subCategoryKey, UserSubscription userSubscription) {
     return CheckboxListTile(
       title: Text(subCategoryKey),
+      subtitle: Text(userSubscription.category),
       value: selectedSubscriptions.contains(userSubscription),
       onChanged: (value) {
               updateList(value, userSubscription);
