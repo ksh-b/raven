@@ -29,7 +29,7 @@ class ArticleProvider {
       Publisher publisher = publishers[subscription.publisher]!;
       // if there are any articles in stash, un-stash them
       var stashedPublisherArticles = stashedArticles
-          .where((e) => e.publisher.toString() == publisher.toString())
+          .where((e) => e.publisher == publisher.name)
           .toList();
       if (stashedPublisherArticles.isNotEmpty) {
         subscriptionArticles = stashedPublisherArticles.take(few).toList();
@@ -94,6 +94,7 @@ class ArticleProvider {
       await Future.wait(futures);
     }
     newsArticles.addAll(subscriptionArticles);
+    newsArticles.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
     return newsArticles;
   }
 
@@ -112,7 +113,5 @@ class ArticleProvider {
           : page + 1;
     }
 
-    // sort - show most recent first
-    subscriptionArticles.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
   }
 }
