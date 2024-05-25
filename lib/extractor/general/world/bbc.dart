@@ -59,37 +59,36 @@ class BBC extends Publisher {
     String apiUrl = "https://push.api.bbci.co.uk/batch?"
         "t=/data/bbc-morph-lx-commentary-data-paged/about/$id/"
         "isUk/false/limit/5/nitroKey/lx-nitro/pageNumber/$page/version/1.5.6";
-    final response = await dio().get(apiUrl);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = (response.data);
-      var articles = data["payload"][0]["body"]["results"];
-      for (var article in articles) {
-        var articleUrl = article['url'];
-        if (articleUrl == null) continue;
-        var title = article['title'];
-        var author = article.containsKey("contributor")
-            ? article['contributor']["name"]
-            : "";
-        var thumbnail =
-            article.containsKey("image") ? article["image"]["href"] : "";
-        var time = article["lastPublished"];
-        var excerpt = article['summary'];
-        articlesData.add(NewsArticle(
-          publisher: name,
-          title: title ?? "",
-          content: "",
-          excerpt: excerpt,
-          author: author ?? "",
-          url: articleUrl,
-          thumbnail: thumbnail.replaceFirst("http:", "https:") ?? "",
-          publishedAt: stringToUnix(time?.trim() ?? ""),
-          tags: [category],
-          category: category,
-        ));
+    await dio().get(apiUrl).then((response) {
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = (response.data);
+        var articles = data["payload"][0]["body"]["results"];
+        for (var article in articles) {
+          var articleUrl = article['url'];
+          if (articleUrl == null) continue;
+          var title = article['title'];
+          var author = article.containsKey("contributor")
+              ? article['contributor']["name"]
+              : "";
+          var thumbnail =
+              article.containsKey("image") ? article["image"]["href"] : "";
+          var time = article["lastPublished"];
+          var excerpt = article['summary'];
+          articlesData.add(NewsArticle(
+            publisher: name,
+            title: title ?? "",
+            content: "",
+            excerpt: excerpt,
+            author: author ?? "",
+            url: articleUrl,
+            thumbnail: thumbnail.replaceFirst("http:", "https:") ?? "",
+            publishedAt: stringToUnix(time?.trim() ?? ""),
+            tags: [category],
+            category: category,
+          ));
+        }
       }
-    }
-
+    });
     return articlesData;
   }
 
@@ -105,30 +104,35 @@ class BBC extends Publisher {
         '"groupResourceId":"urn:bbc:vivo:curation:$groupResourceId",'
         '"groupPosition":5,"topicId":"$topicId"}'
         '&urn=urn:bbc:vivo:curation:$groupResourceId';
-    final response = await dio().get(apiUrl);
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = (response.data);
-      var articles = data["posts"];
-      for (var article in articles) {
-        var title = article['headline'];
-        var author = article['contributor'] ?? "";
-        var thumbnail = article["image"] != null ? article["image"]["src"] : "";
-        var time = convertToIso8601(article["timestamp"]);
-        var articleUrl = article['url'];
-        var excerpt = "";
-        articlesData.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt,
-            author: author ?? "",
-            url: articleUrl,
-            thumbnail: thumbnail.replaceFirst("http:", "https:") ?? "",
-            publishedAt: stringToUnix(time),
-            tags: [category],
-            category: category));
-      }
-    }
+    await dio().get(apiUrl).then(
+      (response) {
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = (response.data);
+          var articles = data["posts"];
+          for (var article in articles) {
+            var title = article['headline'];
+            var author = article['contributor'] ?? "";
+            var thumbnail =
+                article["image"] != null ? article["image"]["src"] : "";
+            var time = convertToIso8601(article["timestamp"]);
+            var articleUrl = article['url'];
+            var excerpt = "";
+            articlesData.add(NewsArticle(
+                publisher: name,
+                title: title ?? "",
+                content: "",
+                excerpt: excerpt,
+                author: author ?? "",
+                url: articleUrl,
+                thumbnail: thumbnail.replaceFirst("http:", "https:") ?? "",
+                publishedAt: stringToUnix(time),
+                tags: [category],
+                category: category));
+          }
+        }
+      },
+    );
+
     return articlesData;
   }
 
@@ -169,28 +173,32 @@ class BBC extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
-    if (response.statusCode == 200) {
-      var document = html_parser.parse(response.data);
-      var jsonContent = jsonDecode(
-          document.querySelector('script[type="application/json"]')?.text ??
-              "{}");
-      String content = '';
-      if(jsonContent is! Map) {
-        content = document.querySelector('main article')?.outerHtml ?? "";
-      } else {
-        content = '<html><body>';
-        var blocks = jsonContent["props"]["pageProps"]["page"]
-        [convertString(newsArticle.url)]["contents"];
-        for (var b in blocks) {
-          if (b["type"] == "text") {
-            content += '<p>${b["model"]["blocks"][0]["model"]["text"]}</p>';
+    await dio().get("$homePage${newsArticle.url}").then(
+      (response) {
+        if (response.statusCode == 200) {
+          var document = html_parser.parse(response.data);
+          var jsonContent = jsonDecode(
+              document.querySelector('script[type="application/json"]')?.text ??
+                  "{}");
+          String content = '';
+          if (jsonContent is! Map) {
+            content = document.querySelector('main article')?.outerHtml ?? "";
+          } else {
+            content = '<html><body>';
+            var blocks = jsonContent["props"]["pageProps"]["page"]
+                [convertString(newsArticle.url)]["contents"];
+            for (var b in blocks) {
+              if (b["type"] == "text") {
+                content += '<p>${b["model"]["blocks"][0]["model"]["text"]}</p>';
+              }
+            }
+            content = "$content</body></html>";
           }
+          newsArticle.content = content;
         }
-        content = "$content</body></html>";
-      }
-      newsArticle.content = content;
-    }
+      },
+    );
+
     return newsArticle;
   }
 
@@ -227,36 +235,42 @@ class BBC extends Publisher {
     int page = 1,
   }) async {
     Set<NewsArticle> articles = {};
-    var response = await dio().get(
-        "https://web-cdn.api.bbci.co.uk/xd/search?terms=$searchQuery&page=$page");
-    if (response.statusCode == 200) {
-      var document = response.data['data'];
-      for (var element in document) {
-        var title = element['title'];
-        var thumbnail = element['indexImage']['model']['blocks']['src'];
-        var articleUrl = element['path'];
-        var excerpt = element['summary'];
-        var time = element['lastPublishedAt'];
-        var tags = element['topics'].cast<String>();
-        var author = "";
+    await dio()
+        .get("https://web-cdn.api.bbci.co.uk/xd/search?terms=$searchQuery&page=$page")
+        .then(
+      (response) {
+        if (response.statusCode == 200) {
+          var document = response.data['data'];
+          for (var element in document) {
+            var title = element['title'];
+            var thumbnail = element['indexImage']['model']['blocks']['src'];
+            var articleUrl = element['path'];
+            var excerpt = element['summary'];
+            var time = element['lastPublishedAt'];
+            var tags = element['topics'].cast<String>();
+            var author = "";
 
-        if (time != null) {
-          time = convertToIso8601(time);
+            if (time != null) {
+              time = convertToIso8601(time);
+            }
+
+            articles.add(NewsArticle(
+                publisher: name,
+                title: title ?? "",
+                content: "",
+                excerpt: excerpt ?? "",
+                author: author,
+                url:
+                    articleUrl?.replaceFirst("https://www.bbc.co.uk", "") ?? "",
+                thumbnail: thumbnail ?? "",
+                publishedAt: stringToUnix(time?.trim() ?? ""),
+                tags: tags,
+                category: searchQuery));
+          }
         }
+      },
+    );
 
-        articles.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt ?? "",
-            author: author,
-            url: articleUrl?.replaceFirst("https://www.bbc.co.uk", "") ?? "",
-            thumbnail: thumbnail ?? "",
-            publishedAt: stringToUnix(time?.trim() ?? ""),
-            tags: tags,
-            category: searchQuery));
-      }
-    }
     return articles;
   }
 }

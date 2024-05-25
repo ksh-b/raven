@@ -17,15 +17,17 @@ class Engadget extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await dio().get("$homePage/${newsArticle.url}");
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      Element? articleElement = document.querySelector(".caas-body");
-      String? thumbnail =
-          articleElement?.querySelector("p img")?.attributes["src"];
-      String? content = articleElement?.innerHtml;
-      return newsArticle.fill(content: content, thumbnail: thumbnail);
-    }
+    await dio().get("$homePage/${newsArticle.url}").then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        Element? articleElement = document.querySelector(".caas-body");
+        String? thumbnail =
+            articleElement?.querySelector("p img")?.attributes["src"];
+        String? content = articleElement?.innerHtml;
+        newsArticle = newsArticle.fill(content: content, thumbnail: thumbnail);
+      }
+    });
+
     return newsArticle;
   }
 
@@ -46,41 +48,44 @@ class Engadget extends Publisher {
       {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
     if (category == "/" || category.isEmpty) category = "/news";
-    var response = await dio().get(
+    await dio().get(
       "$homePage/$category/page/$page",
-    );
+    ).then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        List<Element> articleElements =
+        document.querySelectorAll("div[data-component=HorizontalCard]");
 
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      List<Element> articleElements =
-          document.querySelectorAll("div[data-component=HorizontalCard]");
+        for (Element articleElement in articleElements) {
+          String? title = articleElement.querySelector("h2,h4 a")?.text;
+          String? excerpt = articleElement.querySelector("h2+div")?.text;
+          String? author =
+              articleElement.querySelector("a[href*=about] span")?.text ?? "";
+          String? date =
+              articleElement.querySelector("span[class*='Ai(c)']")?.text ?? "";
+          String? url =
+          articleElement.querySelector("h2,h4 a")?.attributes["href"];
+          String? thumbnail =
+          articleElement.querySelector("img[width]")?.attributes["src"];
+          int parsedTime = stringToUnix(date, format: "MM.dd.yyyy");
 
-      for (Element articleElement in articleElements) {
-        String? title = articleElement.querySelector("h2,h4 a")?.text;
-        String? excerpt = articleElement.querySelector("h2+div")?.text;
-        String? author =
-            articleElement.querySelector("a[href*=about] span")?.text ?? "";
-        String? date =
-            articleElement.querySelector("span[class*='Ai(c)']")?.text ?? "";
-        String? url =
-            articleElement.querySelector("h2,h4 a")?.attributes["href"];
-        String? thumbnail =
-            articleElement.querySelector("img[width]")?.attributes["src"];
-        int parsedTime = stringToUnix(date, format: "MM.dd.yyyy");
-
-        articles.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt ?? "",
-            author: author,
-            url: url ?? "",
-            thumbnail: thumbnail ?? "",
-            publishedAt: parsedTime,
-            tags: [category],
-            category: category));
+          articles.add(
+            NewsArticle(
+              publisher: name,
+              title: title ?? "",
+              content: "",
+              excerpt: excerpt ?? "",
+              author: author,
+              url: url ?? "",
+              thumbnail: thumbnail ?? "",
+              publishedAt: parsedTime,
+              tags: [category],
+              category: category,
+            ),
+          );
+        }
       }
-    }
+    });
     return articles;
   }
 
@@ -88,36 +93,44 @@ class Engadget extends Publisher {
   Future<Set<NewsArticle>> searchedArticles(
       {required String searchQuery, int page = 1}) async {
     Set<NewsArticle> articles = {};
-    var response = await dio().get(
-        "https://search.engadget.com/search;?p=$searchQuery&pz=10&fr=engadget&fr2=sb-top&bct=0&b=${(page * 10) + 1}&pz=10&bct=0&xargs=0");
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      List<Element> articleElements =
-          document.querySelectorAll(".compArticleList li");
-      for (Element articleElement in articleElements) {
-        String? title = articleElement.querySelector("h4 a")?.text;
-        String? excerpt = articleElement.querySelector("h4+p")?.text;
-        String? author =
-            articleElement.querySelector(".csub span[class*=pr]")?.text;
-        String? date =
-            articleElement.querySelector(".csub span[class*=pl]")?.text;
-        String? url = articleElement.querySelector("h4 a")?.attributes["href"];
-        String? thumbnail =
-            articleElement.querySelector(".thmb")?.attributes["src"];
-        int parsedTime = stringToUnix(date ?? "", format: "MM.dd.yyyy");
+    await dio()
+        .get(
+      "https://search.engadget.com/search;?p=$searchQuery&pz=10&fr=engadget&fr2=sb-top&bct=0&b=${(page * 10) + 1}&pz=10&bct=0&xargs=0",
+    )
+        .then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        List<Element> articleElements =
+            document.querySelectorAll(".compArticleList li");
+        for (Element articleElement in articleElements) {
+          String? title = articleElement.querySelector("h4 a")?.text;
+          String? excerpt = articleElement.querySelector("h4+p")?.text;
+          String? author =
+              articleElement.querySelector(".csub span[class*=pr]")?.text;
+          String? date =
+              articleElement.querySelector(".csub span[class*=pl]")?.text;
+          String? url =
+              articleElement.querySelector("h4 a")?.attributes["href"];
+          String? thumbnail =
+              articleElement.querySelector(".thmb")?.attributes["src"];
+          int parsedTime = stringToUnix(date ?? "", format: "MM.dd.yyyy");
 
-        articles.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt ?? "",
-            author: author ?? "",
-            url: url!, // Parse URL and get path, use "" if url is null
-            thumbnail: thumbnail ?? "",
-            publishedAt: parsedTime,
-            category: searchQuery));
+          articles.add(
+            NewsArticle(
+              publisher: name,
+              title: title ?? "",
+              content: "",
+              excerpt: excerpt ?? "",
+              author: author ?? "",
+              url: url ?? "",
+              thumbnail: thumbnail ?? "",
+              publishedAt: parsedTime,
+              category: searchQuery,
+            ),
+          );
+        }
       }
-    }
+    });
     return articles;
   }
 }

@@ -17,17 +17,19 @@ class ArsTechnica extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      String? thumbnail =
-          document.querySelector(".figure img")?.attributes["href"];
-      String? content = document
-          .querySelectorAll(".article-content p")
-          .map((e) => e.innerHtml)
-          .join("<br><br>");
-      return newsArticle.fill(content: content, thumbnail: thumbnail);
-    }
+    await dio().get("$homePage${newsArticle.url}").then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        String? thumbnail =
+        document.querySelector(".figure img")?.attributes["href"];
+        String? content = document
+            .querySelectorAll(".article-content p")
+            .map((e) => e.innerHtml)
+            .join("<br><br>");
+        newsArticle = newsArticle.fill(content: content, thumbnail: thumbnail);
+      }
+    });
+
     return newsArticle;
   }
 
@@ -49,34 +51,36 @@ class ArsTechnica extends Publisher {
       {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
     var tag = category == "/" ? "" : category;
-    var response = await dio().get("$homePage$category/page/$page");
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      List<Element> articleElements = document.querySelectorAll(".article");
-      for (Element articleElement in articleElements) {
-        String? title = articleElement.querySelector("h2 a")?.text;
-        String? excerpt = articleElement.querySelector(".excerpt")?.text;
-        String? author =
-            articleElement.querySelector("span[itemprop=name]")?.text;
-        String? date =
-            articleElement.querySelector("time")?.attributes["datetime"] ?? "";
-        String? url = articleElement.querySelector("h2 a")?.attributes["href"];
-        String? thumbnail =
-            articleElement.querySelector("figure div")?.attributes["style"];
+    await dio().get("$homePage$category/page/$page").then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        List<Element> articleElements = document.querySelectorAll(".article");
+        for (Element articleElement in articleElements) {
+          String? title = articleElement.querySelector("h2 a")?.text;
+          String? excerpt = articleElement.querySelector(".excerpt")?.text;
+          String? author =
+              articleElement.querySelector("span[itemprop=name]")?.text;
+          String? date =
+              articleElement.querySelector("time")?.attributes["datetime"] ?? "";
+          String? url = articleElement.querySelector("h2 a")?.attributes["href"];
+          String? thumbnail =
+          articleElement.querySelector("figure div")?.attributes["style"];
 
-        articles.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt ?? "",
-            author: author ?? "",
-            url: url?.replaceFirst(homePage, "") ?? "",
-            thumbnail: extractUrl(thumbnail),
-            publishedAt: stringToUnix(date),
-            tags: [tag],
-            category: category));
+          articles.add(NewsArticle(
+              publisher: name,
+              title: title ?? "",
+              content: "",
+              excerpt: excerpt ?? "",
+              author: author ?? "",
+              url: url?.replaceFirst(homePage, "") ?? "",
+              thumbnail: extractUrl(thumbnail),
+              publishedAt: stringToUnix(date),
+              tags: [tag],
+              category: category));
+        }
       }
-    }
+    },);
+
     return articles;
   }
 

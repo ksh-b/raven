@@ -18,11 +18,13 @@ abstract class Trend {
   String get locator;
 
   Future<List<String>> get topics async {
-    var response = await dio().get(url);
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      return document.querySelectorAll(locator).map((e) => e.text).toList();
-    }
-    return [];
+    List<String> topics = [];
+    await dio().get(url).then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        topics = document.querySelectorAll(locator).map((e) => e.text).toList();
+      }
+    });
+    return topics;
   }
 }

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
@@ -36,15 +35,17 @@ class Reuters extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await dio().get('https://neuters.de${newsArticle.url}');
-    if (response.statusCode == 200) {
-      var document = html_parser.parse(response.data);
-      var articleElement = document.querySelectorAll('p:not(.byline)');
-      var content = articleElement.map((e) => "<p>${e.text}</p>").join();
-      return newsArticle.fill(
-        content: content,
-      );
-    }
+    await dio().get('https://neuters.de${newsArticle.url}').then((response) {
+      if (response.statusCode == 200) {
+        var document = html_parser.parse(response.data);
+        var articleElement = document.querySelectorAll('p:not(.byline)');
+        var content = articleElement.map((e) => "<p>${e.text}</p>").join();
+        newsArticle = newsArticle.fill(
+          content: content,
+        );
+      }
+    });
+
     return newsArticle;
   }
 
@@ -60,34 +61,37 @@ class Reuters extends Publisher {
     Set<NewsArticle> articles = {};
 
     List articlesData = [];
-    final Response response = await dio().get(apiUrl);
-
-    if (response.statusCode == 200) {
-      final data = response.data;
-      articlesData = data["result"]["articles"];
-      for (var element in articlesData) {
-        var title = element['title'];
-        var author = element['authors'][0]["name"];
-        var thumbnail = element.keys.contains("thumbnail")
-            ? element['thumbnail']['url']
-            : "";
-        var time = element["published_time"];
-        var articleUrl = '${element['canonical_url']}';
-        var excerpt = element['description'];
-        var tags = element['kicker']['names'];
-        articles.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt,
-            author: author ?? "",
-            url: articleUrl,
-            thumbnail: thumbnail ?? "",
-            publishedAt: stringToUnix(time?.trim() ?? ""),
-            tags: List<String>.from(tags),
-            category: category));
+    await dio().get(apiUrl).then((response) {
+      if (response.statusCode == 200) {
+        final data = response.data;
+        articlesData = data["result"]["articles"];
+        for (var element in articlesData) {
+          var title = element['title'];
+          var author = element['authors'][0]["name"];
+          var thumbnail = element.keys.contains("thumbnail")
+              ? element['thumbnail']['url']
+              : "";
+          var time = element["published_time"];
+          var articleUrl = '${element['canonical_url']}';
+          var excerpt = element['description'];
+          var tags = element['kicker']['names'];
+          articles.add(
+            NewsArticle(
+              publisher: name,
+              title: title ?? "",
+              content: "",
+              excerpt: excerpt,
+              author: author ?? "",
+              url: articleUrl,
+              thumbnail: thumbnail ?? "",
+              publishedAt: stringToUnix(time?.trim() ?? ""),
+              tags: List<String>.from(tags),
+              category: category,
+            ),
+          );
+        }
       }
-    }
+    });
     return articles;
   }
 

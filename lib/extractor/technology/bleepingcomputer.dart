@@ -17,20 +17,22 @@ class BleepingComputer extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      String? thumbnail = "";
-      String? content = document
-          .querySelectorAll(".articleBody > :not(.cz-related-article-wrapp)")
-          .toList()
-          .map((e) => e.innerHtml)
-          .join("<br><br>");
-      return newsArticle.fill(
-        content: content,
-        thumbnail: thumbnail,
-      );
-    }
+    await dio().get("$homePage${newsArticle.url}").then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        String? thumbnail = "";
+        String? content = document
+            .querySelectorAll(".articleBody > :not(.cz-related-article-wrapp)")
+            .toList()
+            .map((e) => e.innerHtml)
+            .join("<br><br>");
+        newsArticle = newsArticle.fill(
+          content: content,
+          thumbnail: thumbnail,
+        );
+      }
+    });
+
     return newsArticle;
   }
 

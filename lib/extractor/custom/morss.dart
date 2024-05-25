@@ -23,7 +23,6 @@ class Morss extends Publisher {
   @override
   bool get hasSearchSupport => false;
 
-
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
     if (newsArticle.content.isEmpty) {
@@ -51,33 +50,39 @@ class Morss extends Publisher {
     } else {
       url = "$homePage/:format=json:cors/$category";
     }
-    final response = await dio().get(url);
-    if (response.statusCode == 200) {
-      var data = response.data;
-      var items = data["items"];
-      for (var item in items) {
-        var content = item["content"];
-        var excerpt = item.containsKey("desc") ? item["desc"] : "";
-        if(isHTML(excerpt)) {
-          content = "<b>$excerpt</b>$content";
-          excerpt = "";
-        }
-        articles.add(
-          NewsArticle(
-            publisher: name,
-            title: item["title"] ?? "",
-            content: content,
-            excerpt: excerpt,
-            author: "",
-            url: item["url"],
-            tags: [],
-            thumbnail: "",
-            publishedAt:
+    try {
+      await dio().get(url).then((response) {
+        if (response.statusCode == 200) {
+          var data = response.data;
+          var items = data["items"];
+          for (var item in items) {
+            var content = item["content"];
+            var excerpt = item.containsKey("desc") ? item["desc"] : "";
+            if (isHTML(excerpt)) {
+              content = "<b>$excerpt</b>$content";
+              excerpt = "";
+            }
+            articles.add(
+              NewsArticle(
+                publisher: name,
+                title: item["title"] ?? "",
+                content: content,
+                excerpt: excerpt,
+                author: "",
+                url: item["url"],
+                tags: [],
+                thumbnail: "",
+                publishedAt:
                 item.containsKey("time") ? isoToUnix(item["time"]) : -1,
-            category: category,
-          ),
-        );
-      }
+                category: category,
+              ),
+            );
+          }
+        }
+      });
+
+    } catch (e) {
+      return articles;
     }
     return articles;
   }

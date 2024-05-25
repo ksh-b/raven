@@ -19,37 +19,40 @@ class TheQuint extends Publisher {
 
   Future<Map<String, String>> extractCategories() async {
     Map<String, String> map = {};
-    var response = await dio().get(homePage);
-    if (response.statusCode == 200) {
-      var document = html_parser.parse(response.data);
-      document
-          .querySelectorAll('#second-nav-bar a[id*=ga4-header]')
-          .forEach((element) {
-        map.putIfAbsent(
-          element.text,
-          () {
-            return element.attributes["href"]!
-                .replaceFirst("/", "")
-                .replaceFirst("news/", "");
-          },
-        );
-      });
-    }
+    await dio().get(homePage).then((response) {
+      if (response.statusCode == 200) {
+        var document = html_parser.parse(response.data);
+        document
+            .querySelectorAll('#second-nav-bar a[id*=ga4-header]')
+            .forEach((element) {
+          map.putIfAbsent(
+            element.text,
+            () {
+              return element.attributes["href"]!
+                  .replaceFirst("/", "")
+                  .replaceFirst("news/", "");
+            },
+          );
+        });
+      }
+    });
+
     var unsupported = ["Videos", "The Quint Lab", "Graphic Novels"];
     return map..removeWhere((key, value) => unsupported.contains(key));
   }
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      var content =
-          document.querySelectorAll(".story-element-text p,blockquote");
-      return newsArticle.fill(
-        content: content.map((e) => e.innerHtml).join("<br><br>"),
-      );
-    }
+    await dio().get("$homePage${newsArticle.url}").then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        var content =
+        document.querySelectorAll(".story-element-text p,blockquote");
+        newsArticle = newsArticle.fill(
+          content: content.map((e) => e.innerHtml).join("<br><br>"),
+        );
+      }
+    });
     return newsArticle;
   }
 
@@ -67,37 +70,39 @@ class TheQuint extends Publisher {
     String url =
         "$homePage/api/v1/collections/$category?limit=$limit&offset=$offset";
 
-    final response = await dio().get(url);
-    if (response.statusCode == 200) {
-      List data = (response.data)["items"];
+    await dio().get(url).then((response) {
 
-      for (var element in data) {
-        if (element["story"] == null) continue;
-        List<String> tags = [];
-        var title = element["story"]['headline'];
-        var author = element['story']["author-name"];
-        var thumbnail =
-            "https://images.thequint.com/${element['story']['hero-image-s3-key']}";
-        var time = element['story']["last-published-at"];
-        String articleUrl = element['story']["url"] ?? "";
-        var excerpt = element['story']['summary'] ?? "";
-        var sections = element['story']["sections"];
-        for (var section in sections) {
-          tags.add(section["name"]);
+      if (response.statusCode == 200) {
+        List data = (response.data)["items"];
+
+        for (var element in data) {
+          if (element["story"] == null) continue;
+          List<String> tags = [];
+          var title = element["story"]['headline'];
+          var author = element['story']["author-name"];
+          var thumbnail =
+              "https://images.thequint.com/${element['story']['hero-image-s3-key']}";
+          var time = element['story']["last-published-at"];
+          String articleUrl = element['story']["url"] ?? "";
+          var excerpt = element['story']['summary'] ?? "";
+          var sections = element['story']["sections"];
+          for (var section in sections) {
+            tags.add(section["name"]);
+          }
+          articles.add(NewsArticle(
+              publisher: name,
+              title: title ?? "",
+              content: "",
+              excerpt: excerpt,
+              author: author ?? "",
+              url: articleUrl.replaceFirst(homePage, ""),
+              tags: tags,
+              thumbnail: thumbnail,
+              publishedAt: time,
+              category: category));
         }
-        articles.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt,
-            author: author ?? "",
-            url: articleUrl.replaceFirst(homePage, ""),
-            tags: tags,
-            thumbnail: thumbnail,
-            publishedAt: time,
-            category: category));
       }
-    }
+    },);
     return articles;
   }
 
@@ -108,35 +113,37 @@ class TheQuint extends Publisher {
   }) async {
     Set<NewsArticle> articles = {};
     String apiUrl = '$homePage/route-data.json?path=/search&q=$searchQuery';
-    final response = await dio().get(apiUrl);
-    if (response.statusCode == 200) {
-      List data = (response.data)["data"]["stories"];
+    await dio().get(apiUrl).then((response) {
+      if (response.statusCode == 200) {
+        List data = (response.data)["data"]["stories"];
 
-      for (var element in data) {
-        List<String> tags = [];
-        var title = element['headline'];
-        var author = element['authors'][0]["name"];
-        var thumbnail =
-            "https://images.thequint.com/${element['hero-image-s3-key']}";
-        var time = element["last-published-at"];
-        var articleUrl = element["url"];
-        var sections = element["sections"];
-        for (var section in sections) {
-          tags.add(section["name"]);
+        for (var element in data) {
+          List<String> tags = [];
+          var title = element['headline'];
+          var author = element['authors'][0]["name"];
+          var thumbnail =
+              "https://images.thequint.com/${element['hero-image-s3-key']}";
+          var time = element["last-published-at"];
+          var articleUrl = element["url"];
+          var sections = element["sections"];
+          for (var section in sections) {
+            tags.add(section["name"]);
+          }
+          articles.add(NewsArticle(
+              publisher: name,
+              title: title ?? "",
+              content: "",
+              excerpt: "",
+              author: author ?? "",
+              url: articleUrl.replaceFirst(homePage, ""),
+              thumbnail: thumbnail,
+              publishedAt: time,
+              category: searchQuery,
+              tags: tags));
         }
-        articles.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: "",
-            author: author ?? "",
-            url: articleUrl.replaceFirst(homePage, ""),
-            thumbnail: thumbnail,
-            publishedAt: time,
-            category: searchQuery,
-            tags: tags));
       }
-    }
+    });
+
     return articles;
   }
 }

@@ -19,29 +19,33 @@ class GoogleTrend extends Trend {
   @override
   Future<List<String>> get topics async {
     var country = "US";
+    List<String> queries = [];
     if (Hive.isBoxOpen("settings")) {
       country = "${countryCodes[Store.countrySetting]}";
     }
-    var response = await dio().get(url + country, options: Options(
-      responseType: ResponseType.plain,
-    ));
-    List<String> queries = [];
-    if (response.statusCode == 200) {
-      Document document = html_parser.parse(response.data);
-      var jsonText = document.outerHtml
-          .replaceFirst(")]}',", "")
-          .replaceFirst("<html><head></head><body>", "")
-          .replaceFirst("</body></html>", "");
-      var somethings = json.decode(jsonText)["default"]["trendingSearchesDays"];
-      for (var something in somethings) {
-        var searches = something["trendingSearches"];
-        for (var search in searches) {
-          queries.add(search["title"]["query"].toString());
+    await dio().get(
+      url + country,
+      options: Options(
+        responseType: ResponseType.plain,
+      ),
+    ).then((response) {
+      if (response.statusCode == 200) {
+        Document document = html_parser.parse(response.data);
+        var jsonText = document.outerHtml
+            .replaceFirst(")]}',", "")
+            .replaceFirst("<html><head></head><body>", "")
+            .replaceFirst("</body></html>", "");
+        var somethings = json.decode(jsonText)["default"]["trendingSearchesDays"];
+        for (var something in somethings) {
+          var searches = something["trendingSearches"];
+          for (var search in searches) {
+            queries.add(search["title"]["query"].toString());
+          }
         }
+        queries = queries.take(10).toList();
       }
-      return queries.take(10).toList();
-    }
-    return [];
+    });
+    return queries;
   }
 
   static List<String> locations = [

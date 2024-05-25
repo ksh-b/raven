@@ -63,58 +63,62 @@ class TheWire extends Publisher {
   Future<Set<NewsArticle>> extract(
       String apiUrl, bool isSearch, String category) async {
     Set<NewsArticle> articles = {};
-    final response = await dio().get(apiUrl);
-    if (response.statusCode == 200) {
-      List data;
-      if (isSearch) {
-        data = (response.data)["generic"];
-      } else {
-        try {
-          data = (response.data);
-        } catch (e) {
-          data = [];
+    await dio().get(apiUrl).then((response) {
+      if (response.statusCode == 200) {
+        List data;
+        if (isSearch) {
+          data = (response.data)["generic"];
+        } else {
+          try {
+            data = (response.data);
+          } catch (e) {
+            data = [];
+          }
+        }
+        for (var element in data) {
+          var title = element['post_title'];
+          var author = element['post_author_name'][0]["author_name"];
+          var thumbnail =
+          element['hero_image'] == false ? "" : element['hero_image'][0];
+          var time = element["post_date_gmt"];
+          var articleUrl =
+              '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
+          var excerpt = element['post_excerpt'];
+          var tags = element['categories'].map((e) => e['name']).toList();
+          articles.add(NewsArticle(
+              publisher: name,
+              title: title ?? "",
+              content: "",
+              excerpt: excerpt,
+              author: author ?? "",
+              url: articleUrl,
+              thumbnail: thumbnail ?? "",
+              category: category,
+              publishedAt: stringToUnix(time),
+              tags: List<String>.from(tags)));
         }
       }
-      for (var element in data) {
-        var title = element['post_title'];
-        var author = element['post_author_name'][0]["author_name"];
-        var thumbnail =
-            element['hero_image'] == false ? "" : element['hero_image'][0];
-        var time = element["post_date_gmt"];
-        var articleUrl =
-            '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
-        var excerpt = element['post_excerpt'];
-        var tags = element['categories'].map((e) => e['name']).toList();
-        articles.add(NewsArticle(
-            publisher: name,
-            title: title ?? "",
-            content: "",
-            excerpt: excerpt,
-            author: author ?? "",
-            url: articleUrl,
-            thumbnail: thumbnail ?? "",
-            category: category,
-            publishedAt: stringToUnix(time),
-            tags: List<String>.from(tags)));
-      }
-    }
+    },);
+
     return articles;
   }
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    var response = await dio().get('$homePage${newsArticle.url}');
-    if (response.statusCode == 200) {
-      var data = (response.data);
-      var postDetail = data["post-detail"][0];
-      var content = postDetail["post_content"];
-      var thumbnail = postDetail["featured_image"][0];
-      return newsArticle.fill(
-        content: content,
-        thumbnail: thumbnail,
-      );
-    }
-    return newsArticle;
+    NewsArticle newsArticle_ = newsArticle;
+    await dio().get('$homePage${newsArticle.url}').then((response) {
+      if (response.statusCode == 200) {
+        var data = (response.data);
+        var postDetail = data["post-detail"][0];
+        var content = postDetail["post_content"];
+        var thumbnail = postDetail["featured_image"][0];
+        newsArticle_ = newsArticle.fill(
+          content: content,
+          thumbnail: thumbnail,
+        );
+      }
+    });
+    return newsArticle_;
   }
 
   @override

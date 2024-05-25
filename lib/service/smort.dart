@@ -13,16 +13,21 @@ class Smort extends Fallback {
   @override
   Future<MapEntry<bool, NewsArticle>> fallback(NewsArticle article) async {
     String url = "${publishers[article.publisher]!.homePage}${article.url}";
-    var response = await dio().get(
+    bool success = false;
+    await dio().get(
       "https://www.smort.io/article?smortParseAdvanced=true&url=$url",
-    );
-    if (response.statusCode == 200) {
-      var document = html_parser.parse(response.data);
-      var text =
-          document.querySelector("script[id='__NEXT_DATA__']")?.text ?? "";
-      article.content =
-          jsonDecode(text)["props"]["pageProps"]["body"] ?? document.outerHtml;
-    } else {
+    ).then((response) {
+      if (response.statusCode == 200) {
+        success = true;
+        var document = html_parser.parse(response.data);
+        var text =
+            document.querySelector("script[id='__NEXT_DATA__']")?.text ?? "";
+        article.content =
+            jsonDecode(text)["props"]["pageProps"]["body"] ?? document.outerHtml;
+      }
+    },);
+
+    if(!success) {
       return MapEntry(false, article);
     }
     return MapEntry(true, article);
