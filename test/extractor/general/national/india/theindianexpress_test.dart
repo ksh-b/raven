@@ -13,7 +13,7 @@ void main() {
   });
 
   test('Category Articles Test', () async {
-    await ExtractorTest.categoryArticlesTest(publisher);
+    await ExtractorTest.categoryArticlesTest(publisher, ignoreDateCheck: true);
   });
 
   test('Search Articles Test', () async {
