@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
@@ -35,13 +36,28 @@ class Reuters extends Publisher {
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
-    await dio().get('https://neuters.de${newsArticle.url}').then((response) {
+    var headers_ = await dio().get(
+      "https://www.reuters.com/",
+      options: Options(
+        responseType: ResponseType.plain,
+        validateStatus: (status) => true,
+      ),
+    ).then((value) => value.headers.map);
+
+    await dio().get(
+      "https://www.reuters.com${newsArticle.url}",
+      options: Options(
+        headers: {"Cookie": headers_['set-cookie']},
+        validateStatus: (status) => true,
+      ),
+    ).then((response) {
+      print(response.data);
       if (response.statusCode == 200) {
         var document = html_parser.parse(response.data);
-        var articleElement = document.querySelectorAll('p:not(.byline)');
-        var content = articleElement.map((e) => "<p>${e.text}</p>").join();
+        var content = document.querySelector("div[class*=article-body]")?.outerHtml;
         newsArticle = newsArticle.fill(
           content: content,
+          thumbnail: "",
         );
       }
     });
