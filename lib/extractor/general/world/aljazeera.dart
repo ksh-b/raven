@@ -121,7 +121,7 @@ class AlJazeera extends Publisher {
             url: articleUrl,
             thumbnail: thumbnail,
             publishedAt: stringToUnix(time?.trim() ?? ""),
-            tags: [createTag(category)],
+            tags: [articleUrl.split("/").length > 1 ? articleUrl.split("/")[1]:""],
             category: category,
           ),
         );
