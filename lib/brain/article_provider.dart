@@ -18,8 +18,8 @@ class ArticleProvider {
 
   Future<List<NewsArticle>> loadPage(int page, {String? query}) async {
     List<Future> futures = [];
-    List<NewsArticle> newsArticles = [];
-    List<NewsArticle> subscriptionArticles = [];
+    Set<NewsArticle> newsArticles = {};
+    Set<NewsArticle> subscriptionArticles = {};
     List<UserSubscription> subscriptions = Store.selectedSubscriptions;
     bool needFresh = false;
 
@@ -32,7 +32,7 @@ class ArticleProvider {
           .where((e) => e.publisher == publisher.name)
           .toList();
       if (stashedPublisherArticles.isNotEmpty) {
-        subscriptionArticles = stashedPublisherArticles.take(few).toList();
+        subscriptionArticles = stashedPublisherArticles.take(few).toSet();
         stashedArticles.removeAll(subscriptionArticles);
       }
 
@@ -56,7 +56,7 @@ class ArticleProvider {
               (value) {
                 if (value.isNotEmpty) {
                   collectPublisherArticles(
-                    subscriptionArticles,
+                    subscriptionArticles.toSet(),
                     value,
                     "${value.first.publisher}~${value.first.category}",
                     page,
@@ -94,12 +94,12 @@ class ArticleProvider {
       await Future.wait(futures);
     }
     newsArticles.addAll(subscriptionArticles);
-    newsArticles.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
-    return newsArticles;
+    newsArticles.toList().sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+    return newsArticles.toList();
   }
 
   void collectPublisherArticles(
-    List<NewsArticle> subscriptionArticles,
+    Set<NewsArticle> subscriptionArticles,
     Set<NewsArticle> articles,
     String subscription,
     int page,
