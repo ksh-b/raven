@@ -41,13 +41,13 @@ class ExtractorTest {
     expect(article.title, isNotEmpty, reason: "$article");
 
     await publisher.article(article).then(
-      (value) {
+      (value) async {
         print(article);
         expect(value, isNotNull);
         expect(value.publishedAt, isNonNegative,
             reason: article.url, skip: skipDateCheck);
         if (value.content.isEmpty) {
-          FallbackProvider().get(article).then((value) {
+          await FallbackProvider().get(article).then((value) {
             expect(value.content, isNotEmpty, reason: article.url);
           });
         } else {
