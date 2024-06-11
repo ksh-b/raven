@@ -51,7 +51,6 @@ class Reuters extends Publisher {
         validateStatus: (status) => true,
       ),
     ).then((response) {
-      print(response.data);
       if (response.statusCode == 200) {
         var document = html_parser.parse(response.data);
         var content = document.querySelector("div[class*=article-body]")?.outerHtml;

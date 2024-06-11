@@ -2,6 +2,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:raven/brain/dio_manager.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/utils/time.dart';
 
 class TheGuardian extends Publisher {
   @override
@@ -96,15 +97,11 @@ class TheGuardian extends Publisher {
     await dio().get("$homePage$category?page=$page").then((response) {
       if (response.statusCode == 200) {
         var document = html_parser.parse(response.data);
-        var data = document.querySelectorAll(".fc-item__container");
+        var data = document.querySelectorAll(".dcr-16c50tn");
         for (var article in data) {
           articles.add(NewsArticle(
             publisher: name,
-            title: article
-                .querySelector(".fc-item__header a .js-headline-text")
-                ?.text
-                .trim() ??
-                "",
+            title: article.querySelector(".dcr-lv2v9o")?.attributes["aria-label"] ?? "",
             content: "",
             excerpt: "",
             author: "",
@@ -114,11 +111,12 @@ class TheGuardian extends Publisher {
                 ?.replaceFirst(homePage, "") ??
                 "",
             tags: [category],
-            thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
-            publishedAt: (int.parse(
-                article.querySelector("time")?.attributes["data-timestamp"] ??
-                    "0")
-                .toInt()),
+            thumbnail: article.querySelector("img")?.attributes["src"]
+                ?.replaceFirst("width=120", "width=720")
+                .replaceFirst("width=75", "width=720")
+                ?? "",
+            publishedAt: article.querySelector("time")!=null?
+            isoToUnix(article.querySelector("time")!.attributes["datetime"]!):-1,
             category: category,
           ));
         }

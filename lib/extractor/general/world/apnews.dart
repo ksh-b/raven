@@ -47,6 +47,7 @@ class APNews extends Publisher {
       "Press Releases",
       "Press Releases",
       "My Account",
+      "Photography",
     ];
     return map
       ..removeWhere(
