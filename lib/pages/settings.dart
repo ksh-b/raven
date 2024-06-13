@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:raven/extractor/trend/google.dart';
 import 'package:raven/extractor/trend/yahoo.dart';
 import 'package:raven/model/trends.dart';
@@ -262,12 +263,29 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text('Settings'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.only(left: 16, right: 16),
         child: ValueListenableBuilder(
           valueListenable: Store.settings.listenable(),
           builder: (context, box, child) {
             return ListView(
-              children: [themeSection(), articleSection(), searchSection()],
+              children: [
+                themeSection(),
+                articleSection(),
+                searchSection(),
+                ListTile(
+                  leading: const Icon(Icons.info_outline_rounded),
+                  title: const Text('About'),
+                  onTap: () {
+                    PackageInfo.fromPlatform().then((packageInfo) {
+                      showAboutDialog(
+                        context: context,
+                        applicationName: packageInfo.appName,
+                        applicationVersion: packageInfo.version,
+                      );
+                    });
+                  },
+                ),
+              ],
             );
           },
         ),

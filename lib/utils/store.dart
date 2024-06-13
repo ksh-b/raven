@@ -159,6 +159,14 @@ class Store {
     settings.put("scale", scale);
   }
 
+  static int get articlesPerSub {
+    return settings.get("articlesPerSub", defaultValue: 5);
+  }
+
+  static set articlesPerSub(int numArticles) {
+    settings.put("articlesPerSub", numArticles);
+  }
+
   //// Saved ////
 
   static Box get saved {
