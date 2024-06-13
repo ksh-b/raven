@@ -98,6 +98,9 @@ class AlJazeera extends Publisher {
     if (category == "/") {
       category = "news";
     }
+    if(!category.startsWith("/")) {
+      return {};
+    }
     Set<NewsArticle> articles = {};
     Response? response = await get(category, page);
     if (response?.statusCode == 200) {
