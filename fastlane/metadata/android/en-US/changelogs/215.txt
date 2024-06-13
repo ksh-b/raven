@@ -1,0 +1,8 @@
+### Fixed
+- Fixed/Updated Extractors: APNews, The Guardian, Reuters, Ars Technica, Al Jazeera
+- Yahoo trend results showing incorrect data
+- Feed not loading when one of the subscription has issue
+
+### Added
+- When offline some articles will be shown instead of blank screen
+- Max articles shown per subscription can be adjusted now (earlier only 5 were shown per subscription)

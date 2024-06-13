@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2024-06-13
+
+### Fixed
+- Fixed/Updated Extractors: APNews, The Guardian, Reuters, Ars Technica, Al Jazeera
+- Yahoo trend results showing incorrect data
+- Feed not loading when one of the subscription has issue
+
+### Added
+- When offline some articles will be shown instead of blank screen 
+- Max articles shown per subscription can be adjusted now (earlier only 5 were shown per subscription)
+
 ## [0.12.2] - 2024-05-18
 
 ### Fixed
@@ -188,8 +199,9 @@ Fdroid release
 
 ### First Release
 
-[unreleased]: https://github.com/ksh-b/raven/compare/v0.12.2...HEAD
-[0.12.1]: https://github.com/ksh-b/raven/compare/v0.12.1...v0.12.2
+[unreleased]: https://github.com/ksh-b/raven/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/ksh-b/raven/compare/v0.12.2...v0.13.0
+[0.12.2]: https://github.com/ksh-b/raven/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/ksh-b/raven/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/ksh-b/raven/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/ksh-b/raven/compare/v0.10.0...v0.11.0
