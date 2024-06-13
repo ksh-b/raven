@@ -7,7 +7,6 @@ import 'package:raven/utils/store.dart';
 import 'package:worker_manager/worker_manager.dart';
 
 class ArticleProvider {
-  int few = 5;
   Set<NewsArticle> stashedArticles = {};
   HashMap<String, int> nextPage = HashMap();
 
@@ -32,7 +31,7 @@ class ArticleProvider {
           .where((e) => e.publisher == publisher.name)
           .toList();
       if (stashedPublisherArticles.isNotEmpty) {
-        subscriptionArticles = stashedPublisherArticles.take(few).toSet();
+        subscriptionArticles = stashedPublisherArticles.take(Store.articlesPerSub).toSet();
         stashedArticles.removeAll(subscriptionArticles);
       }
 
@@ -104,8 +103,8 @@ class ArticleProvider {
     String subscription,
     int page,
   ) {
-    subscriptionArticles.addAll(articles.take(few).toList());
-    var stashedArticles_ = articles.skip(few);
+    subscriptionArticles.addAll(articles.take(Store.articlesPerSub).toList());
+    var stashedArticles_ = articles.skip(Store.articlesPerSub);
     stashedArticles.addAll(stashedArticles_);
     if (stashedArticles_.isNotEmpty) {
       nextPage[subscription] = nextPage.containsKey(subscription)

@@ -93,6 +93,22 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.linear_scale),
+            title: const Text('Max articles per subscription'),
+            subtitle: Slider(
+              value: Store.articlesPerSub * 1.0,
+              min: 5,
+              max: 20,
+              divisions: 3,
+              label: Store.articlesPerSub.toString(),
+              onChanged: (double value) {
+                setState(() {
+                  Store.articlesPerSub = value.toInt();
+                });
+              },
+            ),
+          ),
+          ListTile(
             leading: Icon(Icons.alt_route_rounded),
             title: const Text('Alternate URL (Long tap)'),
             subtitle: Text(Store.ladderSetting),
