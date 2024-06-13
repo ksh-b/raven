@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:raven/extractor/trend/google.dart';
+import 'package:raven/extractor/trend/yahoo.dart';
 import 'package:raven/model/trends.dart';
 import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/store.dart';
@@ -49,7 +50,6 @@ class _SettingsPageState extends State<SettingsPage> {
               );
             },
           ),
-          SizedBox(height: 20),
           ListTile(
             leading: const Icon(Icons.format_size_rounded),
             title: const Text('Font size'),
@@ -66,7 +66,6 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
-          SizedBox(height: 20),
         ],
       ),
     );
@@ -234,9 +233,21 @@ class _SettingsPageState extends State<SettingsPage> {
                       Store.countrySetting = option;
                     }, GoogleTrend.locations);
                   },
-                  title: const Text("Google Trends location"),
+                  title: Text("Google Trends location"),
                   subtitle: Text(Store.countrySetting),
                 )
+              : const SizedBox.shrink(),
+          Store.trendsProviderSetting == "Yahoo"
+              ? ListTile(
+            leading: const Icon(Icons.location_on_rounded),
+            onTap: () {
+              _showPopup(context, "Trends Provider", (String option) {
+                Store.countrySetting = option;
+              }, YahooTrend.locations);
+            },
+            title: Text("Yahoo Trends location"),
+            subtitle: Text(Store.countrySetting),
+          )
               : const SizedBox.shrink(),
           const SizedBox(height: 20),
         ],
