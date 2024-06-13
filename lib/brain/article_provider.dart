@@ -55,7 +55,7 @@ class ArticleProvider {
               (value) {
                 if (value.isNotEmpty) {
                   collectPublisherArticles(
-                    subscriptionArticles.toSet(),
+                    subscriptionArticles,
                     value,
                     "${value.first.publisher}~${value.first.category}",
                     page,
@@ -111,6 +111,5 @@ class ArticleProvider {
           ? (nextPage[subscription]! + 1)
           : page + 1;
     }
-
   }
 }
