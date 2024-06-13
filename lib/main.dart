@@ -15,6 +15,7 @@ Future<void> main() async {
   await Hive.openBox('subscriptions');
   await Hive.openBox('settings');
   await Hive.openBox('saved');
+  await Hive.openBox('offline-articles');
 
   // TODO: Remove this in future version
   Store.selectedSubscriptions = Store.selectedSubscriptions

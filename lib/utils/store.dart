@@ -176,4 +176,25 @@ class Store {
   static List<dynamic> getSavedArticles(NewsArticle article) {
     return saved.values.toList();
   }
+
+
+  /// Recent ////
+
+  static Box get offlineArticles {
+    return Hive.box("offline-articles");
+  }
+
+  static void saveOfflineArticles(List<NewsArticle> articles) {
+    offlineArticles.put("timestamp", DateTime.now().millisecondsSinceEpoch);
+    offlineArticles.put("list", articles);
+  }
+
+  static int lastSavedTimeStamp() {
+    return offlineArticles.get("timestamp", defaultValue: -1);
+  }
+
+  static List<NewsArticle> getOfflineArticles() {
+    return List<NewsArticle>.from(offlineArticles.get("list", defaultValue: []));
+  }
+
 }

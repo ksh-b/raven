@@ -123,7 +123,14 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
       isLoading = true;
     });
     articleProvider.reset();
-    loadMore();
+    if(await Network.isConnected()) {
+      loadMore();
+    } else {
+      setState(() {
+        newsArticles = Store.getOfflineArticles();
+        isLoading = false;
+      });
+    }
   }
 
   void loadMore() {
@@ -151,6 +158,9 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
       }
       setState(() {
         newsArticles += value;
+        if(page==1 && newsArticles.isNotEmpty) {
+          Store.saveOfflineArticles(newsArticles);
+        }
       });
     }).whenComplete(
       () {
