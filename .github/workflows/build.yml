@@ -1,0 +1,28 @@
+name: build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout all the submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt upgrade
+          submodules/flutter/bin/flutter config --no-analytics
+          submodules/flutter/bin/flutter pub get
+      - name: Build
+        run: submodules/flutter/bin/flutter build apk --split-per-abi
+
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
