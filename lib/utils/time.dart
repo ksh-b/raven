@@ -6,7 +6,7 @@ int stringToUnix(String timestamp, {String? format}) {
       DateFormat inputFormat = DateFormat(format);
       DateTime parsedTime = inputFormat
           .parse(timestamp.replaceFirst("pm", "PM").replaceFirst("am", "AM"));
-      parsedTime.millisecondsSinceEpoch;
+      return parsedTime.millisecondsSinceEpoch;
     }
     return isoToUnix(timestamp);
   } catch (e) {
