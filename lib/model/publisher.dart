@@ -17,6 +17,7 @@ import 'package:raven/extractor/technology/engadget.dart';
 import 'package:raven/extractor/technology/ghacks.dart';
 import 'package:raven/extractor/technology/theverge.dart';
 import 'package:raven/extractor/technology/torrentfreak.dart';
+import 'package:raven/extractor/technology/xdadevelopers.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/utils/string.dart';
 
@@ -40,6 +41,7 @@ Map<String, Publisher> publishers = {
   "The Quint": TheQuint(),
   "The Wire": TheWire(),
   "TorrentFreak": TorrentFreak(),
+  "XDA developers": XDAdevelopers(),
 };
 
 enum Category {
