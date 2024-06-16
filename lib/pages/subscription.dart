@@ -112,7 +112,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                     height: 24,
                     width: 24,
                     errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                        CircleAvatar(child: Text(newsSource.characters.first),),
                   ),
                   trailing: categories.isEmpty
                       ? const SizedBox.shrink()
