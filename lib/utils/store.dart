@@ -167,6 +167,14 @@ class Store {
     settings.put("articlesPerSub", numArticles);
   }
 
+  static String get searxInstance {
+    return settings.get("searxInstance", defaultValue: "https://searxng.site");
+  }
+
+  static set searxInstance(String country) {
+    settings.put("searxInstance", country);
+  }
+
   //// Saved ////
 
   static Box get saved {
