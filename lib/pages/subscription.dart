@@ -20,7 +20,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
   List<String> filteredNewsSources = [];
   TextEditingController searchController = TextEditingController();
   bool _isSearching = false;
-  int? _value = 0;
+  String _value = "all";
 
   @override
   void initState() {
@@ -56,43 +56,35 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
       ),
       body: Column(
         children: [
-          Wrap(
-            spacing: 5.0,
-            children: List<Widget>.generate(
-              Category.values.length + 1,
-              (int index) {
-                if (index == 0) {
-                  return ChoiceChip(
-                    label: const Text("all"),
-                    selected: _value == index,
-                    onSelected: (bool selected) {
-                      setState(() {
-                        _value = selected ? index : null;
-                        filteredNewsSources = newsSources;
-                        searchSubscriptions();
-                      });
-                    },
-                  );
-                } else {
-                  return ChoiceChip(
-                    label: Text(
-                        Category.values[index - 1].toString().split(".")[1]),
-                    selected: _value == index,
-                    onSelected: (bool selected) {
-                      setState(() {
-                        _value = selected ? index : null;
-                        searchSubscriptions();
-                        filteredNewsSources = filteredNewsSources
-                            .where((element) =>
-                                publishers[element]?.mainCategory ==
-                                Category.values[index - 1])
-                            .toList();
-                      });
-                    },
-                  );
-                }
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: DropdownButtonFormField(
+              value: _value,
+              onChanged: (selected) {
+                setState(() {
+                  _value = selected!;
+                  searchSubscriptions();
+                  if(selected == "all") {
+                    filteredNewsSources = newsSources;
+                  }
+                  else {
+                    filteredNewsSources = newsSources
+                        .where((element) => publishers[element]?.mainCategory.name == selected)
+                        .toList();
+                  }
+                });
               },
-            ).toList(),
+              items: (["all"] + Category.values.map((e) => e.name).toList()).map((item) {
+                return DropdownMenuItem(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList(),
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "Category"
+              ),
+            ),
           ),
           Expanded(
             child: ListView.builder(
