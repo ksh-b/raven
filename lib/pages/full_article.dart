@@ -6,6 +6,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:raven/brain/fallback_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/pages/widget/options_popup.dart';
 import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/html_helper.dart';
 import 'package:raven/utils/network.dart';
@@ -61,7 +62,6 @@ class _ArticlePageState extends State<ArticlePage> {
   Widget build(BuildContext context) {
     final String fullUrl =
         "${publishers[widget.article.publisher]!.homePage}${widget.article.url}";
-    final String altUrl = "${Store.ladderUrl}/$fullUrl";
     return StreamBuilder<NewsArticle>(
       initialData: widget.article,
       stream: customArticle(widget.article, context),
@@ -70,8 +70,8 @@ class _ArticlePageState extends State<ArticlePage> {
           appBar: AppBar(
             title: Text(publishers[widget.article.publisher]!.name),
             actions: [
-              ShareButton(altUrl: altUrl, fullUrl: fullUrl),
-              OpenButton(altUrl: altUrl, fullUrl: fullUrl),
+              ShareButton(fullUrl: fullUrl),
+              OpenUrlButton(fullUrl: fullUrl),
             ],
           ),
           body: snapshot.hasData
@@ -83,21 +83,26 @@ class _ArticlePageState extends State<ArticlePage> {
   }
 }
 
-class OpenButton extends StatelessWidget {
-  const OpenButton({
+class OpenUrlButton extends StatelessWidget {
+  const OpenUrlButton({
     super.key,
-    required this.altUrl,
     required this.fullUrl,
   });
 
-  final String altUrl;
   final String fullUrl;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onLongPress: () {
-        launchUrl(Uri.parse(altUrl));
+        showPopup(
+          context,
+          "Prefix URL with...",
+          (String option) {
+            launchUrl(Uri.parse("${Store.ladders[option]!}/$fullUrl"));
+          },
+          Store.ladders.keys.toList(),
+        );
       },
       child: IconButton(
         icon: Icon(Icons.open_in_browser),
@@ -112,18 +117,23 @@ class OpenButton extends StatelessWidget {
 class ShareButton extends StatelessWidget {
   const ShareButton({
     super.key,
-    required this.altUrl,
     required this.fullUrl,
   });
 
-  final String altUrl;
   final String fullUrl;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onLongPress: () {
-        Share.shareUri(Uri.parse(altUrl));
+        showPopup(
+          context,
+          "Prefix URL with...",
+          (String option) {
+            Share.shareUri(Uri.parse("${Store.ladders[option]!}/$fullUrl"));
+          },
+          Store.ladders.keys.toList(),
+        );
       },
       child: IconButton(
         icon: Icon(Icons.share),
