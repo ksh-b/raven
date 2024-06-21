@@ -1,6 +1,5 @@
 import 'package:raven/extractor/custom/morss.dart';
 import 'package:raven/extractor/custom/rss.dart';
-import 'package:raven/extractor/custom/searx.dart';
 import 'package:raven/extractor/general/national/india/thehindu.dart';
 import 'package:raven/extractor/general/national/india/theindianexpress.dart';
 import 'package:raven/extractor/general/national/india/thequint.dart';
@@ -35,7 +34,6 @@ Map<String, Publisher> publishers = {
   "morss": Morss(),
   "Reuters": Reuters(),
   "RSS Feed": RSSFeed(),
-  "SearxNG": Searx(),
   "The Guardian": TheGuardian(),
   "The Hindu": TheHindu(),
   "The Indian Express": TheIndianExpress(),
