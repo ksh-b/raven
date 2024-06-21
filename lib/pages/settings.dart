@@ -4,6 +4,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:raven/extractor/trend/google.dart';
 import 'package:raven/extractor/trend/yahoo.dart';
 import 'package:raven/model/trends.dart';
+import 'package:raven/pages/widget/options_popup.dart';
 import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/theme_provider.dart';
@@ -41,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Color'),
             subtitle: Text(Store.themeColorSetting),
             onTap: () {
-              _showPopup(
+              showPopup(
                 context,
                 "Color",
                 (String option) {
@@ -54,17 +55,22 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: const Icon(Icons.format_size_rounded),
             title: const Text('Font size'),
-            subtitle: Slider(
-              value: Store.fontScale,
-              min: 0.8,
-              max: 1.5,
-              divisions: 7,
-              label: (Store.fontScale * 100).round().toString(),
-              onChanged: (double value) {
-                setState(() {
-                  Store.fontScale = value;
-                });
-              },
+            subtitle: SliderTheme(
+              data: SliderThemeData(
+                  showValueIndicator: ShowValueIndicator.onlyForContinuous,),
+              child: Slider(
+                value: Store.fontScale,
+                min: 0.8,
+                max: 1.5,
+                // divisions: 7,
+                label: (Store.fontScale * 100).round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    Store.fontScale = value;
+                  });
+                },
+
+              ),
             ),
           ),
         ],
@@ -95,33 +101,21 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: const Icon(Icons.linear_scale),
             title: const Text('Max articles per subscription'),
-            subtitle: Slider(
-              value: Store.articlesPerSub * 1.0,
-              min: 5,
-              max: 20,
-              divisions: 3,
-              label: Store.articlesPerSub.toString(),
-              onChanged: (double value) {
-                setState(() {
-                  Store.articlesPerSub = value.toInt();
-                });
-              },
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.alt_route_rounded),
-            title: const Text('Alternate URL (Long tap)'),
-            subtitle: Text(Store.ladderSetting),
-            onTap: () {
-              _showPopup(
-                context,
-                "Ladder",
-                (String option) {
-                  Store.ladderSetting = option;
+            subtitle: SliderTheme(
+              data: SliderThemeData(
+                showValueIndicator: ShowValueIndicator.onlyForContinuous,),
+              child: Slider(
+                value: Store.articlesPerSub * 1.0,
+                min: 5,
+                max: 30,
+                label: Store.articlesPerSub.toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    Store.articlesPerSub = value.toInt();
+                  });
                 },
-                Store.ladders.keys.toList(),
-              );
-            },
+              ),
+            ),
           ),
           SwitchListTile(
             secondary: Icon(Icons.translate_rounded),
@@ -145,7 +139,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text('Translate language'),
                   subtitle: Text(Store.languageSetting),
                   onTap: () {
-                    _showPopup(
+                    showPopup(
                       context,
                       "Translate language",
                       (String option) {
@@ -161,7 +155,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text('Translator instance'),
                   subtitle: Text(Store.translatorInstanceSetting),
                   onTap: () {
-                    _showPopup(
+                    showPopup(
                       context,
                       "Translator instance",
                       (String option) {
@@ -180,7 +174,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text('Translator engine'),
                   subtitle: Text(Store.translatorEngineSetting),
                   onTap: () {
-                    _showPopup(
+                    showPopup(
                       context,
                       "Translate engine",
                       (String option) {
@@ -216,7 +210,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Suggestions provider'),
             subtitle: Text(Store.trendsProviderSetting),
             onTap: () {
-              _showPopup(
+              showPopup(
                 context,
                 "Suggestions provider",
                 (String option) {
@@ -230,7 +224,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ? ListTile(
                   leading: const Icon(Icons.location_on_rounded),
                   onTap: () {
-                    _showPopup(context, "Trends Provider", (String option) {
+                    showPopup(context, "Trends Provider", (String option) {
                       Store.countrySetting = option;
                     }, GoogleTrend.locations);
                   },
@@ -240,15 +234,15 @@ class _SettingsPageState extends State<SettingsPage> {
               : const SizedBox.shrink(),
           Store.trendsProviderSetting == "Yahoo"
               ? ListTile(
-            leading: const Icon(Icons.location_on_rounded),
-            onTap: () {
-              _showPopup(context, "Trends Provider", (String option) {
-                Store.countrySetting = option;
-              }, YahooTrend.locations);
-            },
-            title: Text("Yahoo Trends location"),
-            subtitle: Text(Store.countrySetting),
-          )
+                  leading: const Icon(Icons.location_on_rounded),
+                  onTap: () {
+                    showPopup(context, "Trends Provider", (String option) {
+                      Store.countrySetting = option;
+                    }, YahooTrend.locations);
+                  },
+                  title: Text("Yahoo Trends location"),
+                  subtitle: Text(Store.countrySetting),
+                )
               : const SizedBox.shrink(),
           const SizedBox(height: 20),
         ],
@@ -293,94 +287,4 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showPopup(BuildContext context, String title, Function callback,
-      List<String> options) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return OptionsPopup(
-          title: title,
-          callback: callback,
-          options: options,
-        );
-      },
-    );
-  }
-}
-
-class OptionsPopup extends StatefulWidget {
-  final String title;
-  final Function callback;
-  final List<String> options;
-
-  const OptionsPopup({
-    super.key,
-    required this.title,
-    required this.callback,
-    required this.options,
-  });
-
-  @override
-  State<OptionsPopup> createState() => _OptionsPopupState();
-}
-
-class _OptionsPopupState extends State<OptionsPopup> {
-  late List<String> filteredOptions;
-  late TextEditingController searchController;
-
-  @override
-  void initState() {
-    super.initState();
-    filteredOptions = widget.options;
-    searchController = TextEditingController();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.title),
-      content: Container(
-        width: double.maxFinite,
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: filteredOptions.length + 1,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return widget.options.length > 10
-                  ? TextField(
-                      onChanged: _filterOptions,
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.search_rounded),
-                        hintText: "Search...",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink();
-            }
-            return ListTile(
-              title: Text(filteredOptions[index - 1]),
-              onTap: () {
-                widget.callback(filteredOptions[index - 1]);
-                Navigator.of(context).pop();
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  void _filterOptions(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredOptions = widget.options;
-      } else {
-        filteredOptions = widget.options
-            .where((entry) => entry.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
-  }
 }
