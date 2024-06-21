@@ -93,7 +93,7 @@ class ArticleProvider {
       await Future.wait(futures);
     }
     newsArticles.addAll(subscriptionArticles);
-    newsArticles.toList().sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+    newsArticles = (newsArticles.toList()..sort((a, b) => b.publishedAt.compareTo(a.publishedAt))).toSet();
     return newsArticles.toList();
   }
 
