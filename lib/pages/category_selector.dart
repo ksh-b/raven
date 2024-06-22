@@ -77,7 +77,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
                   return Flexible(
                     child: ListView.builder(
                       shrinkWrap: true,
-                      itemCount: snapshot.data!.length + customSubsSize + 3,
+                      itemCount: snapshot.data!.length + customSubsSize + 2,
                       itemBuilder: (context, index) {
                         var subCategoryKey = "Default";
                         var subCategoryValue = "/";
@@ -126,6 +126,9 @@ crossAxisAlignment: CrossAxisAlignment.start,
                                 _buildCustomTester()
                             ],
                           );
+                        }
+                        else {
+                          return SizedBox.shrink();
                         }
                       },
                     ),
