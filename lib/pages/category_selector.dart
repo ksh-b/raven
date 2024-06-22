@@ -63,83 +63,85 @@ class _CategorySelectorState extends State<CategorySelector> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: FutureBuilder(
-          future: future,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var pubCats = snapshot.data;
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: snapshot.data!.length + customSubsSize + 3 ,
-                itemBuilder: (context, index) {
-                  var subCategoryKey = "Default";
-                  var subCategoryValue = "/";
-                  var userSubscription =
-                      UserSubscription(widget.newsSource, subCategoryValue);
+        child: Column(
+crossAxisAlignment: CrossAxisAlignment.start,
 
-                  // all checkbox
-                  if (index == 0) {
-                    var mainCat = publishers[widget.newsSource]!.mainCategory;
-                    if (mainCat == Category.custom) {
-                      return SizedBox.shrink();
-                    }
-                    return _buildAllCheckbox(subCategoryKey, userSubscription);
-                  }
+          children: [
+            widget.publishers[widget.newsSource]!.hasSearchSupport?
+        ActionChip(label: Text("Has search support"), avatar: Icon(Icons.search_rounded), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),):SizedBox.shrink(),
+            FutureBuilder(
+              future: future,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var pubCats = snapshot.data;
+                  return Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length + customSubsSize + 3,
+                      itemBuilder: (context, index) {
+                        var subCategoryKey = "Default";
+                        var subCategoryValue = "/";
+                        var userSubscription =
+                            UserSubscription(widget.newsSource, subCategoryValue);
 
-                  // publisher categories checkbox
-                  if (index - 1 < pubCats!.length) {
-                    subCategoryKey = pubCats.keys.toList()[index - 1];
-                    subCategoryValue = pubCats.values.toList()[index - 1];
-                    userSubscription = UserSubscription(
-                      widget.newsSource,
-                      subCategoryValue,
-                    );
-                    return _buildCategorySelector(
-                      subCategoryKey,
-                      userSubscription,
-                    );
-                  }
+                        // all checkbox
+                        if (index == 0) {
+                          var mainCat = publishers[widget.newsSource]!.mainCategory;
+                          if (mainCat == Category.custom) {
+                            return SizedBox.shrink();
+                          }
+                          return _buildAllCheckbox(subCategoryKey, userSubscription);
+                        }
 
-                  // custom categories saved by user
-                  else if (index > pubCats.length &&
-                      index < customSubsSize + pubCats.length + 1) {
-                    return customCategorySaved(index, snapshot);
-                  }
+                        // publisher categories checkbox
+                        if (index - 1 < pubCats!.length) {
+                          subCategoryKey = pubCats.keys.toList()[index - 1];
+                          subCategoryValue = pubCats.values.toList()[index - 1];
+                          userSubscription = UserSubscription(
+                            widget.newsSource,
+                            subCategoryValue,
+                          );
+                          return _buildCategorySelector(
+                            subCategoryKey,
+                            userSubscription,
+                          );
+                        }
 
-                  // custom categories selector
-                  else if (index == (pubCats.length + 1 + customSubsSize)) {
-                    return Flex(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      direction: Axis.horizontal,
-                      children: [
-                        _buildCustomSourceSelector(),
-                        if (customCategory.isEmpty)
-                          const Flexible(child: SizedBox.shrink())
-                        else
-                          _buildCustomTester()
-                      ],
-                    );
-                  }
+                        // custom categories saved by user
+                        else if (index > pubCats.length &&
+                            index < customSubsSize + pubCats.length + 1) {
+                          return customCategorySaved(index, snapshot);
+                        }
 
-                  // save button
-                  else {
-                    return SaveButton(
-                      selectedSubscriptions: selectedSubscriptions,
-                      widget: widget,
-                    );
-                  }
-                },
-              );
-            } else if (snapshot.hasError) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(snapshot.error.toString()),
-              );
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
+                        // custom categories selector
+                        else if (index == (pubCats.length + 1 + customSubsSize)) {
+                          return Flex(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            direction: Axis.horizontal,
+                            children: [
+                              _buildCustomSourceSelector(),
+                              if (customCategory.isEmpty)
+                                const Flexible(child: SizedBox.shrink())
+                              else
+                                _buildCustomTester()
+                            ],
+                          );
+                        }
+                      },
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(snapshot.error.toString()),
+                  );
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -168,8 +170,8 @@ class _CategorySelectorState extends State<CategorySelector> {
       subtitle: Text(userSubscription.category),
       value: selectedSubscriptions.contains(userSubscription),
       onChanged: (value) {
-              updateList(value, userSubscription);
-            },
+        updateList(value, userSubscription);
+      },
     );
   }
 
@@ -200,8 +202,7 @@ class _CategorySelectorState extends State<CategorySelector> {
       value: selectedSubscriptions
           .contains(customSubscriptions[index - (snapshot.data!.length + 1)]),
       onChanged: (value) {
-        updateList(
-            value, customSubscriptions[index - (snapshot.data!.length + 1)]);
+        updateList(value, customSubscriptions[index - (snapshot.data!.length + 1)]);
       },
     );
   }
@@ -270,36 +271,10 @@ class _CategorySelectorState extends State<CategorySelector> {
   void updateList(bool? value, UserSubscription userSubscription) {
     setState(() {
       if (value!) {
-        selectedSubscriptions.add(userSubscription);
+        Store.selectedSubscriptions = selectedSubscriptions..add(userSubscription);
       } else {
-        selectedSubscriptions.remove(userSubscription);
+        Store.selectedSubscriptions = selectedSubscriptions..remove(userSubscription);
       }
     });
-  }
-}
-
-class SaveButton extends StatelessWidget {
-  const SaveButton({
-    super.key,
-    required this.selectedSubscriptions,
-    required this.widget,
-  });
-
-  final List<UserSubscription> selectedSubscriptions;
-  final CategorySelector widget;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: FilledButton(
-        onPressed: () {
-          Store.selectedSubscriptions = selectedSubscriptions;
-          Navigator.of(context).pop();
-          widget.callback();
-        },
-        child: const Text("SAVE"),
-      ),
-    );
   }
 }
