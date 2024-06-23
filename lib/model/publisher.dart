@@ -14,7 +14,6 @@ import 'package:raven/extractor/technology/androidpolice.dart';
 import 'package:raven/extractor/technology/arstechnica.dart';
 import 'package:raven/extractor/technology/bleepingcomputer.dart';
 import 'package:raven/extractor/technology/engadget.dart';
-import 'package:raven/extractor/technology/ghacks.dart';
 import 'package:raven/extractor/technology/theverge.dart';
 import 'package:raven/extractor/technology/torrentfreak.dart';
 import 'package:raven/extractor/technology/xdadevelopers.dart';
@@ -30,7 +29,6 @@ Map<String, Publisher> publishers = {
   "BleepingComputer": BleepingComputer(),
   "CNN": CNN(),
   "Engadget": Engadget(),
-  "gHacks": GHacks(),
   "morss": Morss(),
   "Reuters": Reuters(),
   "RSS Feed": RSSFeed(),
