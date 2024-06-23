@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2024-06-23
+
+### Added
+- Extractors: Android Police, XDA Developers (#13)
+- Option to filter with tags
+- Context menu action to translate parts of article (#12)
+
+### Changed
+- "Save" button is removed from category selector. Changes are auto saved 
+- Articles will now be saved with just swipe (#23)
+- Ladder options are moved to full article page
+- Minor layout changes
+
+### Fixed
+- Article sorting (really) (#22)
+- Article text not selectable (#32)
+
+
 ## [0.13.0] - 2024-06-13
 
 ### Fixed
@@ -199,7 +217,8 @@ Fdroid release
 
 ### First Release
 
-[unreleased]: https://github.com/ksh-b/raven/compare/v0.13.0...HEAD
+[unreleased]: https://github.com/ksh-b/raven/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/ksh-b/raven/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/ksh-b/raven/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/ksh-b/raven/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/ksh-b/raven/compare/v0.12.0...v0.12.1
