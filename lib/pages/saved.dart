@@ -44,29 +44,27 @@ class _SavedPageState extends State<SavedPage> {
                   var article = Store.saved.values.toList()[index];
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                    child: Slidable(
+                    child: Dismissible(
                       key: Key(article.url),
-                      endActionPane: ActionPane(
-                        motion: const ScrollMotion(),
-                        children: [
-                          SlidableAction(
-                            backgroundColor:
-                                ThemeProvider().getCurrentTheme().cardColor,
-                            foregroundColor: ThemeProvider()
-                                .getCurrentTheme()
-                                .textTheme
-                                .titleMedium!
-                                .color,
-                            onPressed: (context) {
-                              article.load().then((value) {
-                                Store.deleteArticle(value);
-                              });
-                            },
-                            icon: Icons.delete,
-                            label: "Delete",
-                          )
-                        ],
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        child: Align(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Icon(Icons.delete_forever_rounded),
+                          ),
+                          alignment: Alignment.centerRight,
+                        ),
                       ),
+                      confirmDismiss: (direction) async {
+                        if (direction == DismissDirection.endToStart) {
+                          article.load().then((value) {
+                            Store.deleteArticle(value);
+                          });
+                          return false;
+                        }
+                        return null;
+                      },
                       child: FeedCard(article: article),
                     ),
                   );
