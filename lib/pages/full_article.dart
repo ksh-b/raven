@@ -29,7 +29,7 @@ class _ArticlePageState extends State<ArticlePage> {
     NewsArticle newsArticle,
     BuildContext context,
   ) async* {
-    if(newsArticle.tags.contains("saved")) {
+    if (newsArticle.tags.contains("saved")) {
       yield newsArticle;
     } else if (newsArticle.content.isNotEmpty &&
         !Store.shouldTranslate &&
@@ -152,6 +152,7 @@ class SuccessArticle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String selectedText = "";
     TextStyle metadataStyle = const TextStyle(
       fontStyle: FontStyle.italic,
       color: Colors.grey,
@@ -169,24 +170,83 @@ class SuccessArticle extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      child: ListView(
-        children: [
-          snapshot.connectionState != ConnectionState.done
-              ? LinearProgressIndicator()
-              : SizedBox.shrink(),
-          TextWidget("", snapshot.data!.title, titleStyle),
-          TextWidget("Author", snapshot.data!.author, metadataStyle),
-          TextWidget(
-            "Published",
-            unixToString(snapshot.data!.publishedAt),
-            metadataStyle,
-          ),
-          if (Network.shouldLoadImage(snapshot.data!.thumbnail))
-            Image(snapshot),
-          TextWidget("", snapshot.data!.excerpt, excerptStyle),
-          HtmlWidget(snapshot.data!.content),
-        ],
+      child: SelectionArea(
+        onSelectionChanged: (value) {
+          selectedText = value?.plainText ?? "";
+        },
+        contextMenuBuilder: (mContext, selectableRegionState) {
+          final List<ContextMenuButtonItem> buttonItems =
+              selectableRegionState.contextMenuButtonItems;
+          buttonItems.add(
+            ContextMenuButtonItem(
+              label: 'Translate',
+              onPressed: () {
+                showModalBottomSheet(
+                  context: mContext,
+                  builder: (context) {
+                    return Container(
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                        child: SingleChildScrollView(
+                          child: TranslatedText(
+                            text: selectedText,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          );
+          return AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: selectableRegionState.contextMenuAnchors,
+            buttonItems: buttonItems,
+          );
+        },
+        child: ListView(
+          children: [
+            snapshot.connectionState != ConnectionState.done
+                ? LinearProgressIndicator()
+                : SizedBox.shrink(),
+            TextWidget("", snapshot.data!.title, titleStyle),
+            TextWidget("Author", snapshot.data!.author, metadataStyle),
+            TextWidget(
+              "Published",
+              unixToString(snapshot.data!.publishedAt),
+              metadataStyle,
+            ),
+            if (Network.shouldLoadImage(snapshot.data!.thumbnail))
+              Image(snapshot),
+            TextWidget("", snapshot.data!.excerpt, excerptStyle),
+            HtmlWidget(snapshot.data!.content),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class TranslatedText extends StatefulWidget {
+  final String text;
+
+  const TranslatedText({super.key, required this.text});
+
+  @override
+  State<TranslatedText> createState() => _TranslatedTextState();
+}
+
+class _TranslatedTextState extends State<TranslatedText> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: SimplyTranslate().translate(widget.text, Store.languageSetting),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Text(snapshot.data!);
+        }
+        return Text("Translating...");
+      },
     );
   }
 }
@@ -351,8 +411,7 @@ class FailArticle extends StatelessWidget {
           children: [
             const ListTile(
               title: Text("Error loading article"),
-              subtitle:
-                  Text("You can try opening the url in your browser"),
+              subtitle: Text("You can try opening the url in your browser"),
             ),
             ListTile(
               leading: const Icon(Icons.open_in_browser),
