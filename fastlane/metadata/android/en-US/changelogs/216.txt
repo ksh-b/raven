@@ -1,0 +1,14 @@
+### Added
+- Extractors: Android Police, XDA Developers (#13)
+- Option to filter with tags
+- Context menu action to translate parts of article (#12)
+
+### Changed
+- "Save" button is removed from category selector. Changes are auto saved
+- Articles will now be saved with just swipe (#23)
+- Ladder options are moved to full article page
+- Minor layout changes
+
+### Fixed
+- Article sorting (really) (#22)
+- Article text not selectable (#32)
