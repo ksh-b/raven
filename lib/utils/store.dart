@@ -91,6 +91,14 @@ class Store {
     settings.put("loadImages", load);
   }
 
+  static bool get showTagListSetting {
+    return settings.get("showTagList", defaultValue: false);
+  }
+
+  static set showTagListSetting(bool showTagList) {
+    settings.put("showTagList", showTagList);
+  }
+
   static String get trendsProviderSetting {
     return settings.get("trendsProvider", defaultValue: trends.keys.first);
   }

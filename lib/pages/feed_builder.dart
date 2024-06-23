@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:raven/brain/article_provider.dart';
 import 'package:raven/model/article.dart';
@@ -10,7 +9,6 @@ import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/string.dart';
-import 'package:raven/utils/theme_provider.dart';
 import 'package:raven/utils/time.dart';
 
 class FeedPageBuilder extends StatefulWidget {
@@ -25,6 +23,9 @@ class FeedPageBuilder extends StatefulWidget {
 
 class _FeedPageBuilderState extends State<FeedPageBuilder> {
   List<NewsArticle> newsArticles = [];
+  List<NewsArticle> filteredNewsArticles = [];
+  Map<String, int> tags = {};
+  Set<String> selectedTags = {};
   bool isLoading = false;
   ArticleProvider articleProvider = ArticleProvider();
   int page = 0;
@@ -46,55 +47,106 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
         valueListenable: Store.subscriptions.listenable(),
         builder: (BuildContext context, value, Widget? child) {
           return Store.selectedSubscriptions.isNotEmpty
-              ? ListView.builder(
-                  itemCount: newsArticles.length + 2,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return isLoading
-                          ? const LinearProgressIndicator()
-                          : const SizedBox.shrink();
-                    }
-                    if (index - 1 < newsArticles.length) {
-                      var article = newsArticles[index - 1];
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                        child: Slidable(
-                          key: Key(article.url),
-                          startActionPane: ActionPane(
-                            motion: ScrollMotion(),
-                            children: [
-                              SlidableAction(
-                                backgroundColor:
-                                    ThemeProvider().getCurrentTheme().cardColor,
-                                foregroundColor: ThemeProvider()
-                                    .getCurrentTheme()
-                                    .textTheme
-                                    .titleMedium!
-                                    .color,
-                                onPressed: (context) {
-                                  article.load(translate: true).then((value) {
-                                    value.tags += ["saved"];
-                                    Store.saveArticle(value);
-                                  });
-                                },
-                                icon: Icons.save,
-                                label: "Save",
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 16),
+                      child: Store.showTagListSetting?SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: tags.keys
+                              .map(
+                                (key) => Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 4, right: 4),
+                                  child: ChoiceChip(
+                                    label: Text(key),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(24.0)),
+                                    selected: selectedTags.contains(key),
+                                    avatar: Text("${tags[key]}"),
+                                    onSelected: (selected) {
+                                      setState(() {
+                                        if (selected) {
+                                          selectedTags = selectedTags..add(key);
+                                        } else {
+                                          selectedTags = selectedTags
+                                            ..remove(key);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ),
                               )
-                            ],
-                          ),
-                          child: FeedCard(article: article),
+                              .toList(),
                         ),
-                      );
-                    } else {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : loadMore,
-                          child: Text(isLoading ? "Loading" : "Load more"),
-                        ),
-                      );
-                    }
-                  },
+                      ):SizedBox.shrink(),
+                    ),
+                    Flexible(
+                      child: ListView.builder(
+                        itemCount: filterNewsArticle(
+                                    newsArticles, selectedTags.toList())
+                                .length +
+                            2,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return isLoading
+                                ? const LinearProgressIndicator()
+                                : const SizedBox.shrink();
+                          }
+                          if (index - 1 <
+                              filterNewsArticle(
+                                      newsArticles, selectedTags.toList())
+                                  .length) {
+                            var article = filterNewsArticle(
+                                newsArticles, selectedTags.toList())[index - 1];
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                              child: Dismissible(
+                                key: Key(article.url),
+                                direction: DismissDirection.startToEnd,
+                                background: Container(
+                                  child: Align(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 16),
+                                      child: Icon(Icons.save_alt_rounded),
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                  ),
+                                ),
+                                confirmDismiss: (direction) async {
+                                  if (direction == DismissDirection.startToEnd) {
+                                    article
+                                        .load(translate: true)
+                                        .then((value) {
+                                      value.tags += ["saved"];
+                                      Store.saveArticle(value);
+                                    });
+                                    return false;
+                                  }
+                                  return null;
+                                },
+                                child: FeedCard(article: article),
+                              ),
+                            );
+                          } else {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 32, 16, 16),
+                              child: ElevatedButton(
+                                onPressed: isLoading ? null : loadMore,
+                                child:
+                                    Text(isLoading ? "Loading" : "Load more"),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 )
               : Center(
                   child: Padding(
@@ -116,6 +168,15 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
     );
   }
 
+  List<NewsArticle> filterNewsArticle(
+      List<NewsArticle> articles, List<String> tags) {
+    List<NewsArticle> fArticles = articles
+        .where(
+            (element) => element.tags.any((element) => tags.contains(element)))
+        .toList();
+    return fArticles.isEmpty ? articles : fArticles;
+  }
+
   Future<void> refresh() async {
     setState(() {
       newsArticles = [];
@@ -123,7 +184,7 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
       isLoading = true;
     });
     articleProvider.reset();
-    if(await Network.isConnected()) {
+    if (await Network.isConnected()) {
       loadMore();
     } else {
       setState(() {
@@ -158,9 +219,19 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
       }
       setState(() {
         newsArticles += value;
-        if(page==1 && newsArticles.isNotEmpty) {
+        if (page == 1 && newsArticles.isNotEmpty) {
           Store.saveOfflineArticles(newsArticles);
         }
+        for (var article in newsArticles) {
+          for (var tag in article.tags) {
+            tags.update(tag, (value) => (tags[tag] ?? 1) + 1,
+                ifAbsent: () => 1);
+          }
+        }
+        List<MapEntry<String, int>> entries = tags.entries.toList();
+        entries.sort((e1, e2) => tags[e2.key]!.compareTo(tags[e1.key]!));
+
+        tags = Map.fromEntries(entries);
       });
     }).whenComplete(
       () {

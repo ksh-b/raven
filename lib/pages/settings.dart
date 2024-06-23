@@ -127,66 +127,67 @@ class _SettingsPageState extends State<SettingsPage> {
               });
             },
           ),
-          Store.shouldTranslate
-              ? ListTile(
-                  title: const Text('Translator'),
-                  subtitle: Text(Store.translatorSetting),
-                  enabled: false,
-                )
-              : SizedBox.shrink(),
-          Store.shouldTranslate
-              ? ListTile(
-                  title: const Text('Translate language'),
-                  subtitle: Text(Store.languageSetting),
-                  onTap: () {
-                    showPopup(
-                      context,
-                      "Translate language",
-                      (String option) {
-                        Store.languageSetting = option;
-                      },
-                      SimplyTranslate().languages.keys.toList(),
-                    );
-                  },
-                )
-              : SizedBox.shrink(),
-          Store.shouldTranslate
-              ? ListTile(
-                  title: const Text('Translator instance'),
-                  subtitle: Text(Store.translatorInstanceSetting),
-                  onTap: () {
-                    showPopup(
-                      context,
-                      "Translator instance",
-                      (String option) {
-                        Store.translatorInstanceSetting = option;
-                        Store.translatorEngineSetting = SimplyTranslate()
-                            .instances[Store.translatorInstanceSetting]!
-                            .first;
-                      },
-                      SimplyTranslate().instances.keys.toList(),
-                    );
-                  },
-                )
-              : SizedBox.shrink(),
-          Store.shouldTranslate
-              ? ListTile(
-                  title: const Text('Translator engine'),
-                  subtitle: Text(Store.translatorEngineSetting),
-                  onTap: () {
-                    showPopup(
-                      context,
-                      "Translate engine",
-                      (String option) {
-                        Store.translatorEngineSetting = option;
-                      },
-                      SimplyTranslate()
-                          .instances[Store.translatorInstanceSetting]!,
-                    );
-                  },
-                  enabled: false,
-                )
-              : const SizedBox.shrink(),
+          ListTile(
+            title: const Text('Translator'),
+            subtitle: Text(Store.translatorSetting),
+            enabled: false,
+          ),
+          ListTile(
+            title: const Text('Translate language'),
+            subtitle: Text(Store.languageSetting),
+            onTap: () {
+              showPopup(
+                context,
+                "Translate language",
+                (String option) {
+                  Store.languageSetting = option;
+                },
+                SimplyTranslate().languages.keys.toList(),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Translator instance'),
+            subtitle: Text(Store.translatorInstanceSetting),
+            onTap: () {
+              showPopup(
+                context,
+                "Translator instance",
+                (String option) {
+                  Store.translatorInstanceSetting = option;
+                  Store.translatorEngineSetting = SimplyTranslate()
+                      .instances[Store.translatorInstanceSetting]!
+                      .first;
+                },
+                SimplyTranslate().instances.keys.toList(),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Translator engine'),
+            subtitle: Text(Store.translatorEngineSetting),
+            onTap: () {
+              showPopup(
+                context,
+                "Translate engine",
+                (String option) {
+                  Store.translatorEngineSetting = option;
+                },
+                SimplyTranslate().instances[Store.translatorInstanceSetting]!,
+              );
+            },
+            enabled: false,
+          ),
+          SwitchListTile(
+            secondary: const Icon(
+              Icons.category_rounded,
+            ),
+            title: const Text('Filter with tags'),
+            value: Store.showTagListSetting,
+            onChanged: (bool value) {
+              Store.showTagListSetting = value;
+            },
+          ),
           const SizedBox(height: 20),
         ],
       ),
