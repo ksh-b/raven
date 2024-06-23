@@ -25,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: const Text(
-              'Theme',
+              'Appearance',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -39,7 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ListTile(
             leading: const Icon(Icons.format_paint_rounded),
-            title: const Text('Color'),
+            title: const Text('Theme'),
             subtitle: Text(Store.themeColorSetting),
             onTap: () {
               showPopup(
@@ -57,7 +57,8 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Font size'),
             subtitle: SliderTheme(
               data: SliderThemeData(
-                  showValueIndicator: ShowValueIndicator.onlyForContinuous,),
+                showValueIndicator: ShowValueIndicator.onlyForContinuous,
+              ),
               child: Slider(
                 value: Store.fontScale,
                 min: 0.8,
@@ -69,7 +70,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     Store.fontScale = value;
                   });
                 },
-
               ),
             ),
           ),
@@ -103,7 +103,8 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Max articles per subscription'),
             subtitle: SliderTheme(
               data: SliderThemeData(
-                showValueIndicator: ShowValueIndicator.onlyForContinuous,),
+                showValueIndicator: ShowValueIndicator.onlyForContinuous,
+              ),
               child: Slider(
                 value: Store.articlesPerSub * 1.0,
                 min: 5,
@@ -287,5 +288,4 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-
 }
