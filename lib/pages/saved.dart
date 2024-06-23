@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
@@ -8,7 +7,6 @@ import 'package:raven/pages/full_article.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/store.dart';
 import 'package:raven/utils/string.dart';
-import 'package:raven/utils/theme_provider.dart';
 import 'package:raven/utils/time.dart';
 
 class SavedPage extends StatefulWidget {
