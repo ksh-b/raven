@@ -39,7 +39,7 @@ Map<String, Publisher> publishers = {
   "The Quint": TheQuint(),
   "The Wire": TheWire(),
   "TorrentFreak": TorrentFreak(),
-  "XDA developers": XDAdevelopers(),
+  "XDA Developers": XDAdevelopers(),
 };
 
 enum Category {
