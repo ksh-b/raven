@@ -6,10 +6,8 @@ import 'package:raven/utils/store.dart';
 class CategorySelector extends StatefulWidget {
   final Map<String, Publisher> publishers;
   final String newsSource;
-  final VoidCallback callback;
 
-  const CategorySelector(this.publishers, this.newsSource,
-      {super.key, required this.callback});
+  const CategorySelector(this.publishers, this.newsSource, {super.key});
 
   @override
   State<CategorySelector> createState() => _CategorySelectorState();
@@ -64,11 +62,16 @@ class _CategorySelectorState extends State<CategorySelector> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-crossAxisAlignment: CrossAxisAlignment.start,
-
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            widget.publishers[widget.newsSource]!.hasSearchSupport?
-        ActionChip(label: Text("Has search support"), avatar: Icon(Icons.search_rounded), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),):SizedBox.shrink(),
+            widget.publishers[widget.newsSource]!.hasSearchSupport
+                ? ActionChip(
+                    label: Text("Has search support"),
+                    avatar: Icon(Icons.search_rounded),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24)),
+                  )
+                : SizedBox.shrink(),
             FutureBuilder(
               future: future,
               builder: (context, snapshot) {
@@ -81,16 +84,18 @@ crossAxisAlignment: CrossAxisAlignment.start,
                       itemBuilder: (context, index) {
                         var subCategoryKey = "Default";
                         var subCategoryValue = "/";
-                        var userSubscription =
-                            UserSubscription(widget.newsSource, subCategoryValue);
+                        var userSubscription = UserSubscription(
+                            widget.newsSource, subCategoryValue);
 
                         // all checkbox
                         if (index == 0) {
-                          var mainCat = publishers[widget.newsSource]!.mainCategory;
+                          var mainCat =
+                              publishers[widget.newsSource]!.mainCategory;
                           if (mainCat == Category.custom) {
                             return SizedBox.shrink();
                           }
-                          return _buildAllCheckbox(subCategoryKey, userSubscription);
+                          return _buildAllCheckbox(
+                              subCategoryKey, userSubscription);
                         }
 
                         // publisher categories checkbox
@@ -114,7 +119,8 @@ crossAxisAlignment: CrossAxisAlignment.start,
                         }
 
                         // custom categories selector
-                        else if (index == (pubCats.length + 1 + customSubsSize)) {
+                        else if (index ==
+                            (pubCats.length + 1 + customSubsSize)) {
                           return Flex(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             direction: Axis.horizontal,
@@ -126,8 +132,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
                                 _buildCustomTester()
                             ],
                           );
-                        }
-                        else {
+                        } else {
                           return SizedBox.shrink();
                         }
                       },
@@ -205,7 +210,8 @@ crossAxisAlignment: CrossAxisAlignment.start,
       value: selectedSubscriptions
           .contains(customSubscriptions[index - (snapshot.data!.length + 1)]),
       onChanged: (value) {
-        updateList(value, customSubscriptions[index - (snapshot.data!.length + 1)]);
+        updateList(
+            value, customSubscriptions[index - (snapshot.data!.length + 1)]);
       },
     );
   }
@@ -274,9 +280,11 @@ crossAxisAlignment: CrossAxisAlignment.start,
   void updateList(bool? value, UserSubscription userSubscription) {
     setState(() {
       if (value!) {
-        Store.selectedSubscriptions = selectedSubscriptions..add(userSubscription);
+        Store.selectedSubscriptions = selectedSubscriptions
+          ..add(userSubscription);
       } else {
-        Store.selectedSubscriptions = selectedSubscriptions..remove(userSubscription);
+        Store.selectedSubscriptions = selectedSubscriptions
+          ..remove(userSubscription);
       }
     });
   }

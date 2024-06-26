@@ -104,7 +104,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                     height: 24,
                     width: 24,
                     errorWidget: (context, url, error) =>
-                        CircleAvatar(child: Text(newsSource.characters.first),),
+                        CircleAvatar(child: Text(newsSource.characters.first)),
                   ),
                   trailing: categories.isEmpty
                       ? const SizedBox.shrink()
@@ -115,16 +115,13 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                         builder: (context) => CategorySelector(
                           publishers,
                           newsSource,
-                          callback: () {
-                            setState(
-                              () {
-                                categories = getSelectedCategories(newsSource);
-                              },
-                            );
-                          },
                         ),
                       ),
-                    );
+                    ).whenComplete(() {
+                      setState(() {
+                        categories = getSelectedCategories(newsSource);
+                      });
+                    });
                   },
                 );
               },
