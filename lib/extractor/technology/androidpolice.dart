@@ -23,7 +23,6 @@ class AndroidPolice extends Publisher {
     await dio().get("$homePage${newsArticle.url}").then((response) {
       if (response.statusCode == 200) {
         Document document = html_parser.parse(response.data);
-        String? thumbnail = "";
         String? content = document.querySelector(".article-body")?.innerHtml;
         List<String> related = document.querySelectorAll(".no-badge.small").map((e) => e.innerHtml).toList();
         for (String rel in related) {
@@ -31,7 +30,6 @@ class AndroidPolice extends Publisher {
         }
         newsArticle = newsArticle.fill(
           content: content,
-          thumbnail: thumbnail,
         );
       }
     });
@@ -92,7 +90,7 @@ class AndroidPolice extends Publisher {
 
           articles.add(NewsArticle(
               publisher: name,
-              title: title ?? "",
+              title: title?.trim() ?? "",
               content: content ?? "",
               excerpt: excerpt ?? "",
               author: author ?? "",
