@@ -182,6 +182,7 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
       newsArticles = [];
       page = 0;
       isLoading = true;
+      tags = tags..clear();
     });
     articleProvider.reset();
     if (await Network.isConnected()) {

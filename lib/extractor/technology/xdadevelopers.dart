@@ -132,7 +132,7 @@ class XDAdevelopers extends Publisher {
 
         articles.add(NewsArticle(
             publisher: name,
-            title: title ?? "",
+            title: title?.trim() ?? "",
             content: "",
             excerpt: excerpt ?? "",
             author: author ?? "",
