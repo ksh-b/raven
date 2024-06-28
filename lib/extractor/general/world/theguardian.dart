@@ -97,11 +97,15 @@ class TheGuardian extends Publisher {
     await dio().get("$homePage$category?page=$page").then((response) {
       if (response.statusCode == 200) {
         var document = html_parser.parse(response.data);
-        var data = document.querySelectorAll(".dcr-16c50tn");
+        var data = document.querySelectorAll("#maincontent div[class*='dcr-']");
         for (var article in data) {
+          var title = article.querySelector("a")?.attributes["aria-label"] ?? "";
+          if(title.isEmpty) {
+            continue;
+          }
           articles.add(NewsArticle(
             publisher: name,
-            title: article.querySelector(".dcr-lv2v9o")?.attributes["aria-label"] ?? "",
+            title: title,
             content: "",
             excerpt: "",
             author: "",
