@@ -52,33 +52,37 @@ int isoToUnix(String timestamp) {
 }
 
 int relativeStringToUnix(String timeString) {
-  if (timeString.contains("ago")) {
-    if (timeString.startsWith("a ")) {
-      timeString = timeString.replaceFirst("a ", "1 ");
+  try {
+    if (timeString.contains("ago")) {
+      if (timeString.startsWith("a ")) {
+        timeString = timeString.replaceFirst("a ", "1 ");
+      }
     }
-  }
-  List<String> words = timeString.split(' ');
-  int value = int.parse(words[0]);
-  String unit = words[1].toLowerCase();
-  int seconds;
-  switch (unit) {
-    case 'sec':
-    case 'second':
-    case 'seconds':
-      seconds = value;
-      break;
-    case 'min':
-    case 'minute':
-    case 'minutes':
-      seconds = value * 60;
-      break;
-    case 'hour':
-    case 'hours':
-      seconds = value * 3600;
-      break;
+    List<String> words = timeString.split(' ');
+    int value = int.parse(words[0]);
+    String unit = words[1].toLowerCase();
+    int seconds;
+    switch (unit) {
+      case 'sec':
+      case 'second':
+      case 'seconds':
+        seconds = value;
+        break;
+      case 'min':
+      case 'minute':
+      case 'minutes':
+        seconds = value * 60;
+        break;
+      case 'hour':
+      case 'hours':
+        seconds = value * 3600;
+        break;
 
-    default:
-      seconds = 0;
+      default:
+        seconds = 0;
+    }
+    return DateTime.now().subtract(Duration(seconds: seconds)).millisecondsSinceEpoch;
+  } catch (e) {
+    return -1;
   }
-  return DateTime.now().subtract(Duration(seconds: seconds)).millisecondsSinceEpoch;
 }
