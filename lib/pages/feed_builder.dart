@@ -67,7 +67,6 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
                                         borderRadius:
                                             BorderRadius.circular(24.0)),
                                     selected: selectedTags.contains(key),
-                                    avatar: Text("${tags[key]}"),
                                     onSelected: (selected) {
                                       setState(() {
                                         if (selected) {
@@ -169,10 +168,15 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
   }
 
   List<NewsArticle> filterNewsArticle(
-      List<NewsArticle> articles, List<String> tags) {
+      List<NewsArticle> articles, List<String> selectedTags) {
     List<NewsArticle> fArticles = articles
-        .where(
-            (element) => element.tags.any((element) => tags.contains(element)))
+        .where((element) {
+          return selectedTags.contains(element.publisher)
+              || selectedTags.contains(element.category)
+              || selectedTags.contains(publishers[element.publisher]!.mainCategory.name)
+              || element.tags.any((element) => selectedTags.contains(element))
+          ;
+        })
         .toList();
     return fArticles.isEmpty ? articles : fArticles;
   }
@@ -224,10 +228,13 @@ class _FeedPageBuilderState extends State<FeedPageBuilder> {
           Store.saveOfflineArticles(newsArticles);
         }
         for (var article in newsArticles) {
+          var mainCategory = publishers[article.publisher]!.mainCategory.name;
           for (var tag in article.tags) {
-            tags.update(tag, (value) => (tags[tag] ?? 1) + 1,
-                ifAbsent: () => 1);
+            tags.putIfAbsent(tag, () => 0);
           }
+          tags.putIfAbsent(article.category, () => 1);
+          tags.putIfAbsent(mainCategory, () => 2);
+          tags.putIfAbsent(article.publisher, () => 3);
         }
         List<MapEntry<String, int>> entries = tags.entries.toList();
         entries.sort((e1, e2) => tags[e2.key]!.compareTo(tags[e1.key]!));
