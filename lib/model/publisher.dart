@@ -1,5 +1,7 @@
 import 'package:raven/extractor/custom/morss.dart';
 import 'package:raven/extractor/custom/rss.dart';
+import 'package:raven/extractor/general/national/bangladesh/prothamalo.dart';
+import 'package:raven/extractor/general/national/bangladesh/prothamalo_en.dart';
 import 'package:raven/extractor/general/national/india/thehindu.dart';
 import 'package:raven/extractor/general/national/india/theindianexpress.dart';
 import 'package:raven/extractor/general/national/india/thequint.dart';
@@ -30,6 +32,7 @@ Map<String, Publisher> publishers = {
   "CNN": CNN(),
   "Engadget": Engadget(),
   "morss": Morss(),
+  "Protham Alo": ProthamAloEn(),
   "Reuters": Reuters(),
   "RSS Feed": RSSFeed(),
   "The Guardian": TheGuardian(),
@@ -40,6 +43,7 @@ Map<String, Publisher> publishers = {
   "The Wire": TheWire(),
   "TorrentFreak": TorrentFreak(),
   "XDA Developers": XDAdevelopers(),
+  "প্রথম আলো": ProthamAlo(),
 };
 
 enum Category {
