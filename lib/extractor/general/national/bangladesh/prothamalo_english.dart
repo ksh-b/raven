@@ -13,7 +13,10 @@ class ProthamAloEn extends Publisher {
   Future<Map<String, String>> get categories => extractCategories();
 
   @override
-  Category get mainCategory => Category.india;
+  Category get mainCategory => Category.bangladesh;
+
+  @override
+  bool get hasSearchSupport => true;
 
   Future<Map<String, String>> extractCategories() async {
     return {
@@ -136,11 +139,5 @@ class ProthamAloEn extends Publisher {
       }
     });
     return newsArticle;
-  }
-
-  @override
-  Future<Set<NewsArticle>> articles(
-      {String category = "home", int page = 1}) async {
-    return super.articles(category: category, page: page);
   }
 }
