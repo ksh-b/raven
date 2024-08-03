@@ -1,14 +1,21 @@
 import 'package:raven/extractor/custom/morss.dart';
 import 'package:raven/extractor/custom/rss.dart';
+import 'package:raven/extractor/general/national/bangladesh/prothamalo.dart';
+import 'package:raven/extractor/general/national/bangladesh/prothamalo_english.dart';
+import 'package:raven/extractor/general/national/china/rfa_cantonese.dart';
+import 'package:raven/extractor/general/national/china/rfa_mandarin.dart';
+import 'package:raven/extractor/general/national/china/rfa_tibetan.dart';
 import 'package:raven/extractor/general/national/india/thehindu.dart';
 import 'package:raven/extractor/general/national/india/theindianexpress.dart';
 import 'package:raven/extractor/general/national/india/thequint.dart';
 import 'package:raven/extractor/general/national/india/thewire.dart';
+import 'package:raven/extractor/general/national/myanmar/rfa_burmese.dart';
 import 'package:raven/extractor/general/world/aljazeera.dart';
 import 'package:raven/extractor/general/world/apnews.dart';
 import 'package:raven/extractor/general/world/bbc.dart';
 import 'package:raven/extractor/general/world/cnn.dart';
 import 'package:raven/extractor/general/world/reuters.dart';
+import 'package:raven/extractor/general/world/rfa_english.dart';
 import 'package:raven/extractor/general/world/theguardian.dart';
 import 'package:raven/extractor/technology/androidpolice.dart';
 import 'package:raven/extractor/technology/arstechnica.dart';
@@ -30,7 +37,9 @@ Map<String, Publisher> publishers = {
   "CNN": CNN(),
   "Engadget": Engadget(),
   "morss": Morss(),
+  "Protham Alo": ProthamAloEn(),
   "Reuters": Reuters(),
+  "Radio Free Asia": RfaEnglish(),
   "RSS Feed": RSSFeed(),
   "The Guardian": TheGuardian(),
   "The Hindu": TheHindu(),
@@ -40,12 +49,24 @@ Map<String, Publisher> publishers = {
   "The Wire": TheWire(),
   "TorrentFreak": TorrentFreak(),
   "XDA Developers": XDAdevelopers(),
+
+  "প্রথম আলো": ProthamAlo(),
+  "မြန်မာဌာန": RfaBurmese(),
+  "RFA 自由亞洲電台粵語部": RfaCantonese(),
+  "自由亚洲电台": RfaMandarin(),
+  "ཨེ་ཤེ་ཡ་རང་དབང་རླུང་འཕྲིན་ཁང་": RfaTibetan(),
 };
 
 enum Category {
-  world,
   technology,
+  world,
+
+  // countries
+  bangladesh,
+  china,
   india,
+
+  // misc
   custom,
 }
 
