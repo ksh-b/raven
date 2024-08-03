@@ -14,6 +14,7 @@ This app uses APIs and web scraping to fetch news articles.
 ## Installation
 Get it on
 - [![IzzyOnDroid](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/kshib.raven)](https://apt.izzysoft.de/fdroid/index/apk/kshib.raven)
+- [![F-Droid Version](https://img.shields.io/f-droid/v/kshib.raven?color=blue&label=F-Droid)](https://f-droid.org/en/packages/kshib.raven)
 - [![Github releases](https://img.shields.io/github/v/release/ksh-b/raven?label=Github)](https://github.com/ksh-b/raven/releases/latest)
 - Or via [Obtanium](https://github.com/ImranR98/Obtainium)
 
