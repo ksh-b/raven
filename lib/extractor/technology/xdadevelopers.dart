@@ -16,7 +16,8 @@ class XDAdevelopers extends Publisher {
   Category get mainCategory => Category.technology;
 
   @override
-  String get iconUrl => "https://www.xda-developers.com/public/build/images/favicon-48x48.8f822f21.png";
+  String get iconUrl =>
+      "https://www.xda-developers.com/public/build/images/favicon-48x48.8f822f21.png";
 
   @override
   Future<NewsArticle> article(NewsArticle newsArticle) async {
@@ -24,7 +25,10 @@ class XDAdevelopers extends Publisher {
       if (response.statusCode == 200) {
         Document document = html_parser.parse(response.data);
         String? content = document.querySelector(".article-body")?.innerHtml;
-        List<String> related = document.querySelectorAll(".no-badge.small").map((e) => e.innerHtml).toList();
+        List<String> related = document
+            .querySelectorAll(".no-badge.small")
+            .map((e) => e.innerHtml)
+            .toList();
         for (String rel in related) {
           content = content?.replaceFirst(rel, "");
         }
@@ -47,8 +51,7 @@ class XDAdevelopers extends Publisher {
           (response) {
         if (response.statusCode == 200) {
           var document = html_parser.parse(response.data);
-          document.querySelectorAll(".sidenav-link")
-              .forEach((element) {
+          document.querySelectorAll(".sidenav-link").forEach((element) {
             map.putIfAbsent(
               element.text.trim(),
                   () {
@@ -67,28 +70,36 @@ class XDAdevelopers extends Publisher {
   Future<Set<NewsArticle>> categoryArticles(
       {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    await dio().get("$homePage/news/$page").then((response) {
+    await dio().get("$homePage/$category/$page").then((response) {
       if (response.statusCode == 200) {
         Document document = html_parser.parse(response.data);
         List<Element> articleElements =
         document.querySelectorAll(".listing-content .article");
         for (Element articleElement in articleElements) {
-          String? title = articleElement.querySelector(".display-card-title")?.text;
-          String? excerpt = articleElement.querySelector(".display-card-excerpt")?.text;
-          String? author = articleElement.querySelector(".display-card-author")?.text;
-          String? url = articleElement.querySelector(".display-card-title a")?.attributes["href"];
+          String? title =
+              articleElement.querySelector(".display-card-title")?.text;
+          String? excerpt =
+              articleElement.querySelector(".display-card-excerpt")?.text;
+          String? author =
+              articleElement.querySelector(".display-card-author")?.text;
+          String? url = articleElement
+              .querySelector(".display-card-title a")
+              ?.attributes["href"];
           var tags = articleElement
               .querySelectorAll(".listing-title")
               .map((e) => e.text)
               .toList();
-          String? thumbnail = articleElement
-              .querySelector("picture img")
-              ?.attributes["src"];
-          String? content = articleElement.querySelector(".display-card-firstParagraph")?.text;
-          String? date = articleElement.querySelector(".display-card-date")?.text;
-          int parsedTime = relativeStringToUnix(date??"");
+          String? thumbnail =
+          articleElement.querySelector("picture img")?.attributes["src"];
+          String? content = articleElement
+              .querySelector(".display-card-firstParagraph")
+              ?.text;
+          String? date =
+              articleElement.querySelector(".display-card-date")?.text;
+          int parsedTime = relativeStringToUnix(date ?? "");
 
-          articles.add(NewsArticle(
+          articles.add(
+            NewsArticle(
               publisher: name,
               title: title?.trim() ?? "",
               content: content ?? "",
@@ -98,7 +109,9 @@ class XDAdevelopers extends Publisher {
               thumbnail: thumbnail ?? "",
               publishedAt: parsedTime,
               tags: tags,
-              category: category));
+              category: category,
+            ),
+          );
         }
       }
     });
@@ -116,31 +129,35 @@ class XDAdevelopers extends Publisher {
       List<Element> articleElements =
       document.querySelectorAll(".listing-content .article");
       for (Element articleElement in articleElements) {
-        String? title = articleElement.querySelector(".display-card-title")?.text;
-        String? excerpt = articleElement.querySelector(".display-card-excerpt")?.text;
-        String? author = articleElement.querySelector(".display-card-author")?.text;
-        String? url = articleElement.querySelector(".display-card-title a")?.attributes["href"];
+        String? title =
+            articleElement.querySelector(".display-card-title")?.text;
+        String? excerpt =
+            articleElement.querySelector(".display-card-excerpt")?.text;
+        String? author =
+            articleElement.querySelector(".display-card-author")?.text;
+        String? url = articleElement
+            .querySelector(".display-card-title a")
+            ?.attributes["href"];
         var tags = articleElement
             .querySelectorAll(".listing-title")
             .map((e) => e.text)
             .toList();
-        String? thumbnail = articleElement
-            .querySelector("picture img")
-            ?.attributes["src"];
+        String? thumbnail =
+        articleElement.querySelector("picture img")?.attributes["src"];
         String? date = articleElement.querySelector(".display-card-date")?.text;
-        int parsedTime = relativeStringToUnix(date??"");
+        int parsedTime = relativeStringToUnix(date ?? "");
 
         articles.add(NewsArticle(
-            publisher: name,
-            title: title?.trim() ?? "",
-            content: "",
-            excerpt: excerpt ?? "",
-            author: author ?? "",
-            url: url?.replaceFirst(homePage, "") ?? "",
-            thumbnail: thumbnail ?? "",
-            publishedAt: parsedTime,
-            tags: tags,
-            category: searchQuery));
+          publisher: name,
+          title: title?.trim() ?? "",
+          content: "",
+          excerpt: excerpt ?? "",
+          author: author ?? "",
+          url: url?.replaceFirst(homePage, "") ?? "",
+          thumbnail: thumbnail ?? "",
+          publishedAt: parsedTime,
+          tags: tags,
+          category: searchQuery,),);
       }
     }
     return articles;

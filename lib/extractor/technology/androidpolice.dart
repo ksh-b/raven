@@ -67,7 +67,7 @@ class AndroidPolice extends Publisher {
   Future<Set<NewsArticle>> categoryArticles(
       {String category = "", int page = 1}) async {
     Set<NewsArticle> articles = {};
-    await dio().get("$homePage/news/$page").then((response) {
+    await dio().get("$homePage/$category/$page").then((response) {
       if (response.statusCode == 200) {
         Document document = html_parser.parse(response.data);
         List<Element> articleElements =
