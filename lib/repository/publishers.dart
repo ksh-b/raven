@@ -18,6 +18,7 @@ import 'package:raven/repository/news/general/world/cnn.dart';
 import 'package:raven/repository/news/general/world/rfa_english.dart';
 import 'package:raven/repository/news/general/world/theguardian.dart';
 import 'package:raven/repository/news/science/phys.dart';
+import 'package:raven/repository/news/science/space.dart';
 import 'package:raven/repository/news/technology/androidpolice.dart';
 import 'package:raven/repository/news/technology/arstechnica.dart';
 import 'package:raven/repository/news/technology/bleepingcomputer.dart';
@@ -47,6 +48,7 @@ Map<String, Publisher> publishers = {
 
     // science
     Phys(),
+    Space(),
 
     // custom
     Morss(),
