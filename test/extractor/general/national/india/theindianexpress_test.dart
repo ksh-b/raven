@@ -1,4 +1,4 @@
-import 'package:raven/extractor/general/national/india/theindianexpress.dart';
+import 'package:raven/repository/news/general/national/india/theindianexpress.dart';
 import 'package:test/test.dart';
 import 'package:raven/model/publisher.dart';
 

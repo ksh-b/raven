@@ -1,11 +1,11 @@
-import 'package:raven/extractor/technology/xdadevelopers.dart';
+import 'package:raven/repository/news/technology/androidpolice.dart';
 import 'package:test/test.dart';
 import 'package:raven/model/publisher.dart';
 
 import '../common.dart';
 
 void main() {
-  Publisher publisher = XDAdevelopers();
+  Publisher publisher = AndroidPolice();
 
   test('Extract Categories Test', () async {
     await ExtractorTest.categoriesTest(publisher);

@@ -1,4 +1,4 @@
-import 'package:raven/extractor/general/national/china/rfa_mandarin.dart';
+import 'package:raven/repository/news/general/national/china/rfa_mandarin.dart';
 import 'package:test/test.dart';
 import 'package:raven/model/publisher.dart';
 

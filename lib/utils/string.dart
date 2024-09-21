@@ -1,3 +1,5 @@
+import 'package:path/path.dart' as path;
+
 String getAsSearchQuery(String category) {
   if (category.startsWith("#")) {
     category = category.replaceFirst("#", "");
@@ -25,4 +27,19 @@ String findStringBetween(String text, String start, String end) {
   } else {
     return "";
   }
+}
+
+String baseName(String input) {
+  return path.basenameWithoutExtension(input).toTitleCase;
+}
+
+extension StringCasingExtension on String {
+  String get toCapitalized =>
+      length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
+
+  String get toTitleCase => replaceAll("-", " ")
+      .replaceAll(RegExp(' +'), ' ')
+      .split(' ')
+      .map((str) => str.toCapitalized)
+      .join(' ');
 }

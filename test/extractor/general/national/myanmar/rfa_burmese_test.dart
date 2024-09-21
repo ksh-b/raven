@@ -1,6 +1,6 @@
-import 'package:raven/extractor/general/national/china/rfa_mandarin.dart';
-import 'package:raven/extractor/general/national/china/rfa_tibetan.dart';
-import 'package:raven/extractor/general/national/myanmar/rfa_burmese.dart';
+import 'package:raven/repository/news/general/national/china/rfa_mandarin.dart';
+import 'package:raven/repository/news/general/national/china/rfa_tibetan.dart';
+import 'package:raven/repository/news/general/national/myanmar/rfa_burmese.dart';
 import 'package:test/test.dart';
 import 'package:raven/model/publisher.dart';
 

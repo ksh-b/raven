@@ -20,7 +20,7 @@ String unixToString(int then) {
   const int day = 24 * hour;
   const int month = 30 * day;
   var now = DateTime.now().millisecondsSinceEpoch;
-  var timePassed = (now - then)~/1000;
+  var timePassed = (now - then) ~/ 1000;
 
   if (then == -1) {
     return '';
@@ -81,7 +81,9 @@ int relativeStringToUnix(String timeString) {
       default:
         seconds = 0;
     }
-    return DateTime.now().subtract(Duration(seconds: seconds)).millisecondsSinceEpoch;
+    return DateTime.now()
+        .subtract(Duration(seconds: seconds))
+        .millisecondsSinceEpoch;
   } catch (e) {
     return -1;
   }

@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:raven/extractor/general/world/bbc.dart';
+import 'package:raven/repository/news/general/world/bbc.dart';
 import 'package:raven/model/publisher.dart';
 
 import '../../common.dart';
@@ -16,6 +16,6 @@ void main() {
   });
 
   test('Search Articles Test', () async {
-    await ExtractorTest.searchedArticlesTest(publisher, 'Leclerc fastest in Imola practice');
+    await ExtractorTest.searchedArticlesTest(publisher, 'Ballymena');
   });
 }

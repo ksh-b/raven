@@ -18,18 +18,24 @@ class UserSubscriptionAdapter extends TypeAdapter<UserSubscription> {
     };
     return UserSubscription(
       fields[0] as String,
+      fields[2] as String,
       fields[1] as String,
+      isCustom: fields[3] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserSubscription obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.publisher)
       ..writeByte(1)
-      ..write(obj.category);
+      ..write(obj.categoryPath)
+      ..writeByte(2)
+      ..write(obj.categoryLabel)
+      ..writeByte(3)
+      ..write(obj.isCustom);
   }
 
   @override

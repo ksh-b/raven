@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:raven/extractor/technology/torrentfreak.dart';
+import 'package:raven/repository/news/technology/torrentfreak.dart';
 import 'package:raven/model/publisher.dart';
 
 import '../common.dart';

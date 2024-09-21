@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:html/dom.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart' as html_parser;
 import 'package:html/parser.dart';
-import 'package:raven/brain/dio_manager.dart';
-import 'package:raven/utils/store.dart';
-import 'package:worker_manager/worker_manager.dart';
+import 'package:raven/model/article.dart';
+import 'package:raven/model/publisher.dart';
+import 'package:raven/repository/store.dart';
+import 'package:raven/service/http_client.dart';
 
 class SimplyTranslate {
   Map<String, String> languages = {
@@ -157,22 +159,38 @@ class SimplyTranslate {
     ],
   };
 
-  Future<List<String>> translateSentences(
-    List<String> sentences,
-    String language,
-  ) async {
-    List<String> translated = [];
-    for (var ms in sentences) {
-      var s = await translate(
-        ms,
-        language,
-      );
-      translated.add(s);
-    }
-    return translated;
+  Future<Article> translateArticle(Article article) async {
+    Article fullArticle =
+        await (Publisher.fromString(article.publisher)).article(article);
+    String content = fullArticle.content;
+    String title = fullArticle.title;
+    String excerpt = fullArticle.excerpt;
+
+    title = await translate(title);
+    content = await translate(content, isHtml: true);
+    excerpt = await translate(excerpt);
+
+    fullArticle.content = content;
+    fullArticle.title = title;
+    fullArticle.excerpt = excerpt;
+
+    return fullArticle;
   }
 
-  Future<String> translate(String inputText, String language) async {
+  Future<String> translate(String inputText,
+      {String? language, bool isHtml = false}) async {
+    if (!Store.shouldTranslate) {
+      return inputText;
+    }
+    if (isHtml) {
+      dom.Document document = html_parser.parse(inputText);
+      document.querySelectorAll('script').forEach((tag) {
+        tag.remove();
+      });
+      inputText = document.body?.text ?? inputText;
+    }
+
+    language ??= Store.languageSetting;
     String url =
         'https://${Store.translatorInstanceSetting}/?engine=${Store.translatorEngineSetting}';
     Map<String, String> payload = {
@@ -180,99 +198,7 @@ class SimplyTranslate {
       'to': languages[language]!,
       'text': inputText
     };
-    return workerManager.execute<String>(() async {
-      var response = await dio().post(url, data: FormData.fromMap(payload));
-      var document = parse(response.data);
-      return document.getElementById('output')?.text ?? inputText;
-    });
-  }
-
-  List<String> extractTextFromDocument(Document doc) {
-    List<String> text = [];
-
-    void extractTextFromNode(Node node) {
-      if (node.nodeType == Node.TEXT_NODE) {
-        text += [(node.text ?? "")];
-      } else if (node.nodeType == Node.DOCUMENT_NODE) {
-        Document element = node as Document;
-        for (var child in element.nodes) {
-          extractTextFromNode(child);
-        }
-      } else if (node.nodeType == Node.ELEMENT_NODE) {
-        Element element = node as Element;
-        for (var child in element.nodes) {
-          extractTextFromNode(child);
-        }
-      }
-    }
-
-    extractTextFromNode(doc);
-    text.removeWhere(
-      (element) => element.trim().isEmpty,
-    );
-
-    return text;
-  }
-
-  List<String> mergeSentences(List<String> sentences) {
-    List<String> mergedSentences = [];
-    String currentMergedSentence = '';
-
-    for (String sentence in sentences) {
-      if (currentMergedSentence.length + sentence.length <= 4000) {
-        if (currentMergedSentence.isNotEmpty) {
-          currentMergedSentence += " ";
-        }
-        currentMergedSentence += sentence;
-      } else {
-        mergedSentences.add(currentMergedSentence);
-        currentMergedSentence = sentence;
-      }
-    }
-
-    if (currentMergedSentence.isNotEmpty) {
-      mergedSentences.add(currentMergedSentence);
-    }
-
-    return mergedSentences
-      ..removeWhere(
-        (element) => element.isEmpty,
-      )
-      ..map(
-        (e) => "$e ",
-      );
-  }
-
-  List<String> splitParagraph(String paragraph, [int wordsPerSentence = 500]) {
-    final List<String> words = paragraph.replaceAll(" <", "<").replaceAll("> ", ">").split(RegExp(r'\s+'));
-    final List<List<String>> groupedWords = _groupLists(words, wordsPerSentence);
-    final List<String> sentences = groupedWords.map((wordList) => wordList.join(' ')).toList();
-
-    return sentences;
-  }
-
-  List<List<String>> _groupLists(List<String> items, int groupSize) {
-    final List<List<String>> groups = [];
-    for (int i = 0; i < items.length; i += groupSize) {
-      groups.add(items.sublist(i, i + groupSize > items.length ? items.length : i + groupSize));
-    }
-    return groups;
-  }
-
-
-  Future<String> translateParagraph(
-    String paragraph,
-    String language,
-  ) async {
-    if(paragraph.isEmpty) return paragraph;
-    var translatedHtml = "";
-    List<String> smallParas = splitParagraph(paragraph);
-    List<String> translatedSmallParas = List.filled(smallParas.length, '');
-    for (int i = 0; i < smallParas.length; i++) {
-      translatedSmallParas[i] = await translate(smallParas[i], language);
-      translatedHtml +=translatedSmallParas[i];
-    }
-
-    return translatedHtml;
+    var response = await dio().post(url, data: FormData.fromMap(payload));
+    return parse(response.data).getElementById('output')?.text ?? inputText;
   }
 }

@@ -1,8 +1,11 @@
 import 'dart:io';
 
-import 'package:raven/brain/fallback_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/model/user_subscription.dart';
+import 'package:raven/provider/fallback_provider.dart';
 import 'package:test/test.dart';
 
 class ExtractorTest {
@@ -13,20 +16,30 @@ class ExtractorTest {
     expect(categories.isNotEmpty, true);
   }
 
-  static Future<void> categoryArticlesTest(Publisher publisher,
-      {String? category, bool ignoreDateCheck = false}) async {
+  static Future<void> categoryArticlesTest(
+    Publisher publisher, {
+    String? category,
+    bool ignoreDateCheck = false,
+  }) async {
+
     if (category == null) {
       final Map<String, String> categories = await publisher.categories;
 
       for (String category in categories.values) {
+        expect(category, startsWith('/'), reason: category);
         await testCategory(category, publisher, ignoreDateCheck);
       }
-    } else{
+    } else {
       await testCategory(category, publisher, ignoreDateCheck);
     }
   }
 
-  static Future<void> testCategory(String category, Publisher publisher, bool skipDateCheck) async {
+  static Future<void> testCategory(
+    String category,
+    Publisher publisher,
+    bool skipDateCheck,
+  ) async {
+
     sleep(Duration(seconds: 2));
     print(category);
     expect(category, isNotNull);
@@ -37,7 +50,7 @@ class ExtractorTest {
 
     var article = categoryArticles.first;
     expect(article, isNotNull);
-    expect(article, isA<NewsArticle>());
+    expect(article, isA<Article>());
     expect(article.title, isNotEmpty, reason: "$article");
 
     await publisher.article(article).then(
@@ -67,7 +80,7 @@ class ExtractorTest {
 
       var article = searchArticles.first;
       print("<<<$article>>>");
-      expect(article, isA<NewsArticle>());
+      expect(article, isA<Article>());
       expect(article.title, isNotEmpty);
       expect(article.publishedAt, isNot(-1),
           reason: article.publishedAt.toString(), skip: ignoreDateCheck);

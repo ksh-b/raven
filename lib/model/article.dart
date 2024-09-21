@@ -1,35 +1,31 @@
 import 'package:hive/hive.dart';
-import 'package:raven/model/publisher.dart';
-import 'package:raven/service/simplytranslate.dart';
-import 'package:raven/utils/html_helper.dart';
-import 'package:raven/utils/store.dart';
 
 part 'article.g.dart';
 
 @HiveType(typeId: 1)
-class NewsArticle extends HiveObject {
-  @HiveField(0)
-  String publisher;
+class Article {
   @HiveField(1)
-  String title;
+  String publisher;
   @HiveField(2)
-  String content;
+  String title;
   @HiveField(3)
-  String excerpt;
+  String content;
   @HiveField(4)
-  String author;
+  String excerpt;
   @HiveField(5)
-  String url;
+  String author;
   @HiveField(6)
-  String thumbnail;
+  String url;
   @HiveField(7)
-  String category;
+  String thumbnail;
   @HiveField(8)
-  List<String> tags;
+  String category;
   @HiveField(9)
+  List<String> tags;
+  @HiveField(10)
   int publishedAt;
 
-  NewsArticle({
+  Article({
     required this.publisher,
     required this.title,
     required this.content,
@@ -37,12 +33,12 @@ class NewsArticle extends HiveObject {
     required this.author,
     required this.url,
     required this.thumbnail,
-    this.tags = const [],
-    required this.publishedAt,
     required this.category,
+    required this.tags,
+    required this.publishedAt,
   });
 
-  NewsArticle fill({
+  Article fill({
     String? title,
     String? content,
     String? excerpt,
@@ -53,7 +49,7 @@ class NewsArticle extends HiveObject {
     int? publishedAt,
     String? category,
   }) {
-    return NewsArticle(
+    return Article(
       publisher: publisher,
       title: title ?? this.title,
       content: content ?? this.content,
@@ -63,56 +59,7 @@ class NewsArticle extends HiveObject {
       thumbnail: thumbnail ?? this.thumbnail,
       publishedAt: publishedAt ?? this.publishedAt,
       category: category ?? this.category,
+      tags: this.tags,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'publisher': publisher,
-      'title': title,
-      'content': content,
-      'excerpt': excerpt,
-      'author': author,
-      'url': url,
-      'thumbnail': thumbnail,
-      'tags': tags,
-      'publishedAt': publishedAt,
-      'category': category,
-    };
-  }
-
-  @override
-  String toString() {
-    return toJson().toString();
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is NewsArticle &&
-          runtimeType == other.runtimeType &&
-          url == other.url;
-
-  @override
-  int get hashCode => url.hashCode ^ title.hashCode;
-
-  Future<NewsArticle> load({bool translate = false}) async {
-    var newsArticle = await publishers[publisher]!.article(this);
-    if (Store.shouldTranslate && translate) {
-      var translate = SimplyTranslate();
-      newsArticle.title = (await translate.translate(
-        newsArticle.title,
-        Store.languageSetting,
-      ));
-      newsArticle.excerpt = (await translate.translate(
-        newsArticle.excerpt,
-        Store.languageSetting,
-      ));
-      newsArticle.content = (await translate.translateParagraph(
-        cleanHtml(newsArticle.content).join(),
-        Store.languageSetting,
-      ));
-    }
-    return newsArticle;
   }
 }

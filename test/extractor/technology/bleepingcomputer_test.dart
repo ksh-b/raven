@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:raven/extractor/technology/bleepingcomputer.dart';
+import 'package:raven/repository/news/technology/bleepingcomputer.dart';
 import 'package:raven/model/publisher.dart';
 
 import '../common.dart';

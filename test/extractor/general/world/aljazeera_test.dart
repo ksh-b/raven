@@ -1,4 +1,4 @@
-import 'package:raven/extractor/general/world/aljazeera.dart';
+import 'package:raven/repository/news/general/world/aljazeera.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:test/test.dart';
 

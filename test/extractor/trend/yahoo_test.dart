@@ -1,4 +1,5 @@
-import 'package:raven/extractor/trend/yahoo.dart';
+
+import 'package:raven/repository/trend/yahoo.dart';
 import 'package:test/test.dart';
 
 void main() {

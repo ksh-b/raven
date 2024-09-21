@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:raven/extractor/general/world/cnn.dart';
+import 'package:raven/repository/news/general/world/cnn.dart';
 import 'package:raven/model/publisher.dart';
 
 import '../../common.dart';

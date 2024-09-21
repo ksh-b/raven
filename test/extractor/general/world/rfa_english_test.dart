@@ -1,4 +1,4 @@
-import 'package:raven/extractor/general/world/rfa_english.dart';
+import 'package:raven/repository/news/general/world/rfa_english.dart';
 import 'package:test/test.dart';
 import 'package:raven/model/publisher.dart';
 

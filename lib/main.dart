@@ -2,31 +2,27 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:raven/model/article.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:raven/model/user_subscription.dart';
-import 'package:raven/pages/home.dart';
-import 'package:raven/utils/store.dart';
-import 'package:raven/utils/theme_provider.dart';
+import 'package:raven/provider/article.dart';
+import 'package:raven/provider/search.dart';
+import 'package:raven/provider/theme.dart';
+import 'package:raven/repository/store.dart';
+import 'package:raven/screen/home.dart';
+
+import 'model/article.dart';
+import 'provider/category_search.dart';
+import 'provider/navigation.dart';
 
 Future<void> main() async {
   await Hive.initFlutter();
-  Hive.registerAdapter(UserSubscriptionAdapter());
-  Hive.registerAdapter(NewsArticleAdapter());
-  await Hive.openBox('subscriptions');
+  Hive.registerAdapter<UserSubscription>(UserSubscriptionAdapter());
+  Hive.registerAdapter<Article>(ArticleAdapter());
   await Hive.openBox('settings');
   await Hive.openBox('saved');
   await Hive.openBox('offline-articles');
-
-  // TODO: Remove this in future version
-  Store.selectedSubscriptions = Store.selectedSubscriptions
-    ..removeWhere(
-      (element) {
-        return
-          element.toString() == "RSS Feed~/" ||
-          element.toString() == "morss~/" ||
-          element.toString() == "Ars Technica~";
-      },
-    );
+  await Hive.openBox('subscriptions');
 
   if (Store.sdkVersion == -1) {
     await DeviceInfoPlugin().androidInfo.then((value) {
@@ -34,7 +30,29 @@ Future<void> main() async {
     });
   }
 
-  runApp(const MyApp());
+  if (Store.appDirectory.isEmpty) {
+    Store.appDirectory = (await getApplicationCacheDirectory()).path;
+  }
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (BuildContext context) => ArticleProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => ArticleSearchProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => NavigationProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => CategorySearchProvider(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -49,7 +67,7 @@ class MyApp extends StatelessWidget {
           builder: (lightDynamic, darkDynamic) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-              home: MyHomePage(),
+              home: const MyHomePage(),
               theme: ThemeProvider().getCurrentTheme(
                 lightScheme: lightDynamic,
                 darkScheme: darkDynamic,

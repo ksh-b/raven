@@ -1,0 +1,120 @@
+import 'package:flutter/material.dart';
+import 'package:raven/model/article.dart';
+import 'package:raven/model/publisher.dart';
+import 'package:raven/repository/store.dart';
+import 'package:raven/utils/string.dart';
+
+class ArticleProvider extends ChangeNotifier {
+  int _page = 1;
+  bool _lock = false;
+  Map<String, int> _tags = {};
+  List<String> selectedTags = [];
+
+  int get page => _page;
+
+  Map<String, int> get tags => _tags;
+
+  bool get isLoading => _lock;
+
+  Set<Article> _articles = {};
+  Set<Article> _filteredArticles = {};
+
+  Set<Article> get filteredArticles => _filteredArticles;
+
+  Future<void> refresh() async {
+    _page = 1;
+    _articles = {};
+    _tags = {};
+    selectedTags = [];
+    fetchArticles();
+  }
+
+  Set<Article> get articles =>
+      _filteredArticles.isNotEmpty ? _filteredArticles : _articles;
+
+  Future<void> nextPage() async {
+    _page = _page + 1;
+    fetchArticles();
+  }
+
+  Future<void> fetchArticles() async {
+    _lock = true;
+    notifyListeners();
+    Set<Article> articles = {};
+    Set<String> publishers =
+        Store.selectedSubscriptions.map((e) => e.publisher).toList().toSet();
+    for (String publisher in publishers) {
+      List<String> categories =
+          Store.selectedSubscriptions.where((subscription) {
+        return subscription.publisher == publisher;
+      }).map((subscription) {
+        return subscription.categoryPath;
+      }).toList();
+      tags.putIfAbsent(
+          Publisher.fromString(publisher).mainCategory.toCapitalized, () => 1);
+      tags.putIfAbsent(Publisher.fromString(publisher).name, () => 3);
+
+      for (String category in categories) {
+        Set<Article> categoryArticles = {};
+        try {
+          categoryArticles = await Publisher.fromString(publisher)
+              .categoryArticles(category: category, page: _page);
+        } catch (e) {
+          continue;
+        }
+        articles.addAll(categoryArticles);
+        var categories =
+            categoryArticles.map((e) => e.category).toSet().toList();
+        for (var category in categories) {
+          tags.putIfAbsent(category, () => 2);
+        }
+        for (var cArticle in categoryArticles) {
+          for (var tag in cArticle.tags) {
+            tags.putIfAbsent(tag, () => 0);
+          }
+        }
+      }
+    }
+
+    List<MapEntry<String, int>> entries = tags.entries.toList();
+    entries.sort((e1, e2) => tags[e2.key]!.compareTo(tags[e1.key]!));
+    _tags = Map.fromEntries(entries);
+
+    articles = (articles.toList()
+          ..sort((a, b) => b.publishedAt.compareTo(a.publishedAt)))
+        .toSet();
+    _articles.addAll(articles);
+    _lock = false;
+    filter();
+    notifyListeners();
+  }
+
+  void updateTags(bool selected, String tag) {
+    if (selected) {
+      selectedTags = selectedTags..add(tag);
+    } else {
+      selectedTags = selectedTags..remove(tag);
+    }
+
+    filter();
+
+    notifyListeners();
+  }
+
+  void filter() {
+    if (selectedTags.isEmpty) {
+      _filteredArticles = _articles;
+    } else {
+      _filteredArticles = _articles.where((element) {
+        return selectedTags.contains(element.publisher) ||
+            selectedTags.contains(element.category) ||
+            selectedTags.contains(Publisher.fromString(element.publisher)
+                .mainCategory
+                .toLowerCase()) ||
+            element.tags.any((element) => selectedTags.contains(element));
+      }).toSet();
+    }
+
+    notifyListeners();
+  }
+}

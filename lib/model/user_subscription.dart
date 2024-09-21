@@ -8,14 +8,16 @@ class UserSubscription extends HiveObject {
   String publisher;
 
   @HiveField(1)
-  String category;
+  String categoryPath;
 
-  UserSubscription(this.publisher, this.category);
+  @HiveField(2)
+  String categoryLabel;
 
-  @override
-  String toString() {
-    return "$publisher~$category";
-  }
+  @HiveField(3)
+  bool isCustom;
+
+  UserSubscription(this.publisher, this.categoryLabel, this.categoryPath,
+      {this.isCustom = false});
 
   @override
   bool operator ==(Object other) =>
@@ -23,8 +25,9 @@ class UserSubscription extends HiveObject {
       other is UserSubscription &&
           runtimeType == other.runtimeType &&
           publisher == other.publisher &&
-          category == other.category;
+          categoryPath == other.categoryPath &&
+          categoryLabel == other.categoryLabel;
 
   @override
-  int get hashCode => publisher.hashCode ^ category.hashCode;
+  int get hashCode => publisher.hashCode ^ categoryPath.hashCode;
 }

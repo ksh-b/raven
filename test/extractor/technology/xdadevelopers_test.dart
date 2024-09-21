@@ -1,4 +1,4 @@
-import 'package:raven/extractor/technology/xdadevelopers.dart';
+import 'package:raven/repository/news/technology/xdadevelopers.dart';
 import 'package:test/test.dart';
 import 'package:raven/model/publisher.dart';
 

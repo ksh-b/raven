@@ -41,14 +41,14 @@ List<String> cleanHtml(String htmlString) {
     ];
 
     if (!element.hasContent() || element.text.isEmpty) {
-      if(element.localName!="br") {
+      if (element.localName != "br") {
         element.remove();
       }
     }
 
     for (var ul in unlikelyAttributes) {
-        if (element.attributes.toString().contains(ul)) element.remove();
-      }
+      if (element.attributes.toString().contains(ul)) element.remove();
+    }
 
     if (unlikelyTags.contains(element.localName)) element.remove();
 
@@ -69,7 +69,7 @@ List<String> cleanHtml(String htmlString) {
       .querySelectorAll("html body")
       .map(
         (e) => e.outerHtml,
-        )
+      )
       .toList();
   return chunks(splitHtml);
 }
