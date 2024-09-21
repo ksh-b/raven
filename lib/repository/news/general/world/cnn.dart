@@ -169,7 +169,7 @@ class CNN extends Publisher {
             url: articleUrl,
             thumbnail: thumbnail,
             publishedAt: stringToUnix(time?.trim() ?? ""),
-            category: searchQuery,
+            category: "",
             tags: [],
           ),
         );

@@ -150,7 +150,7 @@ class RfaMandarin extends Publisher {
             tags: [],
             thumbnail: thumbnail,
             publishedAt: stringToUnix(publishedAt, format: "yyyy-MM-dd"),
-            category: searchQuery,
+            category: "",
           ),
         );
       }

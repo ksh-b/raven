@@ -141,7 +141,7 @@ class TheQuint extends Publisher {
             url: articleUrl.replaceFirst(homePage, ""),
             thumbnail: thumbnail,
             publishedAt: time,
-            category: searchQuery,
+            category: "",
             tags: tags,
           ),
         );

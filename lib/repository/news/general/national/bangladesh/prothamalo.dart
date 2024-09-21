@@ -114,7 +114,7 @@ class ProthamAlo extends Publisher {
             author: author ?? "",
             url: articleUrl,
             thumbnail: thumbnail ?? "",
-            category: searchQuery,
+            category: "",
             publishedAt: time,
             tags: List<String>.from(tags),
           ),

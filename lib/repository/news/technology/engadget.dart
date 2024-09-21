@@ -127,7 +127,7 @@ class Engadget extends Publisher {
             url: url ?? "",
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
-            category: searchQuery,
+            category: "",
             tags: [],
           ),
         );

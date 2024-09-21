@@ -158,7 +158,7 @@ class AndroidPolice extends Publisher {
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             tags: tags,
-            category: searchQuery,
+            category: "",
           ),
         );
       }

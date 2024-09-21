@@ -170,7 +170,7 @@ class APNews extends Publisher {
                 "",
             thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
             publishedAt: timestamp,
-            category: searchQuery,
+            category: "",
             tags: [],
           ),
         );

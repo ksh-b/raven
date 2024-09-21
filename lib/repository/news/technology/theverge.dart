@@ -145,7 +145,7 @@ class TheVerge extends Publisher {
             url: url.replaceFirst(homePage, ""),
             thumbnail: thumbnail,
             publishedAt: dateEntry,
-            category: searchQuery,
+            category: "",
             tags: [],
           ),
         );

@@ -156,7 +156,7 @@ class XDAdevelopers extends Publisher {
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             tags: tags,
-            category: searchQuery,
+            category: "",
           ),
         );
       }

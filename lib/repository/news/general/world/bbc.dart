@@ -267,7 +267,7 @@ class BBC extends Publisher {
             thumbnail: thumbnail ?? "",
             publishedAt: stringToUnix(time?.trim() ?? ""),
             tags: tags,
-            category: searchQuery,
+            category: "",
           ),
         );
       }
