@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raven/model/user_subscription.dart';
+import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/screen/category_selector.dart';
 import 'package:raven/utils/string.dart';
@@ -49,7 +50,7 @@ class CustomCategoryTextBox extends StatelessWidget {
 
   void saveCustomSubscription() {
     customCategoryController.text = "";
-    Store.customSubscriptions += [
+    SubscriptionPref.customSubscriptions += [
       UserSubscription(
         widget.newsSource,
         baseName(customCategoryPath),

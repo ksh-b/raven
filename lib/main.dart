@@ -1,13 +1,17 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:raven/model/filter.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/provider/article.dart';
 import 'package:raven/provider/search.dart';
 import 'package:raven/provider/theme.dart';
+import 'package:raven/repository/preferences/appearance.dart';
+import 'package:raven/repository/preferences/internal.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/screen/home.dart';
 
@@ -19,20 +23,28 @@ Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter<UserSubscription>(UserSubscriptionAdapter());
   Hive.registerAdapter<Article>(ArticleAdapter());
+  Hive.registerAdapter<Filter>(FilterAdapter());
   await Hive.openBox('settings');
   await Hive.openBox('saved');
   await Hive.openBox('offline-articles');
   await Hive.openBox('subscriptions');
 
-  if (Store.sdkVersion == -1) {
+  if (Internal.sdkVersion == -1) {
     await DeviceInfoPlugin().androidInfo.then((value) {
-      Store.sdkVersion = value.version.sdkInt;
+      Internal.sdkVersion = value.version.sdkInt;
     });
   }
 
-  if (Store.appDirectory.isEmpty) {
-    Store.appDirectory = (await getApplicationCacheDirectory()).path;
+  if (Internal.appDirectory.isEmpty) {
+    Internal.appDirectory = (await getApplicationCacheDirectory()).path;
   }
+
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle().copyWith(
+      statusBarColor: ThemeProvider.colors[AppearancePref.color],
+      systemNavigationBarColor: ThemeProvider.colors[AppearancePref.color],
+    ),
+  );
 
   runApp(
     MultiProvider(

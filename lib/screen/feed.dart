@@ -16,24 +16,22 @@ class _FeedPageState extends State<FeedPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('What\'s happening?'),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: MySearchDelegate(),
-                );
-              },
-            ),
-          ],
-        ),
-        body: const FeedPageDelegate(query: ""),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('What\'s happening?'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: MySearchDelegate(),
+              );
+            },
+          ),
+        ],
       ),
+      body: const FeedPageDelegate(query: ""),
     );
   }
 

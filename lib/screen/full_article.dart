@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/repository/ladders.dart';
+import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/html_widget.dart';
@@ -156,7 +158,7 @@ class FullArticle extends StatelessWidget {
         const SizedBox(height: 12),
 
         // Content
-        Store.shouldTranslate
+        ContentPref.shouldTranslate
             ? TranslatedText(response.data?.content ?? "")
             : HtmlWidget(response.data?.content ?? "")
       ],
@@ -180,9 +182,9 @@ class OpenUrlButton extends StatelessWidget {
           context,
           "Prefix URL with...",
           (String option) {
-            launchUrl(Uri.parse("${Store.ladders[option]!}/$fullUrl"));
+            launchUrl(Uri.parse("${ladders[option]!}/$fullUrl"));
           },
-          Store.ladders.keys.toList(),
+          ladders.keys.toList(),
         );
       },
       child: IconButton(
@@ -211,9 +213,9 @@ class ShareButton extends StatelessWidget {
           context,
           "Prefix URL with...",
           (String option) {
-            Share.shareUri(Uri.parse("${Store.ladders[option]!}/$fullUrl"));
+            Share.shareUri(Uri.parse("${ladders[option]!}/$fullUrl"));
           },
-          Store.ladders.keys.toList(),
+          ladders.keys.toList(),
         );
       },
       child: IconButton(

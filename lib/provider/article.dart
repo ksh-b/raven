@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'package:raven/repository/store.dart';
+import 'package:raven/repository/preferences/content.dart';
+import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/utils/string.dart';
 
 class ArticleProvider extends ChangeNotifier {
@@ -41,11 +42,13 @@ class ArticleProvider extends ChangeNotifier {
     _lock = true;
     notifyListeners();
     Set<Article> articles = {};
-    Set<String> publishers =
-        Store.selectedSubscriptions.map((e) => e.publisher).toList().toSet();
+    Set<String> publishers = SubscriptionPref.selectedSubscriptions
+        .map((e) => e.publisher)
+        .toList()
+        .toSet();
     for (String publisher in publishers) {
       List<String> categories =
-          Store.selectedSubscriptions.where((subscription) {
+          SubscriptionPref.selectedSubscriptions.where((subscription) {
         return subscription.publisher == publisher;
       }).map((subscription) {
         return subscription.categoryPath;
@@ -83,6 +86,44 @@ class ArticleProvider extends ChangeNotifier {
     articles = (articles.toList()
           ..sort((a, b) => b.publishedAt.compareTo(a.publishedAt)))
         .toSet();
+
+    if(ContentPref.shouldFilterContent) {
+      String keyword_ = "";
+      articles.map((article) {
+        var shouldHide = ContentPref.filters.where((filter) {
+          return filter.publisher == article.publisher ||
+              filter.publisher == "any";
+        }).where((filter) {
+          var keyword = RegExp(filter.keyword.toLowerCase());
+          var fieldsToSearch = [
+            if (filter.inTitle) article.title,
+            if (filter.inContent) article.content,
+            if (filter.inAuthor) article.author,
+            if (filter.inUrl) article.url,
+            if (filter.inTags) article.tags.join(' '),
+          ];
+
+          if (filter.inAny) {
+            fieldsToSearch = [
+              article.title,
+              article.content,
+              article.author,
+              article.url,
+              article.tags.join(' ')
+            ];
+          }
+          keyword_ = keyword.pattern;
+          return fieldsToSearch
+              .any((field) => field.toLowerCase().contains(keyword));
+        }).isNotEmpty;
+        if (shouldHide) {
+          article.metadata.putIfAbsent(Metadata.filtered.name, () => keyword_,);
+        }
+        return article;
+      }).toList();
+
+    }
+
     _articles.addAll(articles);
     _lock = false;
     filter();

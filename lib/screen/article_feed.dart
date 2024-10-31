@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:raven/provider/article.dart';
 import 'package:raven/provider/search.dart';
-import 'package:raven/repository/store.dart';
+import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/widget/article_card.dart';
 import 'package:raven/widget/blank_page_message.dart';
 import 'package:raven/widget/tags.dart';
@@ -53,7 +53,7 @@ class ArticleProviderConsumer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: Store.subscriptions.listenable(),
+      valueListenable: SubscriptionPref.subscriptions.listenable(),
       builder: (context, value, child) {
         return Consumer<ArticleProvider>(
           builder: (context, articleProvider, child) {
@@ -61,9 +61,10 @@ class ArticleProviderConsumer extends StatelessWidget {
                 .map((article) => ArticleCard(article))
                 .toList();
 
-            if (tiles.isEmpty && Store.selectedSubscriptions.isEmpty) {
+            if (tiles.isEmpty && SubscriptionPref.selectedSubscriptions.isEmpty) {
               return const BlankPageMessage(
-                  "❤️ Please select some subscriptions to get started");
+                  "Please select some subscriptions to get started",
+              );
             }
 
             return RefreshIndicator(
@@ -76,10 +77,7 @@ class ArticleProviderConsumer extends StatelessWidget {
                   if (index == 0) {
                     if (articleProvider.isLoading) {
                       return const LinearProgressIndicator();
-                    } else if (Store.showTagListSetting) {
-                      return const Tags();
-                    }
-                    return const SizedBox.shrink();
+                    } return const Tags();
                   } else if (tiles.isNotEmpty && index - 1 < tiles.length) {
                     return tiles[index - 1];
                   } else {
@@ -130,10 +128,7 @@ class SearchArticleProviderConsumer extends StatelessWidget {
               if (index == 0) {
                 if (articleProvider.isLoading) {
                   return const LinearProgressIndicator();
-                } else if (Store.showTagListSetting) {
-                  return const Tags();
-                }
-                return const SizedBox.shrink();
+                } return const Tags();
               } else if (tiles.isNotEmpty && index - 1 < tiles.length) {
                 return tiles[index - 1];
               } else {

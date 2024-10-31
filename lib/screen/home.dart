@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raven/provider/navigation.dart';
+import 'package:raven/repository/preferences/appearance.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/screen/feed.dart';
 import 'package:raven/screen/saved.dart';
-import 'package:raven/screen/settings.dart';
+import 'package:raven/screen/settings/settings.dart';
 import 'package:raven/screen/subscriptions.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -24,7 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onDestinationSelected: (int index) {
               nav.index = index;
             },
-            labelBehavior: Store.fontScale > 1
+            labelBehavior: AppearancePref.fontSize > 1
                 ? NavigationDestinationLabelBehavior.alwaysHide
                 : NavigationDestinationLabelBehavior.alwaysShow,
             selectedIndex: nav.index,

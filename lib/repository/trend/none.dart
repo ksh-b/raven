@@ -12,4 +12,7 @@ class NoneTrend extends Trend {
 
   @override
   Future<List<String>> get topics async => [];
+
+  @override
+  List<String> get locations => [];
 }

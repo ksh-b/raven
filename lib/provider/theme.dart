@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:raven/repository/store.dart';
+import 'package:raven/repository/preferences/appearance.dart';
 
 class ThemeProvider {
   static String defaultColor = 'Raven';
 
-  Map<String, Color> colors = {
-    'Raven': Colors.deepPurple,
-    'Red': Colors.red,
-    'Teal': Colors.teal,
-    'Blue': Colors.blue,
-    'Orange': Colors.orange,
+  static Map<String, Color> colors = {
+    "Purple": Colors.purple,
+    "Red": Colors.red,
+    "Pink": Colors.pink,
+    "Orange": Colors.orange,
+    "Yellow": Colors.yellow,
+    "Green": Colors.green,
+    "Teal": Colors.teal,
+    "Blue": Colors.blue,
+    "Light Blue": Colors.lightBlue,
+    "Cyan": Colors.cyan,
+    "Indigo": Colors.indigo,
+    "Brown": Colors.brown,
+    "Grey": Colors.grey,
+    "Blue Grey": Colors.blueGrey,
+    "Amber": Colors.amber,
+    "Lime": Colors.lime,
   };
 
+
   List<String> colorOptions() {
-    List<String> options = [];
-    options = colors.keys.toList();
-    if (Store.sdkVersion >= 31) {
-      options.add("Material You");
-    }
-    return options;
+    return colors.keys.toList();
   }
 
   ThemeData _get(Color color, bool dark) {
-    var fontScale = Store.fontScale;
+    var fontScale = AppearancePref.fontSize;
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: color,
@@ -82,22 +89,18 @@ class ThemeProvider {
     ColorScheme? lightScheme,
     ColorScheme? darkScheme,
   }) {
-    if (Store.themeColorSetting == "Material You") {
-      if (Store.darkThemeSetting && darkScheme != null) {
-        Store.materialYouColor = darkScheme.primary.value;
+    var dark = AppearancePref.theme == ThemePref.Dark.name;
+    if (AppearancePref.materialYou) {
+      if (dark && darkScheme != null) {
         return _get(darkScheme.primary, true);
-      } else if (!Store.darkThemeSetting && lightScheme != null) {
-        Store.materialYouColor = lightScheme.primary.value;
+      } else if (!dark && lightScheme != null) {
         return _get(lightScheme.primary, false);
       }
-      if (Store.materialYouColor != -1) {
-        return _get(Color(Store.materialYouColor), Store.darkThemeSetting);
-      }
-      return _get(colors.values.first, Store.darkThemeSetting);
+      return _get(colors.values.first, dark);
     }
     return _get(
-      colors[Store.themeColorSetting]!,
-      Store.darkThemeSetting,
+      colors[AppearancePref.color]!,
+      dark,
     );
   }
 }

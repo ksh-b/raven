@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/trends.dart';
 import 'package:raven/screen/article_feed.dart';
-
-import '../repository/store.dart';
 
 class MySearchDelegate extends SearchDelegate<String> {
   int page = 1;
@@ -40,19 +39,21 @@ class MySearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(
-      future: trends[Store.trendsProviderSetting]?.topics,
+      future: trends[ContentPref.searchSuggestionsProvider]?.topics,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           return ListView(
             children: snapshot.data!
-                .map((e) => ListTile(
-                      leading: const Icon(Icons.trending_up_rounded),
-                      title: Text(e),
-                      onTap: () {
-                        query = e;
-                        showResults(context);
-                      },
-                    ))
+                .map(
+                  (e) => ListTile(
+                    leading: const Icon(Icons.trending_up_rounded),
+                    title: Text(e),
+                    onTap: () {
+                      query = e;
+                      showResults(context);
+                    },
+                  ),
+                )
                 .toList(),
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
@@ -62,7 +63,11 @@ class MySearchDelegate extends SearchDelegate<String> {
         } else if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
         } else {
-          return const Center(child: Text("No data"));
+          return const ListTile(
+            leading: Icon(Icons.block_rounded),
+            title: Text("No results from provider"),
+            subtitle: Text("Try changing location/provider"),
+          );
         }
       },
     );

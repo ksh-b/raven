@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/repository/preferences/content.dart';
+import 'package:raven/repository/preferences/saved.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/screen/full_article.dart';
 import 'package:raven/utils/network.dart';
@@ -34,13 +36,13 @@ class _SavedPageState extends State<SavedPage> {
           title: const Text("Saved"),
         ),
         body: ValueListenableBuilder(
-          valueListenable: Store.saved.listenable(),
+          valueListenable: SavedArticles.saved.listenable(),
           builder: (BuildContext context, box, Widget? child) {
-            if (Store.saved.isNotEmpty) {
+            if (SavedArticles.saved.isNotEmpty) {
               return ListView.builder(
-                itemCount: Store.saved.keys.length,
+                itemCount: SavedArticles.saved.keys.length,
                 itemBuilder: (context, index) {
-                  Article article = Store.saved.values.toList()[index];
+                  Article article = SavedArticles.saved.values.toList()[index];
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                     child: Dismissible(
@@ -55,7 +57,7 @@ class _SavedPageState extends State<SavedPage> {
                       ),
                       confirmDismiss: (direction) async {
                         if (direction == DismissDirection.endToStart) {
-                          Store.deleteArticle(article);
+                          SavedArticles.deleteArticle(article);
                           return false;
                         }
                         return null;
@@ -93,7 +95,7 @@ class FeedCard extends StatelessWidget {
           child: Flex(
             direction: Axis.vertical,
             children: [
-              Store.loadImagesSetting
+              ContentPref.shouldLoadImages
                   ? Stack(
                       children: [
                         ArticleThumbnail(article: article),

@@ -20,4 +20,7 @@ abstract class Trend {
     }
     return topics;
   }
+
+  List<String> get locations;
+
 }

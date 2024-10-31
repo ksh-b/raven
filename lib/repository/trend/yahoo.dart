@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/model/trend.dart';
+import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/network.dart';
@@ -14,14 +15,15 @@ class YahooTrend extends Trend {
   String get url => "https://www.yahoo.com/";
 
   @override
-  String get locator => ".bd a span:last-child";
+  String get locator => ".trendingNow .Ell";
 
   @override
   Future<List<String>> get topics async {
     var country = "United States of America";
+    var locator = this.locator;
     var yUrl = url;
     if (Hive.isBoxOpen("settings")) {
-      country = Store.countrySetting;
+      country = ContentPref.country;
     }
     switch (country) {
       case "Australia":
@@ -32,6 +34,7 @@ class YahooTrend extends Trend {
         break;
       case "India":
         yUrl = "https://in.search.yahoo.com/";
+        locator = ".keyword-text";
         break;
       case "Malaysia":
         yUrl = "https://malaysia.yahoo.com/";
@@ -59,7 +62,8 @@ class YahooTrend extends Trend {
     return topics;
   }
 
-  static List<String> locations = [
+  @override
+  List<String> locations = [
     'United States of America',
     'Australia',
     'Canada',

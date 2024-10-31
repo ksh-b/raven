@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/provider/theme.dart';
+import 'package:raven/repository/preferences/content.dart';
+import 'package:raven/repository/preferences/saved.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/screen/full_article.dart';
 import 'package:raven/service/simplytranslate.dart';
@@ -24,6 +26,8 @@ class ArticleCard extends StatefulWidget {
 class _ArticleCardState extends State<ArticleCard> {
   @override
   Widget build(BuildContext context) {
+    var filtered = widget.article.metadata.keys.contains(Metadata.filtered.name);
+
     return Dismissible(
       key: Key(widget.article.url),
       direction: DismissDirection.startToEnd,
@@ -36,48 +40,14 @@ class _ArticleCardState extends State<ArticleCard> {
       ),
       confirmDismiss: saveArticle,
       child: InkWell(
-        child: Card(
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Flex(
-            mainAxisSize: MainAxisSize.min,
-            direction: Axis.vertical,
-            children: [
-              Flexible(
-                flex: 1,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Stack(
-                    alignment: Alignment.bottomLeft,
-                    children: [
-                      ArticleThumbnail(widget: widget),
-                      Chips(widget: widget),
-                    ],
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 4,
-                child: ListTile(
-                  title: ArticleTitle(widget: widget),
-                  dense: false,
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Flex(
-                      direction: Axis.horizontal,
-                      children: [
-                        PublisherFavicon(widget: widget),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        ArticlePublisherDetails(widget: widget),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        child: filtered?ExpansionTile(
+          leading: Icon(Icons.hide_source_rounded),
+          title: Text("Excluded based on your criteria"),
+          subtitle: Text(widget.article.metadata[Metadata.filtered.name]??""),
+          children: [
+            VisibleArticleCard(widget: widget),
+          ],
+        ):VisibleArticleCard(widget: widget),
         onTap: () {
           Navigator.push(
             context,
@@ -93,10 +63,67 @@ class _ArticleCardState extends State<ArticleCard> {
     if (direction == DismissDirection.startToEnd) {
       Article article =
           await SimplyTranslate().translateArticle(widget.article);
-      Store.saveArticle(article);
+      SavedArticles.saveArticle(article);
       return false;
     }
     return null;
+  }
+}
+
+class VisibleArticleCard extends StatelessWidget {
+  const VisibleArticleCard({
+    super.key,
+    required this.widget,
+  });
+
+  final ArticleCard widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: Flex(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        direction: Axis.vertical,
+        children: [
+          ContentPref.shouldLoadImages?
+          Flexible(
+            flex: 1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Stack(
+                alignment: Alignment.bottomLeft,
+                children: [
+                  ArticleThumbnail(widget: widget),
+                  Chips(widget: widget),
+                ],
+              ),
+            ),
+          ):SizedBox.shrink(),
+          Flexible(
+            flex: 4,
+            child: ListTile(
+              title: ArticleTitle(widget: widget),
+              dense: false,
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Flex(
+                  direction: Axis.horizontal,
+                  children: [
+                    PublisherFavicon(widget: widget),
+                    const SizedBox(
+                      width: 12,
+                    ),
+                    ArticlePublisherDetails(widget: widget),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -148,7 +175,7 @@ class _ArticleTitleState extends State<ArticleTitle> {
           title.value = await SimplyTranslate()
               .translate(
             widget.widget.article.title,
-            language: Store.languageSetting,
+            language: ContentPref.translateTo,
           )
               .onError(
             (error, stackTrace) {
@@ -193,6 +220,9 @@ class ArticleThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!ContentPref.shouldLoadImages) {
+      return SizedBox.shrink();
+    }
     return CachedNetworkImage(
       imageUrl: widget.article.thumbnail,
       placeholder: (context, url) {
@@ -242,12 +272,15 @@ class Chips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Flex(
-        mainAxisSize: MainAxisSize.min,
-        direction: Axis.horizontal,
-        children: widget.article.tags.map((tag) => RoundedChip(tag)).toList(),
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Flex(
+          mainAxisSize: MainAxisSize.min,
+          direction: Axis.horizontal,
+          children: widget.article.tags.map((tag) => RoundedChip(tag)).toList(),
+        ),
       ),
     );
   }

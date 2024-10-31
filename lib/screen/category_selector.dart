@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
+import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/widget/custom_category_textbox.dart';
 
@@ -39,7 +40,7 @@ class _CategorySelectorState extends State<CategorySelector> {
         title: Text("${widget.newsSource} categories"),
       ),
       body: ValueListenableBuilder(
-        valueListenable: Store.subscriptions.listenable(),
+        valueListenable: SubscriptionPref.subscriptions.listenable(),
         builder: (context, value, child) {
           return Padding(
             padding: const EdgeInsets.all(8.0),
@@ -72,8 +73,8 @@ class _CategorySelectorState extends State<CategorySelector> {
                           List<UserSubscription> allSubscriptions =
                               defaultSubscription
                                   .union(availableSubscriptions.toSet())
-                                  .union(Store.customSubscriptions.toSet())
-                                  .union(Store.selectedSubscriptions.toSet())
+                                  .union(SubscriptionPref.customSubscriptions.toSet())
+                                  .union(SubscriptionPref.selectedSubscriptions.toSet())
                                   .where((element) =>
                                       element.publisher == widget.newsSource)
                                   .toList();
@@ -95,7 +96,7 @@ class _CategorySelectorState extends State<CategorySelector> {
                                           subscription: subscription,
                                         ),
                                       Checkbox(
-                                        value: Store.selectedSubscriptions
+                                        value: SubscriptionPref.selectedSubscriptions
                                             .contains(subscription),
                                         onChanged: (value) {
                                           updateSubscription(
@@ -171,10 +172,10 @@ class _CategorySelectorState extends State<CategorySelector> {
 
   void updateSubscription(bool? checked, UserSubscription subscription) {
     if (checked!) {
-      Store.selectedSubscriptions = Store.selectedSubscriptions
+      SubscriptionPref.selectedSubscriptions = SubscriptionPref.selectedSubscriptions
         ..add(subscription);
     } else {
-      Store.selectedSubscriptions = Store.selectedSubscriptions
+      SubscriptionPref.selectedSubscriptions = SubscriptionPref.selectedSubscriptions
         ..remove(subscription);
     }
   }
@@ -197,10 +198,10 @@ class DeleteCustomCategory extends StatelessWidget {
   }
 
   void deleteCustomSubscription(UserSubscription subscription) {
-    if (Store.selectedSubscriptions.contains(subscription)) {
-      Store.selectedSubscriptions = Store.selectedSubscriptions
+    if (SubscriptionPref.selectedSubscriptions.contains(subscription)) {
+      SubscriptionPref.selectedSubscriptions = SubscriptionPref.selectedSubscriptions
         ..remove(subscription);
     }
-    Store.customSubscriptions = Store.customSubscriptions..remove(subscription);
+    SubscriptionPref.customSubscriptions = SubscriptionPref.customSubscriptions..remove(subscription);
   }
 }

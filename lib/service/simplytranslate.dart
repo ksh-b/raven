@@ -4,7 +4,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:html/parser.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'package:raven/repository/store.dart';
+import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/service/http_client.dart';
 
 class SimplyTranslate {
@@ -179,7 +179,7 @@ class SimplyTranslate {
 
   Future<String> translate(String inputText,
       {String? language, bool isHtml = false}) async {
-    if (!Store.shouldTranslate) {
+    if (!ContentPref.shouldTranslate) {
       return inputText;
     }
     if (isHtml) {
@@ -190,9 +190,9 @@ class SimplyTranslate {
       inputText = document.body?.text ?? inputText;
     }
 
-    language ??= Store.languageSetting;
+    language ??= ContentPref.translateTo;
     String url =
-        'https://${Store.translatorInstanceSetting}/?engine=${Store.translatorEngineSetting}';
+        'https://${ContentPref.translatorInstance}/?engine=${ContentPref.translatorEngine}';
     Map<String, String> payload = {
       'from': 'auto',
       'to': languages[language]!,

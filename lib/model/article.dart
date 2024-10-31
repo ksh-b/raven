@@ -2,6 +2,13 @@ import 'package:hive/hive.dart';
 
 part 'article.g.dart';
 
+enum Metadata {
+  filtered,
+  translated,
+  saved,
+  live,
+}
+
 @HiveType(typeId: 1)
 class Article {
   @HiveField(1)
@@ -24,6 +31,8 @@ class Article {
   List<String> tags;
   @HiveField(10)
   int publishedAt;
+  @HiveField(11)
+  Map<String, String> metadata = {};
 
   Article({
     required this.publisher,
@@ -36,6 +45,7 @@ class Article {
     required this.category,
     required this.tags,
     required this.publishedAt,
+
   });
 
   Article fill({

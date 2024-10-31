@@ -13,6 +13,7 @@ class RoundedChip extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 8),
       child: RawChip(
+        visualDensity: VisualDensity.compact,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(32),

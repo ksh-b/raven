@@ -6,6 +6,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/model/trend.dart';
 import 'package:raven/repository/country.dart';
+import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/network.dart';
@@ -25,7 +26,7 @@ class GoogleTrend extends Trend {
     var country = "US";
     List<String> queries = [];
     if (Hive.isBoxOpen("settings")) {
-      country = "${countryCodes[Store.countrySetting]}";
+      country = "${countryCodes[ContentPref.country]}";
     }
     var response = await dio().get(
       url + country,
@@ -52,7 +53,8 @@ class GoogleTrend extends Trend {
     return queries;
   }
 
-  static List<String> locations = [
+  @override
+  List<String> locations = [
     'Afghanistan',
     'Albania',
     'Algeria',

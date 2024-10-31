@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:raven/model/category.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/provider/category_search.dart';
+import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/screen/category_selector.dart';
 
@@ -82,7 +83,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
               ),
               Expanded(
                 child: ValueListenableBuilder(
-                  valueListenable: Store.subscriptions.listenable(),
+                  valueListenable: SubscriptionPref.subscriptions.listenable(),
                   builder: (BuildContext context, value, Widget? child) {
                     return ListView.builder(
                       itemCount: search.filteredPublishers.length,
@@ -141,7 +142,7 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
   }
 
   String getSelectedCategories(String newsSource) {
-    var categories = Store.selectedSubscriptions
+    var categories = SubscriptionPref.selectedSubscriptions
         .where((element) => element.publisher == newsSource)
         .map((e) {
       var cat = e.categoryPath.split("/").where((i) => i.isNotEmpty);
