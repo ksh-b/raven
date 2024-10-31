@@ -1,0 +1,60 @@
+import 'package:flutter/material.dart';
+import 'package:raven/repository/store.dart';
+
+enum Appearance {
+  theme,
+  color,
+  isMaterialYou,
+  fontSize,
+}
+
+// default values
+final _theme = ThemePref.values.first;
+final _color = "Purple";
+
+final _materialYou = false;
+final _fontSize = 1.0;
+
+enum ThemePref {
+  Light,
+  Dark,
+  System,
+}
+
+class AppearancePref {
+  static String get theme {
+    return Store.settings.get(Appearance.theme.name, defaultValue: _theme.name);
+  }
+
+  static set theme(String theme) {
+    Store.settings.put(Appearance.theme.name, theme);
+  }
+
+  static String get color {
+    return Store.settings.get(Appearance.color.name, defaultValue: _color);
+  }
+
+  static set color(String color) {
+    Store.settings.put(Appearance.color.name, color);
+  }
+
+  static bool get materialYou {
+    return Store.settings
+        .get(Appearance.isMaterialYou.name, defaultValue: _materialYou);
+  }
+
+  static set materialYou(bool isMaterialYou) {
+    Store.settings.put(Appearance.isMaterialYou.name, isMaterialYou);
+  }
+
+  static double get fontSize {
+    return Store.settings.get(
+      Appearance.fontSize.name,
+      defaultValue: _fontSize,
+    );
+  }
+
+  static set fontSize(double fontSize) {
+    Store.settings.put(Appearance.fontSize.name, fontSize);
+  }
+}
