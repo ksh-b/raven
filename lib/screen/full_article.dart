@@ -4,7 +4,6 @@ import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/repository/ladders.dart';
 import 'package:raven/repository/preferences/content.dart';
-import 'package:raven/repository/store.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/html_widget.dart';
 import 'package:raven/widget/options_popup.dart';
@@ -51,6 +50,17 @@ class _ArticlePageState extends State<ArticlePage> {
             future: Publisher.fromString(widget.article.publisher)
                 .article(widget.article),
             builder: (context, response) {
+              if (!response.hasData || response.hasError) {
+                return Center(
+                  child: ListTile(
+                    title: Text("Error loading article"),
+                    subtitle: response.hasError
+                        ? Text(response.error.toString())
+                        : Text("No data"),
+                  ),
+                );
+              }
+
               if (response.hasData && widget.shouldLoad) {
                 return FullArticle(response: response);
               } else {

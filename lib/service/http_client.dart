@@ -1,17 +1,20 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:raven/repository/preferences/internal.dart';
-import 'package:raven/repository/store.dart';
 
 CacheOptions _cacheOptions() {
-
   return CacheOptions(
-    store: Hive.isBoxOpen("settings")?HiveCacheStore(Internal.appDirectory):MemCacheStore(),
+    store: Hive.isBoxOpen("settings")
+        ? HiveCacheStore(Internal.appDirectory)
+        : MemCacheStore(),
     policy: CachePolicy.request,
     hitCacheOnErrorExcept: [401, 403],
     maxStale: const Duration(minutes: 60),
@@ -45,6 +48,19 @@ Dio dio() {
     compact: true,
     maxWidth: 200,
     enabled: kDebugMode,
+    logPrint: (object) async {
+      var directory = await getTemporaryDirectory();
+      File logs = File(
+        '${directory.path}/raven_logs.txt',
+      );
+      String log = "$object\n".replaceAll("║", "")
+          .replaceAll("╚", "")
+          .replaceAll("╔╣", "")
+          .replaceAll("╝", "")
+          .replaceAll("═", "")
+          .replaceAll("╟", "");
+      logs.writeAsStringSync(log, mode: FileMode.append);
+    },
     filter: (options, args) {
       return !args.isResponse || !args.hasUint8ListData;
     },

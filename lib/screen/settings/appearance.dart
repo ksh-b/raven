@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raven/provider/theme.dart';
 import 'package:raven/repository/preferences/appearance.dart';
-import 'package:raven/repository/store.dart';
 import 'package:raven/widget/options_popup.dart';
 
 class AppearancePage extends StatefulWidget {
@@ -22,6 +21,8 @@ class _AppearancePageState extends State<AppearancePage> {
         children: [
           ListTile(
             subtitle: Text("Theme"),
+            visualDensity: VisualDensity.compact,
+            dense: true,
           ),
           ListTile(
             leading: Icon(Icons.brightness_6_rounded),

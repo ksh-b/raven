@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'article.g.dart';
 
@@ -9,6 +10,7 @@ enum Metadata {
   live,
 }
 
+@JsonSerializable()
 @HiveType(typeId: 1)
 class Article {
   @HiveField(1)
@@ -72,4 +74,10 @@ class Article {
       tags: this.tags,
     );
   }
+
+  factory Article.fromJson(Map<String, dynamic> json) => _$ArticleFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ArticleToJson(this);
+
+
 }

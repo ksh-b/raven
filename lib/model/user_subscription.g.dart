@@ -48,3 +48,23 @@ class UserSubscriptionAdapter extends TypeAdapter<UserSubscription> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+UserSubscription _$UserSubscriptionFromJson(Map<String, dynamic> json) =>
+    UserSubscription(
+      json['publisher'] as String,
+      json['categoryLabel'] as String,
+      json['categoryPath'] as String,
+      isCustom: json['isCustom'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$UserSubscriptionToJson(UserSubscription instance) =>
+    <String, dynamic>{
+      'publisher': instance.publisher,
+      'categoryPath': instance.categoryPath,
+      'categoryLabel': instance.categoryLabel,
+      'isCustom': instance.isCustom,
+    };

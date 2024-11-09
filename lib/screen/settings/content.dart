@@ -3,7 +3,6 @@ import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/trends.dart';
 import 'package:raven/screen/customize_filters.dart';
 import 'package:raven/service/simplytranslate.dart';
-import 'package:raven/widget/new_filter_popup.dart';
 import 'package:raven/widget/options_popup.dart';
 
 class ContentPage extends StatefulWidget {
@@ -24,6 +23,8 @@ class _ContentPageState extends State<ContentPage> {
         children: [
           ListTile(
             subtitle: Text("Search suggestions"),
+            visualDensity: VisualDensity.compact,
+            dense: true,
           ),
           ListTile(
             leading: const Icon(Icons.trending_up_rounded),
@@ -77,11 +78,13 @@ class _ContentPageState extends State<ContentPage> {
           Divider(),
           ListTile(
             subtitle: Text("Filter articles"),
+            visualDensity: VisualDensity.compact,
+            dense: true,
           ),
           InkWell(
             child: ListTile(
               leading: const Icon(Icons.filter_alt_rounded), // TODO
-              title: const Text('Enable'),
+              title: const Text('Filter articles'),
               subtitle: const Text("Hide articles containing specified keywords"),
               trailing: Switch(
                 value: ContentPref.shouldFilterContent,
@@ -102,6 +105,8 @@ class _ContentPageState extends State<ContentPage> {
           Divider(),
           ListTile(
             subtitle: Text("Translations"),
+            visualDensity: VisualDensity.compact,
+            dense: true,
           ),
           SwitchListTile(
             secondary: const Icon(Icons.translate_rounded),

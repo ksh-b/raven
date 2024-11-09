@@ -6,16 +6,15 @@ class SavedArticles {
     return Hive.box("saved");
   }
 
-  static void saveArticle(Article article) {
-    saved.put(article.url, article);
+  static void saveArticle(Article article) async {
+    if (saved.keys.contains(article.url)) {
+      await deleteArticle(article);
+    }
+    await saved.put(article.url, article);
   }
 
-  static void deleteArticle(Article article) {
-    saved.delete(article.url);
-  }
-
-  static List<Article> getSavedArticles(Article article) {
-    return saved.values.toList() as List<Article>;
+  static Future<void> deleteArticle(Article article) async {
+    return await saved.delete(article.url);
   }
 
 }

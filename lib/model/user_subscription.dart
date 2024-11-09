@@ -1,7 +1,9 @@
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'user_subscription.g.dart';
 
+@JsonSerializable()
 @HiveType(typeId: 0)
 class UserSubscription extends HiveObject {
   @HiveField(0)
@@ -30,4 +32,9 @@ class UserSubscription extends HiveObject {
 
   @override
   int get hashCode => publisher.hashCode ^ categoryPath.hashCode;
+
+  factory UserSubscription.fromJson(Map<String, dynamic> json) => _$UserSubscriptionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserSubscriptionToJson(this);
+
 }
