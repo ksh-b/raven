@@ -57,7 +57,7 @@ class APNews extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       var document = html_parser.parse(response.data);
       var isLive =
@@ -123,9 +123,7 @@ class APNews extends Publisher {
             author: "",
             url: article
                     .querySelector("a")
-                    ?.attributes["href"]
-                    ?.replaceFirst(homePage, "") ??
-                "",
+                    ?.attributes["href"] ?? "",
             tags: [category],
             thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
             publishedAt: -1,
@@ -165,8 +163,7 @@ class APNews extends Publisher {
             author: "",
             url: article
                     .querySelector("a")
-                    ?.attributes["href"]
-                    ?.replaceFirst(homePage, "") ??
+                    ?.attributes["href"]??
                 "",
             thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
             publishedAt: timestamp,

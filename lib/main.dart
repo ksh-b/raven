@@ -29,6 +29,15 @@ Future<void> main() async {
   await Hive.openBox('offline-articles');
   await Hive.openBox('subscriptions');
 
+  if (Internal.dbVersion == -1) {
+    await Hive.deleteFromDisk();
+    await Hive.openBox('settings');
+    await Hive.openBox('saved');
+    await Hive.openBox('offline-articles');
+    await Hive.openBox('subscriptions');
+    Internal.dbVersion = 1;
+  }
+
   if (Internal.sdkVersion == -1) {
     await DeviceInfoPlugin().androidInfo.then((value) {
       Internal.sdkVersion = value.version.sdkInt;

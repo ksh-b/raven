@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
-import 'package:raven/model/user_subscription.dart';
 import 'package:raven/provider/fallback_provider.dart';
+import 'package:raven/repository/publishers.dart';
 import 'package:test/test.dart';
 
 class ExtractorTest {
@@ -21,7 +19,6 @@ class ExtractorTest {
     String? category,
     bool ignoreDateCheck = false,
   }) async {
-
     if (category == null) {
       final Map<String, String> categories = await publisher.categories;
 
@@ -39,7 +36,6 @@ class ExtractorTest {
     Publisher publisher,
     bool skipDateCheck,
   ) async {
-
     sleep(Duration(seconds: 2));
     print(category);
     expect(category, isNotNull);
@@ -59,6 +55,11 @@ class ExtractorTest {
         expect(value, isNotNull);
         expect(value.publishedAt, isNonNegative,
             reason: article.url, skip: skipDateCheck);
+        expect(
+          article.url,
+          contains(publishers[article.publisher]!.homePage),
+          reason: 'homepage missing in url',
+        );
         if (value.content.isEmpty) {
           await FallbackProvider().get(article).then((value) {
             expect(value.content, isNotEmpty, reason: article.url);
@@ -88,6 +89,11 @@ class ExtractorTest {
       var articleFull = await publisher.article(article);
       expect(articleFull, isNotNull);
       expect(articleFull.content, isNotEmpty);
+      expect(
+        articleFull.url,
+        contains(publishers[articleFull.publisher]!.homePage),
+        reason: 'homepage missing in url',
+      );
     }
   }
 }

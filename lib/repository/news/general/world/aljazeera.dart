@@ -58,7 +58,7 @@ class AlJazeera extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get('$homePage${newsArticle.url}');
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       var document = html_parser.parse(response.data);
       var more = document.querySelector(".more-on")?.innerHtml ?? "";
@@ -101,7 +101,7 @@ class AlJazeera extends Publisher {
             element['author'].isNotEmpty ? element['author'][0]['name'] : "";
         var thumbnail = homePage + element['featuredImage']['sourceUrl'];
         var time = element['date'];
-        var articleUrl = element['link'];
+        var articleUrl = homePage + element['link'];
         var excerpt = element['excerpt'];
         articles.add(
           Article(

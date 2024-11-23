@@ -38,16 +38,16 @@ class BBC extends Publisher {
 
   Map<String, String> uuidMap() {
     return {
-      "/world": "8467c0e0-584b-41de-9682-756b311216b5",
-      "/asia": "070fca6a-b5c7-4b7f-8834-1c989fd40297",
-      "/uk": "082101b1-72b1-4e45-943d-29d6dc6f97b4",
-      "/business": "19a1d11b-1755-4f97-8747-0c9534336a47",
+      "/world": "07cedf01-f642-4b92-821f-d7b324b8ba73",
+      "/asia": "ec977d36-fc91-419e-a860-b151836c176b",
+      "/uk": "27d91e93-c35c-4e30-87bf-1bd443496470",
+      "/business": "daa2a2f9-0c9e-4249-8234-bae58f372d82",
     };
   }
 
   Map<String, Map<String, String>> topicMap() {
     return {
-      "/technology": {
+      "/innovation/technology": {
         "topic": "cd1qez2v2j2t",
         "urn": "b2790c4d-d5c4-489a-84dc-be0dcd3f5252",
       },
@@ -186,7 +186,7 @@ class BBC extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
 
     if (response.successful) {
       var document = html_parser.parse(response.data);
@@ -239,19 +239,19 @@ class BBC extends Publisher {
   }) async {
     Set<Article> articles = {};
     var response = await dio().get(
-        "https://web-cdn.api.bbci.co.uk/xd/search?terms=$searchQuery&page=$page");
+          "https://web-cdn.api.bbci.co.uk/xd/search?terms=$searchQuery&page=$page");
 
     if (response.successful) {
       var document = response.data['data'];
       for (var element in document) {
         var title = element['title'];
         var thumbnail = element['indexImage']['model']['blocks']['src'];
-        var articleUrl = element['path'];
+        var articleUrl = element['path'] ?? element['url']?.replaceFirst(homePage, "");
         var excerpt = element['summary'];
         var time = element['lastPublishedAt'];
         var tags = element['topics'].cast<String>();
         var author = "";
-
+        print(articleUrl);
         if (time != null) {
           time = convertToIso8601(time);
         }
@@ -263,7 +263,7 @@ class BBC extends Publisher {
             content: "",
             excerpt: excerpt ?? "",
             author: author,
-            url: articleUrl?.replaceFirst("https://www.bbc.co.uk", "").replaceFirst("https://www.bbc.com", "") ?? "",
+            url: homePage + (articleUrl ?? ""),
             thumbnail: thumbnail ?? "",
             publishedAt: stringToUnix(time?.trim() ?? ""),
             tags: tags,

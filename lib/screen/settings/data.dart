@@ -46,8 +46,6 @@ class _DataPageState extends State<DataPage> {
             leading: const Icon(Icons.favorite_rounded),
             title: const Text('Subscriptions'),
             onTap: () async {
-              // TODO: Test below android 13
-              // TODO: Add file picker for import
               try {
                 await backupSubscriptions();
                 showSnackBar(context, 'Export successful!');
@@ -70,7 +68,7 @@ class _DataPageState extends State<DataPage> {
           ),
           Divider(),
           ListTile(
-            subtitle: const Text('Import'), // TODO
+            subtitle: const Text('Import'),
             visualDensity: VisualDensity.compact,
             dense: true,
           ),
@@ -119,7 +117,7 @@ class _DataPageState extends State<DataPage> {
           Divider(),
           ListTile(
             leading: const Icon(Icons.receipt_long_rounded),
-            title: const Text('Network logs'), // TODO
+            title: const Text('Network logs'),
             onTap: () async {
               var directory = await getTemporaryDirectory();
               File logsFile = File(
@@ -148,11 +146,11 @@ class _DataPageState extends State<DataPage> {
 
   Future<void> backupSavedArticles() async {
     await requestStoragePermission();
-    var directory = await getExternalStorageDirectory();
+    var directory = await FilePicker.platform.getDirectoryPath();
     var zip = ZipFileEncoder();
-    zip.create('${directory!.path}/$articlesZip');
+    zip.create('${directory!}/$articlesZip');
     var file = File(
-      '${directory.path}/$articlesJson',
+      '$directory/$articlesJson',
     );
     await file.create(recursive: true);
     var encoded = jsonEncode(
@@ -168,11 +166,11 @@ class _DataPageState extends State<DataPage> {
 
   Future<void> backupSubscriptions() async {
     await requestStoragePermission();
-    var directory = await getExternalStorageDirectory();
+    var directory = await FilePicker.platform.getDirectoryPath();
     var zip = ZipFileEncoder();
-    zip.create('${directory!.path}/$subscriptionsZip');
+    zip.create('${directory!}/$subscriptionsZip');
     var file = File(
-      '${directory.path}/$subscriptionsSelectedJson',
+      '$directory/$subscriptionsSelectedJson',
     );
     await file.create(recursive: true);
     var encoded = jsonEncode(
@@ -185,7 +183,7 @@ class _DataPageState extends State<DataPage> {
     await file.delete();
 
     file = File(
-      '${directory.path}/$subscriptionsCustomJson',
+      '$directory/$subscriptionsCustomJson',
     );
     await file.create(recursive: true);
     encoded = jsonEncode(

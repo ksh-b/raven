@@ -3,6 +3,7 @@ import 'package:raven/model/category.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/network.dart';
+import 'package:raven/utils/string.dart';
 import 'package:raven/utils/time.dart';
 
 class TheWire extends Publisher {
@@ -67,7 +68,10 @@ class TheWire extends Publisher {
   }
 
   Future<Set<Article>> extract(
-      String apiUrl, bool isSearch, String category) async {
+    String apiUrl,
+    bool isSearch,
+    String category,
+  ) async {
     Set<Article> articles = {};
     var response = await dio().get(apiUrl);
 
@@ -92,6 +96,7 @@ class TheWire extends Publisher {
             '/wp-json/thewire/v2/posts/detail/${element['post_name']}';
         var excerpt = element['post_excerpt'];
         var tags = element['categories'].map((e) => e['name']).toList();
+
         articles.add(
           Article(
             publisher: name,
@@ -120,6 +125,8 @@ class TheWire extends Publisher {
       var postDetail = data["post-detail"][0];
       var content = postDetail["post_content"];
       var thumbnail = postDetail["featured_image"][0];
+      newsArticle_.url =
+          "$homePage/${newsArticle_.category}${baseName(newsArticle.url)}";
       newsArticle_ = newsArticle.fill(
         content: content,
         thumbnail: thumbnail,

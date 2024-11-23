@@ -19,7 +19,7 @@ class ArsTechnica extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       Document document = html_parser.parse(response.data);
       String? thumbnail =
@@ -65,7 +65,7 @@ class ArsTechnica extends Publisher {
             articleElement.querySelector("span[itemprop=name]")?.text;
         String? date =
             articleElement.querySelector("time")?.attributes["datetime"] ?? "";
-        String? url = articleElement.querySelector("h2 a")?.attributes["href"];
+        String? url = articleElement.querySelector("h2 a")?.attributes["href"] ?? "";
         String? thumbnail =
             articleElement.querySelector("figure div")?.attributes["style"];
 
@@ -76,7 +76,7 @@ class ArsTechnica extends Publisher {
             content: "",
             excerpt: excerpt ?? "",
             author: author ?? "",
-            url: url?.replaceFirst(homePage, "") ?? "",
+            url: homePage + url,
             thumbnail: extractUrl(thumbnail)
                 .replaceFirst("-360x200", "")
                 .replaceFirst("-150x150", ""),

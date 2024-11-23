@@ -192,7 +192,7 @@ class OpenUrlButton extends StatelessWidget {
           context,
           "Prefix URL with...",
           (String option) {
-            launchUrl(Uri.parse("${ladders[option]!}/$fullUrl"));
+            launchUrl(Uri.parse("${ladders[option]!}$fullUrl"));
           },
           ladders.keys.toList(),
         );
@@ -223,7 +223,7 @@ class ShareButton extends StatelessWidget {
           context,
           "Prefix URL with...",
           (String option) {
-            Share.shareUri(Uri.parse("${ladders[option]!}/$fullUrl"));
+            Share.shareUri(Uri.parse("${ladders[option]!}$fullUrl"));
           },
           ladders.keys.toList(),
         );

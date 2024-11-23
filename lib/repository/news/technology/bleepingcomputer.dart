@@ -19,7 +19,7 @@ class BleepingComputer extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       Document document = html_parser.parse(response.data);
       String? thumbnail = "";
@@ -77,7 +77,7 @@ class BleepingComputer extends Publisher {
         String? title = articleElement.querySelector("h4")?.text;
         String? excerpt = articleElement.querySelector("p")?.text;
         String? author = articleElement.querySelector(".author")?.text;
-        String? url = articleElement.querySelector("h4 a")?.attributes["href"];
+        String? url = articleElement.querySelector("h4 a")?.attributes["href"]?? "";
         var tags = articleElement
             .querySelectorAll(".bc_latest_news_category span a")
             .map((e) => e.text)
@@ -105,7 +105,7 @@ class BleepingComputer extends Publisher {
             content: content,
             excerpt: excerpt ?? "",
             author: author ?? "",
-            url: url?.replaceFirst(homePage, "") ?? "",
+            url: url,
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             tags: tags,

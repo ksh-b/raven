@@ -11,7 +11,7 @@ class CNN extends Publisher {
   String get name => "CNN";
 
   @override
-  String get homePage => "https://edition.cnn.com";
+  String get homePage => "https://www.cnn.com";
 
   @override
   Future<Map<String, String>> get categories => extractCategories();
@@ -37,7 +37,7 @@ class CNN extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    String url = "$homePage${newsArticle.url}";
+    String url = newsArticle.url;
     if (newsArticle.url.startsWith("http")) {
       url = newsArticle.url;
     } else {
@@ -121,7 +121,7 @@ class CNN extends Publisher {
             content: "",
             excerpt: "",
             author: "",
-            url: article.querySelector("a")?.attributes["href"] ?? "",
+            url: homePage + (article.querySelector("a")?.attributes["href"] ?? ""),
             tags: [category],
             thumbnail: article.querySelector("img")?.attributes["src"] ?? "",
             publishedAt: -1,

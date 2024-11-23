@@ -50,7 +50,7 @@ class TheGuardian extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       var document = html_parser.parse(response.data);
       var article = document.querySelector('article');
@@ -107,11 +107,10 @@ class TheGuardian extends Publisher {
             content: "",
             excerpt: "",
             author: "",
-            url: article
+            url: homePage + (article
                     .querySelector("a")
-                    ?.attributes["href"]
-                    ?.replaceFirst(homePage, "") ??
-                "",
+                    ?.attributes["href"] ??
+                ""),
             tags: [category],
             thumbnail: article
                     .querySelector("img")

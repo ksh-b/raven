@@ -45,7 +45,7 @@ class TheQuint extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       Document document = html_parser.parse(response.data);
       var content =
@@ -83,7 +83,7 @@ class TheQuint extends Publisher {
         var thumbnail =
             "https://images.thequint.com/${element['story']['hero-image-s3-key']}";
         var time = element['story']["last-published-at"];
-        String articleUrl = element['story']["url"] ?? "";
+        String articleUrl = "${element['story']["url"]}";
         var excerpt = element['story']['summary'] ?? "";
         var sections = element['story']["sections"];
         for (var section in sections) {
@@ -96,7 +96,7 @@ class TheQuint extends Publisher {
             content: "",
             excerpt: excerpt,
             author: author ?? "",
-            url: articleUrl.replaceFirst(homePage, ""),
+            url: articleUrl,
             tags: tags,
             thumbnail: thumbnail,
             publishedAt: time,
@@ -138,7 +138,7 @@ class TheQuint extends Publisher {
             content: "",
             excerpt: "",
             author: author ?? "",
-            url: articleUrl.replaceFirst(homePage, ""),
+            url: articleUrl,
             thumbnail: thumbnail,
             publishedAt: time,
             category: "",

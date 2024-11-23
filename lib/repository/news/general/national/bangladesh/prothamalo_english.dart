@@ -139,6 +139,7 @@ class ProthamAloEn extends Publisher {
         }
       }
       newsArticle.content = content;
+      newsArticle.url = "$homePage/${newsArticle.url}";
     }
     return newsArticle;
   }

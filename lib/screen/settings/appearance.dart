@@ -27,7 +27,7 @@ class _AppearancePageState extends State<AppearancePage> {
           ListTile(
             leading: Icon(Icons.brightness_6_rounded),
             title: Text("Base Theme"),
-            subtitle: Text(AppearancePref.theme.toString()), // TODO: change text
+            subtitle: Text(AppearancePref.theme.toString()),
             trailing: DropdownMenu<String>(
               initialSelection: AppearancePref.theme,
               onSelected: (String? value) {

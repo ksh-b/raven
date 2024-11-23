@@ -19,7 +19,7 @@ class Engadget extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage/${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       Document document = html_parser.parse(response.data);
       Element? articleElement = document.querySelector(".caas-body");
@@ -67,7 +67,7 @@ class Engadget extends Publisher {
         String? date =
             articleElement.querySelector("span[class*='Ai(c)']")?.text ?? "";
         String? url =
-            articleElement.querySelector("h2,h4 a")?.attributes["href"];
+            articleElement.querySelector("h2,h4 a")?.attributes["href"]?? "";
         String? thumbnail =
             articleElement.querySelector("img[width]")?.attributes["src"];
         int parsedTime = stringToUnix(date, format: "MM.dd.yyyy");
@@ -79,7 +79,7 @@ class Engadget extends Publisher {
             content: "",
             excerpt: excerpt ?? "",
             author: author,
-            url: url ?? "",
+            url: homePage + url ,
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             tags: [category],
@@ -112,7 +112,7 @@ class Engadget extends Publisher {
             articleElement.querySelector(".csub span[class*=pr]")?.text;
         String? date =
             articleElement.querySelector(".csub span[class*=pl]")?.text;
-        String? url = articleElement.querySelector("h4 a")?.attributes["href"];
+        String? url = articleElement.querySelector("h4 a")?.attributes["href"] ?? "";
         String? thumbnail =
             articleElement.querySelector(".thmb")?.attributes["src"];
         int parsedTime = stringToUnix(date ?? "", format: "MM.dd.yyyy");
@@ -124,7 +124,7 @@ class Engadget extends Publisher {
             content: "",
             excerpt: excerpt ?? "",
             author: author ?? "",
-            url: url ?? "",
+            url: url ,
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             category: "",

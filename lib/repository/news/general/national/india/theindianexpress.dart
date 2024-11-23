@@ -55,7 +55,7 @@ class TheIndianExpress extends Publisher {
   @override
   Future<Article> article(Article newsArticle) async {
     Article newsArticle_ = newsArticle;
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
 
     if (response.successful) {
       Document document = html_parser.parse(response.data);
@@ -87,6 +87,7 @@ class TheIndianExpress extends Publisher {
             stringToUnix(timestamp ?? "", format: "yyyy-MM-ddTHH:mm:ssZ"),
         tags: tags,
       );
+      newsArticle_.url = "$homePage${newsArticle.url}";
     }
 
     return newsArticle_;
@@ -127,7 +128,6 @@ class TheIndianExpress extends Publisher {
         if (thumbnail != null && !thumbnail.startsWith("https://")) {
           thumbnail = "https://images.indianexpress.com$thumbnail";
         }
-
         articles.add(
           Article(
             publisher: name,
@@ -135,7 +135,7 @@ class TheIndianExpress extends Publisher {
             content: "",
             excerpt: excerpt,
             author: "",
-            url: articleUrl.replaceFirst(homePage, ""),
+            url: articleUrl,
             tags: tags,
             thumbnail: thumbnail ?? "",
             publishedAt: stringToUnix(

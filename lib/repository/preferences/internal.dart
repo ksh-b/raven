@@ -22,4 +22,12 @@ class Internal {
     settings.put("sdkVersion", version);
   }
 
+  static int get dbVersion {
+    return settings.get("dbVersion", defaultValue: -1);
+  }
+
+  static set dbVersion(int version) {
+    settings.put("dbVersion", version);
+  }
+
 }

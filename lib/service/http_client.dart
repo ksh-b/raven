@@ -49,17 +49,21 @@ Dio dio() {
     maxWidth: 200,
     enabled: kDebugMode,
     logPrint: (object) async {
-      var directory = await getTemporaryDirectory();
-      File logs = File(
-        '${directory.path}/raven_logs.txt',
-      );
-      String log = "$object\n".replaceAll("║", "")
-          .replaceAll("╚", "")
-          .replaceAll("╔╣", "")
-          .replaceAll("╝", "")
-          .replaceAll("═", "")
-          .replaceAll("╟", "");
-      logs.writeAsStringSync(log, mode: FileMode.append);
+      try {
+        var directory = await getTemporaryDirectory();
+        File logs = File(
+          '${directory.path}/raven_logs.txt',
+        );
+        String log = "$object\n".replaceAll("║", "")
+            .replaceAll("╚", "")
+            .replaceAll("╔╣", "")
+            .replaceAll("╝", "")
+            .replaceAll("═", "")
+            .replaceAll("╟", "");
+        logs.writeAsStringSync(log, mode: FileMode.append);
+      } catch (e) {
+
+      }
     },
     filter: (options, args) {
       return !args.isResponse || !args.hasUint8ListData;

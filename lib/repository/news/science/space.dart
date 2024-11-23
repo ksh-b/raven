@@ -42,7 +42,7 @@ class Space extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       Document document = html_parser.parse(response.data);
       String? thumbnail = document.querySelector("picture img")?.attributes['src'];
@@ -97,7 +97,7 @@ class Space extends Publisher {
             content: content,
             excerpt: excerpt,
             author: author,
-            url: url?.replaceFirst(homePage, "") ?? "",
+            url: url ?? "",
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             tags: tags,
@@ -147,7 +147,7 @@ class Space extends Publisher {
             content: content,
             excerpt: excerpt,
             author: author,
-            url: url?.replaceFirst(homePage, "") ?? "",
+            url: url ?? "",
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             tags: tags,

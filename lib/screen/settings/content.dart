@@ -83,7 +83,7 @@ class _ContentPageState extends State<ContentPage> {
           ),
           InkWell(
             child: ListTile(
-              leading: const Icon(Icons.filter_alt_rounded), // TODO
+              leading: const Icon(Icons.filter_alt_rounded),
               title: const Text('Filter articles'),
               subtitle: const Text("Hide articles containing specified keywords"),
               trailing: Switch(

@@ -23,7 +23,7 @@ class XDAdevelopers extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get("$homePage${newsArticle.url}");
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       Document document = html_parser.parse(response.data);
       String? content = document.querySelector(".article-body")?.innerHtml;
@@ -83,7 +83,7 @@ class XDAdevelopers extends Publisher {
             articleElement.querySelector(".display-card-author")?.text;
         String? url = articleElement
             .querySelector(".display-card-title a")
-            ?.attributes["href"];
+            ?.attributes["href"]?? "";
         var tags = articleElement
             .querySelectorAll(".listing-title")
             .map((e) => e.text)
@@ -102,7 +102,7 @@ class XDAdevelopers extends Publisher {
             content: content ?? "",
             excerpt: excerpt ?? "",
             author: author ?? "",
-            url: url?.replaceFirst(homePage, "") ?? "",
+            url: homePage + url,
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             tags: tags,
@@ -135,7 +135,7 @@ class XDAdevelopers extends Publisher {
             articleElement.querySelector(".display-card-author")?.text;
         String? url = articleElement
             .querySelector(".display-card-title a")
-            ?.attributes["href"];
+            ?.attributes["href"]?? "";
         var tags = articleElement
             .querySelectorAll(".listing-title")
             .map((e) => e.text)
@@ -152,7 +152,7 @@ class XDAdevelopers extends Publisher {
             content: "",
             excerpt: excerpt ?? "",
             author: author ?? "",
-            url: url?.replaceFirst(homePage, "") ?? "",
+            url: homePage + url ,
             thumbnail: thumbnail ?? "",
             publishedAt: parsedTime,
             tags: tags,

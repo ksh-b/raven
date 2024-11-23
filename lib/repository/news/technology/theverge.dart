@@ -41,7 +41,7 @@ class TheVerge extends Publisher {
 
   @override
   Future<Article> article(Article newsArticle) async {
-    var response = await dio().get('$homePage${newsArticle.url}');
+    var response = await dio().get(newsArticle.url);
     if (response.successful) {
       var document = html_parser.parse(response.data);
       var articleElement = document.querySelector(
@@ -105,7 +105,7 @@ class TheVerge extends Publisher {
             content: "",
             excerpt: "",
             author: author ?? "",
-            url: articleUrl?.replaceFirst(homePage, "") ?? "",
+            url: homePage + (articleUrl?? ""),
             thumbnail: thumbnail ?? "",
             publishedAt: stringToUnix(time?.trim() ?? ""),
             category: category,
@@ -142,7 +142,7 @@ class TheVerge extends Publisher {
             content: "",
             excerpt: excerpt,
             author: "",
-            url: url.replaceFirst(homePage, ""),
+            url: url,
             thumbnail: thumbnail,
             publishedAt: dateEntry,
             category: "",
