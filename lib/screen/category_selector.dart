@@ -3,181 +3,283 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
-import 'package:raven/repository/store.dart';
+import 'package:raven/repository/publishers.dart';
 import 'package:raven/widget/custom_category_textbox.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class CategorySelector extends StatefulWidget {
-  final Map<String, Publisher> publishers;
-  final String newsSource;
+  final Map<String, Source> publishers;
+  final Source mainSource;
 
-  const CategorySelector(this.publishers, this.newsSource, {super.key});
+  const CategorySelector(this.publishers, this.mainSource, {super.key});
 
   @override
   State<CategorySelector> createState() => _CategorySelectorState();
 }
 
 class _CategorySelectorState extends State<CategorySelector> {
-  ValueNotifier<String> customCategory = ValueNotifier<String>("");
-  TextEditingController customCategoryController = TextEditingController();
-  Map<String, String> categories = {};
-  List<UserSubscription> availableSubscriptions = [];
-  late Future<Map<String, String>> futureCategories;
-
   @override
   void initState() {
     super.initState();
-    futureCategories = Publisher.fromString(widget.newsSource).categories;
   }
 
   @override
   Widget build(BuildContext context) {
-    Set<UserSubscription> defaultSubscription = {
-      UserSubscription(widget.newsSource, "Default", "/")
-    };
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("${widget.newsSource} categories"),
+    return DefaultTabController(
+      length: widget.mainSource.otherVersions.length + 1,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("${widget.mainSource.name} categories"),
+          actions: [
+            widget.mainSource.homePage.isNotEmpty
+                ? IconButton(
+                    icon: Icon(Icons.launch_rounded),
+                    onPressed: () {
+                      launchUrlString(widget.mainSource.homePage);
+                    },
+                  )
+                : SizedBox.shrink()
+          ],
+          bottom: TabBar(
+            tabs: [Tab(icon: Text("Main"))] +
+            widget.mainSource.otherVersions.map((e) => Tab(icon: Text(e.name)),).toList(),
+          ),
+        ),
+        body: TabBarView(children: [
+          SourceCategoryTabContent(
+            source: widget.mainSource,
+          )
+        ]+widget.mainSource.otherVersions.map((e) => SourceCategoryTabContent(
+          source: e,
+        )).toList()),
       ),
-      body: ValueListenableBuilder(
-        valueListenable: SubscriptionPref.subscriptions.listenable(),
-        builder: (context, value, child) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                widget.publishers[widget.newsSource]!.hasSearchSupport
-                    ? ActionChip(
-                        label: const Text("Has search support"),
-                        avatar: const Icon(Icons.search_rounded),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-                Flexible(
-                  child: FutureBuilder<Map<String, String>>(
-                      future: futureCategories,
-                      builder: (context, categories) {
-                        if (categories.hasError ||
-                            (categories.hasData && categories.data!.isEmpty)) {
-                          return const SizedBox.shrink();
-                        } else if (categories.hasData &&
-                            categories.data!.isNotEmpty) {
-                          categories.data!.forEach((key, value) {
-                            availableSubscriptions.add(
-                              UserSubscription(widget.newsSource, key, value),
-                            );
-                          });
-                          List<UserSubscription> allSubscriptions =
-                              defaultSubscription
-                                  .union(availableSubscriptions.toSet())
-                                  .union(SubscriptionPref.customSubscriptions.toSet())
-                                  .union(SubscriptionPref.selectedSubscriptions.toSet())
-                                  .where((element) =>
-                                      element.publisher == widget.newsSource)
-                                  .toList();
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: allSubscriptions.length + 2,
-                            itemBuilder: (context, index) {
-                              if (index < allSubscriptions.length) {
-                                var subscription = allSubscriptions[index];
-                                return ListTile(
-                                  title: Text(subscription.categoryLabel),
-                                  subtitle: Text(subscription.categoryPath),
-                                  trailing: Flex(
-                                    mainAxisSize: MainAxisSize.min,
-                                    direction: Axis.horizontal,
-                                    children: [
-                                      if (subscription.isCustom)
-                                        DeleteCustomCategory(
-                                          subscription: subscription,
-                                        ),
-                                      Checkbox(
-                                        value: SubscriptionPref.selectedSubscriptions
-                                            .contains(subscription),
-                                        onChanged: (value) {
-                                          updateSubscription(
-                                            value,
-                                            subscription,
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
+    );
+  }
+}
 
-                              // custom categories selector
-                              else if (index == (allSubscriptions.length + 1) &&
-                                  Publisher.fromString(widget.newsSource)
-                                      .hasCustomSupport) {
-                                return ValueListenableBuilder(
-                                  valueListenable: customCategory,
-                                  builder: (BuildContext context, value,
-                                      Widget? child) {
-                                    return Flex(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      direction: Axis.horizontal,
-                                      children: [
-                                        Flexible(
-                                          flex: 3,
-                                          fit: FlexFit.tight,
-                                          child: TextField(
-                                            controller:
-                                                customCategoryController,
-                                            decoration: const InputDecoration(
-                                              border: OutlineInputBorder(),
-                                              hintText: "Custom URL",
-                                            ),
-                                            onSubmitted: (value) {
-                                              customCategory.value = value;
-                                            },
-                                          ),
-                                        ),
-                                        if (customCategory.value.isEmpty)
-                                          const Flexible(
-                                              child: SizedBox.shrink())
-                                        else
-                                          CustomCategoryTextBox(
-                                            widget: widget,
-                                            customCategoryPath:
-                                                customCategory.value,
-                                            customCategoryController:
-                                                customCategoryController,
-                                          )
-                                      ],
-                                    );
-                                  },
-                                );
-                              } else {
-                                return const SizedBox.shrink();
-                              }
-                            },
+class SourceCategoryTabContent extends StatefulWidget {
+  final Source source;
+
+  SourceCategoryTabContent({
+    super.key,
+    required this.source,
+  });
+
+  @override
+  State<SourceCategoryTabContent> createState() =>
+      _SourceCategoryTabContentState();
+}
+
+class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
+  late Future<Map<String, String>> futureCategories;
+  final ValueNotifier<String> customCategory = ValueNotifier<String>("");
+  final TextEditingController customCategoryController =
+      TextEditingController();
+  final Map<String, String> categories = {};
+  final List<UserSubscription> availableSubscriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    futureCategories = widget.source.categories();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: SubscriptionPref.subscriptions.listenable(),
+      builder: (context, value, child) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              widget.source.hasSearchSupport
+                  ? ActionChip(
+                      label: const Text("Has search support"),
+                      avatar: const Icon(Icons.search_rounded),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+              Flexible(
+                child: FutureBuilder<Map<String, String>>(
+                    future: futureCategories,
+                    builder: (context, categories) {
+                      var noData =
+                          categories.hasData && categories.data!.isEmpty;
+                      if (categories.hasError || noData) {
+                        return const SizedBox.shrink();
+                      } else if (categories.hasData &&
+                          categories.data!.isNotEmpty) {
+                        categories.data!.forEach((key, value) {
+                          availableSubscriptions.add(
+                            UserSubscription(widget.source, key, value),
                           );
-                        }
-                        return const LinearProgressIndicator();
-                      }),
-                ),
-              ],
+                        });
+                        List<UserSubscription> allSubscriptions =
+                            availableSubscriptions
+                                .toSet()
+                                .union(SubscriptionPref.customSubscriptions
+                                    .toSet())
+                                .union(SubscriptionPref.selectedSubscriptions
+                                    .toSet())
+                                .where((element) =>
+                                    element.source == widget.source)
+                                .toList();
+                        return CategoriesList(
+                          allSubscriptions: allSubscriptions,
+                          source: widget.source,
+                          customCategory: customCategory,
+                          customCategoryController: customCategoryController,
+                        );
+                      }
+                      return const LinearProgressIndicator();
+                    }),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class CategoriesList extends StatelessWidget {
+  const CategoriesList({
+    super.key,
+    required this.allSubscriptions,
+    required this.source,
+    required this.customCategory,
+    required this.customCategoryController,
+  });
+
+  final List<UserSubscription> allSubscriptions;
+  final Source source;
+  final ValueNotifier<String> customCategory;
+  final TextEditingController customCategoryController;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: allSubscriptions.length + 2,
+      itemBuilder: (context, index) {
+        var shouldShowCustom = index == (allSubscriptions.length + 1) &&
+            source.hasCustomSupport;
+        if (index < allSubscriptions.length) {
+          return CategoryCheckbox(subscription: allSubscriptions[index]);
+        }
+
+        // custom categories selector
+        return CustomCategoriesSelector(
+          customCategory: customCategory,
+          customCategoryController: customCategoryController,
+          source: source,
+          shouldShowCustom: shouldShowCustom,
+        );
+      },
+    );
+  }
+}
+
+class CategoryCheckbox extends StatelessWidget {
+  final UserSubscription subscription;
+
+  CategoryCheckbox({required this.subscription, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(subscription.categoryLabel),
+      subtitle: Text(subscription.categoryPath),
+      trailing: Flex(
+        mainAxisSize: MainAxisSize.min,
+        direction: Axis.horizontal,
+        children: [
+          if (subscription.isCustom)
+            DeleteCustomCategory(
+              subscription: subscription,
             ),
-          );
-        },
+          Checkbox(
+            value:
+                SubscriptionPref.selectedSubscriptions.contains(subscription),
+            onChanged: (value) {
+              updateSubscription(
+                value,
+                subscription,
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 
   void updateSubscription(bool? checked, UserSubscription subscription) {
     if (checked!) {
-      SubscriptionPref.selectedSubscriptions = SubscriptionPref.selectedSubscriptions
-        ..add(subscription);
+      SubscriptionPref.selectedSubscriptions =
+          SubscriptionPref.selectedSubscriptions..add(subscription);
     } else {
-      SubscriptionPref.selectedSubscriptions = SubscriptionPref.selectedSubscriptions
-        ..remove(subscription);
+      SubscriptionPref.selectedSubscriptions =
+          SubscriptionPref.selectedSubscriptions..remove(subscription);
     }
+  }
+}
+
+class CustomCategoriesSelector extends StatelessWidget {
+  const CustomCategoriesSelector({
+    super.key,
+    required this.customCategory,
+    required this.customCategoryController,
+    required this.source,
+    required this.shouldShowCustom,
+  });
+
+  final ValueNotifier<String> customCategory;
+  final TextEditingController customCategoryController;
+  final Source source;
+  final bool shouldShowCustom;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!shouldShowCustom) {
+      return SizedBox.shrink();
+    }
+    return ValueListenableBuilder(
+      valueListenable: customCategory,
+      builder: (BuildContext context, value, Widget? child) {
+        return Flex(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          direction: Axis.horizontal,
+          children: [
+            Flexible(
+              flex: 3,
+              fit: FlexFit.tight,
+              child: TextField(
+                controller: customCategoryController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "Custom URL",
+                ),
+                onSubmitted: (value) {
+                  customCategory.value = value;
+                },
+              ),
+            ),
+            if (customCategory.value.isEmpty)
+              const Flexible(child: SizedBox.shrink())
+            else
+              CustomCategoryTextBox(
+                source: source,
+                customCategoryPath: customCategory.value,
+                customCategoryController: customCategoryController,
+              )
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -199,9 +301,10 @@ class DeleteCustomCategory extends StatelessWidget {
 
   void deleteCustomSubscription(UserSubscription subscription) {
     if (SubscriptionPref.selectedSubscriptions.contains(subscription)) {
-      SubscriptionPref.selectedSubscriptions = SubscriptionPref.selectedSubscriptions
-        ..remove(subscription);
+      SubscriptionPref.selectedSubscriptions =
+          SubscriptionPref.selectedSubscriptions..remove(subscription);
     }
-    SubscriptionPref.customSubscriptions = SubscriptionPref.customSubscriptions..remove(subscription);
+    SubscriptionPref.customSubscriptions = SubscriptionPref.customSubscriptions
+      ..remove(subscription);
   }
 }

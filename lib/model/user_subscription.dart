@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:raven/model/publisher.dart';
 
 part 'user_subscription.g.dart';
 
@@ -7,7 +8,7 @@ part 'user_subscription.g.dart';
 @HiveType(typeId: 0)
 class UserSubscription extends HiveObject {
   @HiveField(0)
-  String publisher;
+  Source source;
 
   @HiveField(1)
   String categoryPath;
@@ -18,7 +19,7 @@ class UserSubscription extends HiveObject {
   @HiveField(3)
   bool isCustom;
 
-  UserSubscription(this.publisher, this.categoryLabel, this.categoryPath,
+  UserSubscription(this.source, this.categoryLabel, this.categoryPath,
       {this.isCustom = false});
 
   @override
@@ -26,12 +27,17 @@ class UserSubscription extends HiveObject {
       identical(this, other) ||
       other is UserSubscription &&
           runtimeType == other.runtimeType &&
-          publisher == other.publisher &&
+          source.id == other.source.id&&
           categoryPath == other.categoryPath &&
           categoryLabel == other.categoryLabel;
 
   @override
-  int get hashCode => publisher.hashCode ^ categoryPath.hashCode;
+  int get hashCode => source.id.hashCode ^ categoryPath.hashCode;
+
+  @override
+  String toString() {
+    return super.toString();
+  }
 
   factory UserSubscription.fromJson(Map<String, dynamic> json) => _$UserSubscriptionFromJson(json);
 

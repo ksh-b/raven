@@ -17,7 +17,8 @@ class ArticleAdapter extends TypeAdapter<Article> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Article(
-      publisher: fields[1] as String,
+      source: fields[0] as Source,
+      sourceName: fields[1] as String,
       title: fields[2] as String,
       content: fields[3] as String,
       excerpt: fields[4] as String,
@@ -27,15 +28,18 @@ class ArticleAdapter extends TypeAdapter<Article> {
       category: fields[8] as String,
       tags: (fields[9] as List).cast<String>(),
       publishedAt: fields[10] as int,
+      publishedAtString: fields[12] as String,
     )..metadata = (fields[11] as Map).cast<String, String>();
   }
 
   @override
   void write(BinaryWriter writer, Article obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(13)
+      ..writeByte(0)
+      ..write(obj.source)
       ..writeByte(1)
-      ..write(obj.publisher)
+      ..write(obj.sourceName)
       ..writeByte(2)
       ..write(obj.title)
       ..writeByte(3)
@@ -54,6 +58,8 @@ class ArticleAdapter extends TypeAdapter<Article> {
       ..write(obj.tags)
       ..writeByte(10)
       ..write(obj.publishedAt)
+      ..writeByte(12)
+      ..write(obj.publishedAtString)
       ..writeByte(11)
       ..write(obj.metadata);
   }
@@ -74,7 +80,8 @@ class ArticleAdapter extends TypeAdapter<Article> {
 // **************************************************************************
 
 Article _$ArticleFromJson(Map<String, dynamic> json) => Article(
-      publisher: json['publisher'] as String,
+      source: Source.fromJson(json['source'] as Map<String, dynamic>),
+      sourceName: json['sourceName'] as String,
       title: json['title'] as String,
       content: json['content'] as String,
       excerpt: json['excerpt'] as String,
@@ -84,10 +91,12 @@ Article _$ArticleFromJson(Map<String, dynamic> json) => Article(
       category: json['category'] as String,
       tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
       publishedAt: (json['publishedAt'] as num).toInt(),
+      publishedAtString: json['publishedAtString'] as String,
     )..metadata = Map<String, String>.from(json['metadata'] as Map);
 
 Map<String, dynamic> _$ArticleToJson(Article instance) => <String, dynamic>{
-      'publisher': instance.publisher,
+      'source': instance.source,
+      'sourceName': instance.sourceName,
       'title': instance.title,
       'content': instance.content,
       'excerpt': instance.excerpt,
@@ -97,5 +106,6 @@ Map<String, dynamic> _$ArticleToJson(Article instance) => <String, dynamic>{
       'category': instance.category,
       'tags': instance.tags,
       'publishedAt': instance.publishedAt,
+      'publishedAtString': instance.publishedAtString,
       'metadata': instance.metadata,
     };

@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:raven/model/publisher.dart';
 
 part 'article.g.dart';
 
@@ -13,8 +14,10 @@ enum Metadata {
 @JsonSerializable()
 @HiveType(typeId: 1)
 class Article {
+  @HiveField(0)
+  Source source;
   @HiveField(1)
-  String publisher;
+  String sourceName;
   @HiveField(2)
   String title;
   @HiveField(3)
@@ -33,11 +36,14 @@ class Article {
   List<String> tags;
   @HiveField(10)
   int publishedAt;
+  @HiveField(12)
+  String publishedAtString;
   @HiveField(11)
   Map<String, String> metadata = {};
 
   Article({
-    required this.publisher,
+    required this.source,
+    required this.sourceName,
     required this.title,
     required this.content,
     required this.excerpt,
@@ -47,6 +53,7 @@ class Article {
     required this.category,
     required this.tags,
     required this.publishedAt,
+    required this.publishedAtString,
 
   });
 
@@ -59,10 +66,12 @@ class Article {
     String? thumbnail,
     List<String>? tags,
     int? publishedAt,
+    String? publishedAtString,
     String? category,
   }) {
     return Article(
-      publisher: publisher,
+      source: source,
+      sourceName: sourceName,
       title: title ?? this.title,
       content: content ?? this.content,
       excerpt: excerpt ?? this.excerpt,
@@ -70,6 +79,7 @@ class Article {
       url: url ?? this.url,
       thumbnail: thumbnail ?? this.thumbnail,
       publishedAt: publishedAt ?? this.publishedAt,
+      publishedAtString: publishedAtString ?? this.publishedAtString,
       category: category ?? this.category,
       tags: this.tags,
     );
@@ -79,5 +89,16 @@ class Article {
 
   Map<String, dynamic> toJson() => _$ArticleToJson(this);
 
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is Article &&
+            runtimeType == other.runtimeType &&
+            title == other.title &&
+            source.id == other.source.id;
+  }
+
+  @override
+  int get hashCode => title.hashCode ^ source.id.hashCode;
 
 }

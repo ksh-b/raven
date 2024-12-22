@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/trends.dart';
 import 'package:raven/screen/customize_filters.dart';
+import 'package:raven/screen/subscriptions_provider.dart';
 import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/widget/options_popup.dart';
 
@@ -21,6 +22,22 @@ class _ContentPageState extends State<ContentPage> {
       ),
       body: ListView(
         children: [
+          ListTile(
+            subtitle: Text("Subscription Providers"),
+            visualDensity: VisualDensity.compact,
+            dense: true,
+          ),
+          ListTile(
+            leading: const Icon(Icons.public_rounded),
+            title: const Text('Manage'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SubscriptionsManager()),
+              );
+            },
+          ),
+          Divider(),
           ListTile(
             subtitle: Text("Search suggestions"),
             visualDensity: VisualDensity.compact,

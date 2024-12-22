@@ -4,11 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:raven/model/category.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/provider/category_search.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
-import 'package:raven/repository/store.dart';
 import 'package:raven/screen/category_selector.dart';
 
 import '../repository/publishers.dart';
@@ -23,7 +21,7 @@ class SubscriptionsPage extends StatefulWidget {
 class _SubscriptionsPageState extends State<SubscriptionsPage>
     with AutomaticKeepAliveClientMixin {
   TextEditingController searchController = TextEditingController();
-  String _value = "all";
+  String _value = "All";
 
   @override
   Widget build(BuildContext context) {
@@ -64,11 +62,16 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                 child: DropdownButtonFormField(
                   value: _value,
                   onChanged: (selected) {
-                    _value = selected ?? "all";
+                    _value = selected ?? "All";
                     search.searchPublishersByName(searchController.text);
                     search.searchPublishersByCategory(_value);
                   },
-                  items: (["all"] + Category.values.map((e) => e.name).toList())
+                  items: (["All"] +
+                          (publishers.values
+                                  .map((value) => value.siteCategories))
+                              .expand((i) => i)
+                              .toList())
+                      .toSet()
                       .map((item) {
                     return DropdownMenuItem(
                       value: item,
@@ -88,29 +91,39 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                     return ListView.builder(
                       itemCount: search.filteredPublishers.length,
                       itemBuilder: (context, sourceIndex) {
-                        var newsSource = search.filteredPublishers[sourceIndex];
-                        var categories = getSelectedCategories(newsSource);
+                        Source source = search.filteredPublishers[sourceIndex];
+                        var categories = getSelectedCategories(source);
                         return ListTile(
-                          title: Text(newsSource),
-                          leading: CachedNetworkImage(
-                            imageUrl: Publisher.fromString(newsSource).iconUrl,
-                            progressIndicatorBuilder: (
-                              context,
-                              url,
-                              downloadProgress,
-                            ) {
-                              return CircularProgressIndicator(
-                                value: downloadProgress.progress,
-                              );
-                            },
-                            height: 24,
-                            width: 24,
-                            errorWidget: (context, url, error) => CircleAvatar(
-                              child: Text(
-                                newsSource.characters.first,
+                          title: Text(source.name),
+                          leading: ClipOval(
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: source.iconUrl,
+                              progressIndicatorBuilder: (
+                                context,
+                                url,
+                                downloadProgress,
+                              ) {
+                                return CircularProgressIndicator(
+                                  value: downloadProgress.progress,
+                                );
+                              },
+                              height: 40,
+                              width: 40,
+                              errorWidget: (context, url, error) => CircleAvatar(
+                                child: Text(
+                                  source.name.characters.first,
+                                ),
                               ),
                             ),
                           ),
+                          subtitle: categories.isNotEmpty
+                              ? Text(
+                                  categories,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              : SizedBox.shrink(),
                           trailing: categories.isEmpty
                               ? const SizedBox.shrink()
                               : const Icon(Icons.check_circle),
@@ -120,12 +133,12 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
                               MaterialPageRoute(
                                 builder: (context) => CategorySelector(
                                   publishers,
-                                  newsSource,
+                                  source,
                                 ),
                               ),
                             )
                                 .whenComplete(() {
-                              categories = getSelectedCategories(newsSource);
+                              categories = getSelectedCategories(source);
                             });
                           },
                         );
@@ -141,18 +154,21 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
     );
   }
 
-  String getSelectedCategories(String newsSource) {
+  String getSelectedCategories(Source source) {
     var categories = SubscriptionPref.selectedSubscriptions
-        .where((element) => element.publisher == newsSource)
+        .where((saved) =>
+            saved.source.id == source.id ||
+            source.otherVersions.contains(saved.source))
         .map((e) {
-      var cat = e.categoryPath.split("/").where((i) => i.isNotEmpty);
-      return e.categoryPath != "/"
+      var cat = e.categoryLabel.split("/").where((i) => i.isNotEmpty);
+      return e.categoryLabel != "/"
           ? cat.isNotEmpty
               ? cat.last
               : ""
-          : e.categoryPath;
-    }).join(", ");
-    return categories;
+          : e.categoryLabel;
+    }).toList()
+      ..sort();
+    return categories.join(", ");
   }
 
   @override

@@ -71,13 +71,15 @@ class ArticleProviderConsumer extends StatelessWidget {
               onRefresh: () {
                 return articleProvider.refresh();
               },
-              child: ListView.builder(
+              child: ListView.separated(
+
                 itemCount: tiles.length + 2,
                 itemBuilder: (BuildContext context, int index) {
                   if (index == 0) {
-                    if (articleProvider.isLoading) {
-                      return const LinearProgressIndicator();
-                    } return const Tags();
+                    // if (articleProvider.isLoading) {
+                    //   return const LinearProgressIndicator();
+                    // } return const Tags();
+                    return SizedBox.shrink();
                   } else if (tiles.isNotEmpty && index - 1 < tiles.length) {
                     return tiles[index - 1];
                   } else {
@@ -93,7 +95,7 @@ class ArticleProviderConsumer extends StatelessWidget {
                       ),
                     );
                   }
-                },
+                }, separatorBuilder: (BuildContext context, int index) => Divider() ,
               ),
             );
           },

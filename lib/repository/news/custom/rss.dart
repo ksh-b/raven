@@ -1,4 +1,5 @@
 import 'package:dart_rss/dart_rss.dart';
+import 'package:dio/src/response.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/model/article.dart';
@@ -9,21 +10,16 @@ import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/time.dart';
 
-class RSSFeed extends Publisher {
-  @override
-  String get name => "RSS Feed";
-
-  @override
-  String get homePage => "";
-
-  @override
-  Future<Map<String, String>> get categories async => {};
-
-  @override
-  String get mainCategory => Category.custom.name;
-
-  @override
-  bool get hasSearchSupport => false;
+class RSSFeed extends Source {
+  RSSFeed({
+    required super.id,
+    required super.name,
+    required super.homePage,
+    required super.hasSearchSupport,
+    required super.hasCustomSupport,
+    required super.iconUrl,
+    required super.siteCategories,
+  });
 
   @override
   String get iconUrl {
@@ -39,6 +35,7 @@ class RSSFeed extends Publisher {
   @override
   Future<Article> article(Article newsArticle) async {
     newsArticle = await FallbackProvider().get(newsArticle);
+    // remove thumbnail if content has it already
     if (newsArticle.thumbnail == _thumbnail(newsArticle.content)) {
       newsArticle.thumbnail = "";
     }
@@ -47,108 +44,135 @@ class RSSFeed extends Publisher {
 
   @override
   Future<Set<Article>> categoryArticles({
-    String category = "/",
+    String category = "",
     int page = 1,
   }) async {
     if (page > 1) return {};
     Set<Article> articles = {};
     try {
       var response = await dio().get(category);
-
       if (response.successful) {
         WebFeed feed = WebFeed.fromXmlString(response.data);
-        RssFeed rssFeed = const RssFeed();
-        Rss1Feed rss1Feed = const Rss1Feed();
-        AtomFeed atomFeed = const AtomFeed();
         if (feed.rssVersion == RssVersion.rss2) {
-          rssFeed = RssFeed.parse(response.data);
-          for (var item in rssFeed.items) {
-            var images = item.content?.images.toList() ?? [];
-            articles.add(
-              Article(
-                publisher: name,
-                title: item.title ?? "",
-                content: item.description ?? "",
-                excerpt: "",
-                author: item.author ?? "",
-                url: item.link?.trim() ?? "",
-                tags: item.categories.map((e) => e.value ?? "").toList(),
-                thumbnail: images.isNotEmpty
-                    ? images.first
-                    : _thumbnail(item.description ?? ""),
-                publishedAt:
-                    item.pubDate != null ? stringToUnix(item.pubDate!) : -1,
-                category: category,
-              ),
-            );
-          }
+          articles = getRss2Articles(response, category);
         } else if (feed.rssVersion == RssVersion.atom) {
-          atomFeed = AtomFeed.parse(response.data);
-          for (var item in atomFeed.items) {
-            var images = item.media?.thumbnails.toList() ?? [];
-            articles.add(
-              Article(
-                publisher: name,
-                title: item.title ?? "",
-                content: item.content ?? "",
-                excerpt: item.summary ?? "",
-                author: item.authors.join(", "),
-                url: item.links.first.href?.trim() ?? "",
-                tags: item.categories.map((e) => e.label ?? "").toList(),
-                thumbnail: images.isNotEmpty
-                    ? images.first.url ?? ""
-                    : _thumbnail(item.content ?? ""),
-                publishedAt:
-                    item.published != null ? stringToUnix(item.published!) : -1,
-                category: category,
-              ),
-            );
-          }
+          articles = getAtomArticles(response, category);
         } else if (feed.rssVersion == RssVersion.rss1) {
-          rss1Feed = Rss1Feed.parse(response.data);
-          for (var item in rss1Feed.items) {
-            var images = item.content?.images.toList() ?? [];
-            articles.add(
-              Article(
-                publisher: name,
-                title: item.title ?? "",
-                content: item.description ?? "",
-                excerpt: "",
-                author: item.dc?.contributor ?? "",
-                url: item.link?.trim() ?? "",
-                tags: item.dc?.subjects ?? [],
-                thumbnail: images.isNotEmpty
-                    ? images.first
-                    : _thumbnail(item.description ?? ""),
-                publishedAt:
-                    item.dc?.date != null ? stringToUnix(item.dc!.date!) : -1,
-                category: category,
-              ),
-            );
-          }
+          articles = getRss1Articles(response, category);
         } else {
-          for (var item in feed.items) {
-            articles.add(
-              Article(
-                publisher: name,
-                title: item.title,
-                content: item.body,
-                excerpt: "",
-                author: "",
-                url: item.links.isNotEmpty
-                    ? (item.links.first?.trim() ?? "")
-                    : "",
-                tags: [],
-                thumbnail: _thumbnail(item.body),
-                publishedAt: item.updated?.millisecondsSinceEpoch ?? -1,
-                category: category,
-              ),
-            );
-          }
+          articles = getFeedArticles(feed, category);
         }
       }
     } catch (e) {
       return articles;
+    }
+    return articles;
+  }
+
+  Set<Article> getFeedArticles(WebFeed feed, String category) {
+    Set<Article> articles = {};
+    for (var item in feed.items) {
+      articles.add(
+        Article(
+          source: this,
+          sourceName: name,
+          title: item.title,
+          content: item.body,
+          excerpt: "",
+          author: "",
+          url: item.links.isNotEmpty
+              ? (item.links.first?.trim() ?? "")
+              : "",
+          tags: [],
+          thumbnail: _thumbnail(item.body),
+          publishedAt: item.updated?.millisecondsSinceEpoch ?? -1,
+          publishedAtString: item.updated?.toIso8601String() ?? "",
+          category: category,
+        ),
+      );
+    }
+    return articles;
+  }
+
+  Set<Article> getRss1Articles(Response<dynamic> response, String category) {
+    Set<Article> articles = {};
+    var rss1Feed = Rss1Feed.parse(response.data);
+    for (var item in rss1Feed.items) {
+      var images = item.content?.images.toList() ?? [];
+      articles.add(
+        Article(
+          source: this,
+          sourceName: name,
+          title: item.title ?? "",
+          content: item.description ?? "",
+          excerpt: "",
+          author: item.dc?.contributor ?? "",
+          url: item.link?.trim() ?? "",
+          tags: item.dc?.subjects ?? [],
+          thumbnail: images.isNotEmpty
+              ? images.first
+              : _thumbnail(item.description ?? ""),
+          publishedAt:
+              item.dc?.date != null ? stringToUnix(item.dc!.date!) : -1,
+          publishedAtString: item.dc?.date ?? "",
+          category: category,
+        ),
+      );
+    }
+    return articles;
+  }
+
+  Set<Article> getAtomArticles(Response<dynamic> response, String category) {
+    Set<Article> articles = {};
+    var atomFeed = AtomFeed.parse(response.data);
+    for (var item in atomFeed.items) {
+      var images = item.media?.thumbnails.toList() ?? [];
+      articles.add(
+        Article(
+          source: this,
+          sourceName: name,
+          title: item.title ?? "",
+          content: item.content ?? "",
+          excerpt: item.summary ?? "",
+          author: item.authors.join(", "),
+          url: item.links.first.href?.trim() ?? "",
+          tags: item.categories.map((e) => e.label ?? "").toList(),
+          thumbnail: images.isNotEmpty
+              ? images.first.url ?? ""
+              : _thumbnail(item.content ?? ""),
+          publishedAt:
+              item.published != null ? stringToUnix(item.published!) : -1,
+          publishedAtString: item.published ?? "",
+          category: category,
+        ),
+      );
+    }
+    return articles;
+  }
+
+  Set<Article> getRss2Articles(Response<dynamic> response, String category) {
+    Set<Article> articles = {};
+    var rssFeed = RssFeed.parse(response.data);
+    for (var item in rssFeed.items) {
+      var images = item.content?.images.toList() ?? [];
+      articles.add(
+        Article(
+          source: this,
+          sourceName: name,
+          title: item.title ?? "",
+          content: item.description ?? "",
+          excerpt: "",
+          author: item.author ?? "",
+          url: item.link?.trim() ?? "",
+          tags: item.categories.map((e) => e.value ?? "").toList(),
+          thumbnail: images.isNotEmpty
+              ? images.first
+              : _thumbnail(item.description ?? ""),
+          publishedAt: item.pubDate != null ? stringToUnix(item.pubDate!) : -1,
+          publishedAtString: item.pubDate ?? "",
+          category: category,
+        ),
+      );
     }
     return articles;
   }

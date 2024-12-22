@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:raven/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
-import 'package:raven/repository/store.dart';
-import 'package:raven/screen/category_selector.dart';
+import 'package:raven/repository/publishers.dart';
 import 'package:raven/utils/string.dart';
 
 class CustomCategoryTextBox extends StatelessWidget {
   const CustomCategoryTextBox({
     super.key,
-    required this.widget,
+    required this.source,
     required this.customCategoryPath,
     required this.customCategoryController,
   });
 
-  final CategorySelector widget;
+  final Source source;
   final String customCategoryPath;
   final TextEditingController customCategoryController;
 
   @override
   Widget build(BuildContext context) {
-    var userDefinedCategory = widget.publishers[widget.newsSource]
+    var userDefinedCategory = publishers[source.id]
         ?.articles(category: customCategoryPath);
     return Flexible(
       flex: 1,
@@ -52,7 +52,7 @@ class CustomCategoryTextBox extends StatelessWidget {
     customCategoryController.text = "";
     SubscriptionPref.customSubscriptions += [
       UserSubscription(
-        widget.newsSource,
+        source,
         baseName(customCategoryPath),
         customCategoryPath,
         isCustom: true,

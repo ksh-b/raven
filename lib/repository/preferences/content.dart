@@ -1,4 +1,8 @@
 import 'package:raven/model/filter.dart';
+import 'package:raven/model/publisher.dart';
+import 'package:raven/model/source/repo.dart';
+import 'package:raven/model/stored_repo.dart';
+import 'package:raven/model/subscription_provider.dart';
 import 'package:raven/repository/store.dart';
 import 'package:raven/repository/trends.dart';
 
@@ -13,8 +17,11 @@ enum ContentPrefType {
   translatorEngine,
   country,
   filters,
+  subProviders,
+  sources,
+  repos,
   shouldCollapseFiltered,
-  shouldShowFilterReason
+  shouldShowFilterReason,
 }
 
 /// any,title,url,tag
@@ -125,4 +132,44 @@ class ContentPref {
   static set filters(List<Filter> filters) {
     Store.settings.put(ContentPrefType.filters.name, filters);
   }
+
+  static List<SubscriptionsProvider> get subProviders {
+    return List<SubscriptionsProvider>.from(
+      Store.settings.get(
+        ContentPrefType.subProviders.name,
+        defaultValue: [],
+      ),
+    );
+  }
+
+  static set subProviders(List<SubscriptionsProvider> subProviders) {
+    Store.settings.put(ContentPrefType.subProviders.name, subProviders);
+  }
+
+  static List<Source> get sources {
+    return List<Source>.from(
+      Store.settings.get(
+        ContentPrefType.sources.name,
+        defaultValue: [].cast<Source>(),
+      ),
+    );
+  }
+
+  static set sources(List<Source> sources) {
+    Store.settings.put(ContentPrefType.sources.name, sources);
+  }
+
+  static List<StoredRepo> get repos {
+    return List<StoredRepo>.from(
+      Store.settings.get(
+        ContentPrefType.repos.name,
+        defaultValue: [].cast<StoredRepo>(),
+      ),
+    );
+  }
+
+  static set repos(List<StoredRepo> repos) {
+    Store.settings.put(ContentPrefType.repos.name, repos);
+  }
+
 }

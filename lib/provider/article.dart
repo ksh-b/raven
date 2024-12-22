@@ -42,25 +42,26 @@ class ArticleProvider extends ChangeNotifier {
     _lock = true;
     notifyListeners();
     Set<Article> articles = {};
-    Set<String> publishers = SubscriptionPref.selectedSubscriptions
-        .map((e) => e.publisher)
+    Set<Source> publishers = SubscriptionPref.selectedSubscriptions
+        .map((e) => e.source)
         .toList()
         .toSet();
-    for (String publisher in publishers) {
+    for (Source publisher in publishers) {
       List<String> categories =
           SubscriptionPref.selectedSubscriptions.where((subscription) {
-        return subscription.publisher == publisher;
+        return subscription.source == publisher;
       }).map((subscription) {
         return subscription.categoryPath;
       }).toList();
-      tags.putIfAbsent(
-          Publisher.fromString(publisher).mainCategory.toCapitalized, () => 1);
-      tags.putIfAbsent(Publisher.fromString(publisher).name, () => 3);
+      // for (var cat in publisher.siteCategories) {
+      //   tags.putIfAbsent(cat.toCapitalized, () => 1);
+      // }
+      tags.putIfAbsent(publisher.name, () => 3);
 
       for (String category in categories) {
         Set<Article> categoryArticles = {};
         try {
-          categoryArticles = await Publisher.fromString(publisher)
+          categoryArticles = await publisher
               .categoryArticles(category: category, page: _page);
         } catch (e) {
           continue;
@@ -79,9 +80,9 @@ class ArticleProvider extends ChangeNotifier {
       }
     }
 
-    List<MapEntry<String, int>> entries = tags.entries.toList();
-    entries.sort((e1, e2) => tags[e2.key]!.compareTo(tags[e1.key]!));
-    _tags = Map.fromEntries(entries);
+    List<MapEntry<String, int>> sortedTags = tags.entries.where((it) => it.key.isNotEmpty).toList();
+    sortedTags.sort((e1, e2) => tags[e2.key]!.compareTo(tags[e1.key]!));
+    _tags = Map.fromEntries(sortedTags);
 
     articles = (articles.toList()
           ..sort((a, b) => b.publishedAt.compareTo(a.publishedAt)))
@@ -91,7 +92,7 @@ class ArticleProvider extends ChangeNotifier {
       String keyword_ = "";
       articles.map((article) {
         var shouldHide = ContentPref.filters.where((filter) {
-          return filter.publisher == article.publisher ||
+          return filter.publisher == article.source.id ||
               filter.publisher == "any";
         }).where((filter) {
           var keyword = RegExp(filter.keyword.toLowerCase());
@@ -147,10 +148,10 @@ class ArticleProvider extends ChangeNotifier {
       _filteredArticles = _articles;
     } else {
       _filteredArticles = _articles.where((element) {
-        return selectedTags.contains(element.publisher) ||
+        return selectedTags.contains(element.source.id) ||
             selectedTags.contains(element.category) ||
-            selectedTags.contains(Publisher.fromString(element.publisher)
-                .mainCategory
+            selectedTags.contains(element.source
+                .siteCategories.toString() // FIXME
                 .toLowerCase()) ||
             element.tags.any((element) => selectedTags.contains(element));
       }).toSet();

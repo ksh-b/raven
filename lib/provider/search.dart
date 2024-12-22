@@ -43,18 +43,17 @@ class ArticleSearchProvider extends ChangeNotifier {
     _lock = true;
     notifyListeners();
     Set<Article> articles = {};
-    Set<String> publishers = SubscriptionPref.selectedSubscriptions
+    Set<Source> publishers = SubscriptionPref.selectedSubscriptions
         .where((e) {
-          return Publisher.fromString(e.publisher).hasSearchSupport;
+          return e.source.hasSearchSupport;
         })
-        .map((e) => e.publisher)
+        .map((e) => e.source)
         .toList()
         .toSet();
-    for (String publisher in publishers) {
-      _tags.putIfAbsent(
-          Publisher.fromString(publisher).mainCategory.toCapitalized, () => 1);
-      _tags.putIfAbsent(Publisher.fromString(publisher).name, () => 3);
-      var searchedArticles = await Publisher.fromString(publisher)
+    for (Source publisher in publishers) {
+      _tags.putIfAbsent(publisher.toString().toCapitalized, () => 1); // fixme
+      _tags.putIfAbsent(publisher.name, () => 3);
+      var searchedArticles = await publisher
           .searchedArticles(searchQuery: _searchQuery, page: page);
       articles.addAll(searchedArticles);
       for (var cArticle in searchedArticles) {
@@ -94,10 +93,10 @@ class ArticleSearchProvider extends ChangeNotifier {
       _filteredArticles = _articles;
     } else {
       _filteredArticles = _articles.where((element) {
-        return selectedTags.contains(element.publisher) ||
+        return selectedTags.contains(element.source.id) ||
             selectedTags.contains(element.category) ||
-            selectedTags.contains(Publisher.fromString(element.publisher)
-                .mainCategory
+            selectedTags.contains(element.source
+                .siteCategories.toString() // fixme
                 .toLowerCase()) ||
             element.tags.any((element) => selectedTags.contains(element));
       }).toSet();

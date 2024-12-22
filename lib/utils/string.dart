@@ -30,7 +30,7 @@ String findStringBetween(String text, String start, String end) {
 }
 
 String baseName(String input) {
-  return path.basenameWithoutExtension(input).toTitleCase;
+  return path.basenameWithoutExtension(input);
 }
 
 extension StringCasingExtension on String {

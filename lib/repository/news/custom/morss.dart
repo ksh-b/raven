@@ -9,21 +9,21 @@ import 'package:raven/utils/html_helper.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/time.dart';
 
-class Morss extends Publisher {
-  @override
-  String get name => "morss";
+class Morss extends Source {
+  Morss({
+    required super.id,
+    required super.name,
+    required super.homePage,
+    required super.hasSearchSupport,
+    required super.hasCustomSupport,
+    required super.iconUrl,
+    required super.siteCategories,
+  });
 
   @override
-  String get homePage => "https://morss.it";
-
-  @override
-  Future<Map<String, String>> get categories async => {};
-
-  @override
-  String get mainCategory => Category.custom.name;
-
-  @override
-  bool get hasSearchSupport => false;
+  String get iconUrl {
+    return "https://morss.it/favicon.ico";
+  }
 
   @override
   Future<Article> article(Article newsArticle) async {
@@ -66,7 +66,8 @@ class Morss extends Publisher {
           }
           articles.add(
             Article(
-              publisher: name,
+              source: this,
+              sourceName: name,
               title: item["title"] ?? "",
               content: content,
               excerpt: excerpt,
@@ -76,6 +77,7 @@ class Morss extends Publisher {
               thumbnail: "",
               publishedAt:
                   item.containsKey("time") ? isoToUnix(item["time"]) : -1,
+              publishedAtString: item.containsKey("time"),
               category: category,
             ),
           );

@@ -17,7 +17,7 @@ class UserSubscriptionAdapter extends TypeAdapter<UserSubscription> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UserSubscription(
-      fields[0] as String,
+      fields[0] as Source,
       fields[2] as String,
       fields[1] as String,
       isCustom: fields[3] as bool,
@@ -29,7 +29,7 @@ class UserSubscriptionAdapter extends TypeAdapter<UserSubscription> {
     writer
       ..writeByte(4)
       ..writeByte(0)
-      ..write(obj.publisher)
+      ..write(obj.source)
       ..writeByte(1)
       ..write(obj.categoryPath)
       ..writeByte(2)
@@ -55,7 +55,7 @@ class UserSubscriptionAdapter extends TypeAdapter<UserSubscription> {
 
 UserSubscription _$UserSubscriptionFromJson(Map<String, dynamic> json) =>
     UserSubscription(
-      json['publisher'] as String,
+      Source.fromJson(json['source'] as Map<String, dynamic>),
       json['categoryLabel'] as String,
       json['categoryPath'] as String,
       isCustom: json['isCustom'] as bool? ?? false,
@@ -63,7 +63,7 @@ UserSubscription _$UserSubscriptionFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$UserSubscriptionToJson(UserSubscription instance) =>
     <String, dynamic>{
-      'publisher': instance.publisher,
+      'source': instance.source,
       'categoryPath': instance.categoryPath,
       'categoryLabel': instance.categoryLabel,
       'isCustom': instance.isCustom,

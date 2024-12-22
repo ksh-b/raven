@@ -1,15 +1,19 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/provider/theme.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/saved.dart';
-import 'package:raven/repository/store.dart';
 import 'package:raven/screen/full_article.dart';
 import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/rounded_chip.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -26,52 +30,36 @@ class ArticleCard extends StatefulWidget {
 class _ArticleCardState extends State<ArticleCard> {
   @override
   Widget build(BuildContext context) {
-    var filtered = widget.article.metadata.keys.contains(Metadata.filtered.name);
+    var filtered =
+        widget.article.metadata.keys.contains(Metadata.filtered.name);
 
-    return Dismissible(
-      key: Key(widget.article.url),
-      direction: DismissDirection.startToEnd,
-      background: const Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: EdgeInsets.only(left: 16),
-          child: Icon(Icons.save_alt_rounded),
-        ),
-      ),
-      confirmDismiss: saveArticle,
-      child: InkWell(
-        child: filtered?ExpansionTile(
-          leading: Icon(Icons.hide_source_rounded),
-          title: Text("Excluded based on your criteria"),
-          subtitle: Text(widget.article.metadata[Metadata.filtered.name]??""),
-          children: [
-            VisibleArticleCard(widget: widget),
-          ],
-        ):VisibleArticleCard(widget: widget),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ArticlePage(widget.article)),
-          );
-        },
-      ),
+    return InkWell(
+      child: filtered
+          ? ExpansionTile(
+              leading: Icon(Icons.hide_source_rounded),
+              title: Text("Excluded based on your criteria"),
+              subtitle:
+                  Text(widget.article.metadata[Metadata.filtered.name] ?? ""),
+              children: [
+                VisibleArticleCard(widget: widget),
+              ],
+            )
+          : VisibleArticleCard(widget: widget),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ArticlePage(widget.article)),
+        );
+      },
     );
   }
 
-  Future<bool?> saveArticle(DismissDirection direction) async {
-    if (direction == DismissDirection.startToEnd) {
-      Article article =
-          await SimplyTranslate().translateArticle(widget.article);
-      SavedArticles.saveArticle(article);
-      return false;
-    }
-    return null;
-  }
 }
 
-class VisibleArticleCard extends StatelessWidget {
-  const VisibleArticleCard({
+class VisibleArticleCard extends StatefulWidget {
+
+  VisibleArticleCard({
     super.key,
     required this.widget,
   });
@@ -79,51 +67,97 @@ class VisibleArticleCard extends StatelessWidget {
   final ArticleCard widget;
 
   @override
+  State<VisibleArticleCard> createState() => _VisibleArticleCardState();
+}
+
+class _VisibleArticleCardState extends State<VisibleArticleCard> {
+
+  ValueNotifier<bool> saving = ValueNotifier<bool>(false);
+
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Flex(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        direction: Axis.vertical,
-        children: [
-          ContentPref.shouldLoadImages?
-          Flexible(
-            flex: 1,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Stack(
-                alignment: Alignment.bottomLeft,
-                children: [
-                  ArticleThumbnail(widget: widget),
-                  Chips(widget: widget),
-                ],
-              ),
-            ),
-          ):SizedBox.shrink(),
-          Flexible(
-            flex: 4,
-            child: ListTile(
-              title: ArticleTitle(widget: widget),
-              dense: false,
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Flex(
-                  direction: Axis.horizontal,
-                  children: [
-                    PublisherFavicon(widget: widget),
-                    const SizedBox(
-                      width: 12,
+    return Flex(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      direction: Axis.vertical,
+      children: [
+        Flexible(
+          child: ListTile(
+            dense: true,
+            visualDensity: VisualDensity.compact,
+            title: ArticlePublisherDetails(widget: widget.widget),
+            subtitle: Text(widget.widget.article.category),
+            leading: PublisherFavicon(widget: widget.widget),
+          ),
+        ),
+        Flexible(
+          child: ListTile(
+            title: ArticleTitle(widget: widget.widget),
+            dense: false,
+          ),
+        ),
+        ContentPref.shouldLoadImages
+            ? Flexible(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Stack(
+                      alignment: Alignment.bottomLeft,
+                      children: [
+                        ArticleThumbnail(widget: widget.widget),
+                        Chips(widget: widget.widget),
+                      ],
                     ),
-                    ArticlePublisherDetails(widget: widget),
-                  ],
+                  ),
                 ),
-              ),
+              )
+            : SizedBox.shrink(),
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.share_rounded),
+                  visualDensity: VisualDensity.standard,
+                  onPressed: () {
+                    Share.shareUri(Uri.parse(widget.widget.article.url));
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.bookmark_outline_rounded),
+                  visualDensity: VisualDensity.standard,
+                  onPressed: () {},
+                ),
+                ValueListenableBuilder(
+                  valueListenable: saving,
+                  builder: (BuildContext context, bool isSaving, Widget? child) {
+                    return IconButton(
+                      icon: isSaving?CircularProgressIndicator():Icon(Icons.save_alt_rounded),
+                      visualDensity: VisualDensity.standard,
+                      onPressed: !isSaving?() async {
+                        saving.value = true;
+                        await saveArticle();
+                        saving.value = false;
+                      }:null,
+                    );
+                  },
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
+  }
+
+  Future<void> saveArticle() async {
+    Article article =
+    await SimplyTranslate().translateArticle(widget.widget.article);
+    SavedArticles.saveArticle(article);
   }
 }
 
@@ -138,7 +172,7 @@ class ArticlePublisherDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      "${widget.article.publisher} • ${unixToString(widget.article.publishedAt)}",
+      "${widget.article.sourceName} • ${unixToString(widget.article.publishedAt)}",
     );
   }
 }
@@ -223,14 +257,22 @@ class ArticleThumbnail extends StatelessWidget {
     if (!ContentPref.shouldLoadImages) {
       return SizedBox.shrink();
     }
-    return CachedNetworkImage(
-      imageUrl: widget.article.thumbnail,
-      placeholder: (context, url) {
-        return Container(color: Colors.black38, height: 200);
-      },
-      errorWidget: (context, url, error) {
-        return Container(color: Colors.black38, height: 200);
-      },
+    return Flex(
+      direction: Axis.horizontal,
+      children: [
+        Expanded(
+          child: CachedNetworkImage(
+            fit: BoxFit.cover,
+            imageUrl: widget.article.thumbnail,
+            placeholder: (context, url) {
+              return Container(color: Colors.black38, height: 200);
+            },
+            errorWidget: (context, url, error) {
+              return Container(color: Colors.black38, height: 200);
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -245,19 +287,9 @@ class PublisherFavicon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Publisher publisher = Publisher.fromString(widget.article.publisher);
+    Source publisher = widget.article.source;
     return CircleAvatar(
-      radius: 8,
-      backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-      child: CachedNetworkImage(
-        imageUrl: publisher.iconUrl,
-        placeholder: (context, url) {
-          return CircleAvatar(child: Text(publisher.name.characters.first));
-        },
-        errorWidget: (context, url, error) {
-          return CircleAvatar(child: Text(publisher.name.characters.first));
-        },
-      ),
+      backgroundImage: CachedNetworkImageProvider(publisher.iconUrl),
     );
   }
 }

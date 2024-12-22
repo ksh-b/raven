@@ -3,8 +3,8 @@ import 'package:raven/model/publisher.dart';
 import 'package:raven/repository/publishers.dart';
 
 class CategorySearchProvider extends ChangeNotifier {
-  final List<String> _publishers = publishers.keys.toList();
-  List<String> filteredPublishers = publishers.keys.toList();
+  final List<Source> _publishers = publishers.values.toList();
+  List<Source> filteredPublishers = publishers.values.toList();
 
   bool _isInProgress = false;
 
@@ -16,21 +16,21 @@ class CategorySearchProvider extends ChangeNotifier {
   }
 
   void searchPublishersByCategory(String category) {
-    if (category == "all") {
+    if (category == "All") {
       filteredPublishers = _publishers;
       notifyListeners();
       return;
     }
 
     filteredPublishers = _publishers.where((publisher) {
-      return Publisher.fromString(publisher).mainCategory == category;
+      return publisher.siteCategories.contains(category);
     }).toList();
     notifyListeners();
   }
 
   void searchPublishersByName(String query) {
     filteredPublishers = _publishers.where((publisher) {
-      return publisher.toLowerCase().contains(query);
+      return publisher.id.toLowerCase().contains(query);
     }).toList();
 
     notifyListeners();

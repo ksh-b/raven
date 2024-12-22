@@ -142,7 +142,7 @@ class ArticlePublisherIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
-      imageUrl: Publisher.fromString(article.publisher).iconUrl,
+      imageUrl: article.source.iconUrl,
       progressIndicatorBuilder: (context, url, downloadProgress) {
         return CircularProgressIndicator(
           value: downloadProgress.progress,

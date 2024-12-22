@@ -32,42 +32,37 @@ class ArticlePage extends StatefulWidget {
 }
 
 class _ArticlePageState extends State<ArticlePage> {
+  late Future<Article> fullArticle;
+
+  @override
+  void initState() {
+    super.initState();
+    fullArticle = widget.article.source.article(widget.article);
+  }
+
   @override
   Widget build(BuildContext context) {
     final String fullUrl = widget.article.url;
-    return Scaffold(
-      appBar: AppBar(
-        title: SelectableText(widget.article.publisher),
-        actions: [
-          ShareButton(fullUrl: fullUrl),
-          OpenUrlButton(fullUrl: fullUrl),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: FutureBuilder(
-            initialData: widget.article,
-            future: Publisher.fromString(widget.article.publisher)
-                .article(widget.article),
-            builder: (context, response) {
-              if (!response.hasData || response.hasError) {
-                return Center(
-                  child: ListTile(
-                    title: Text("Error loading article"),
-                    subtitle: response.hasError
-                        ? Text(response.error.toString())
-                        : Text("No data"),
-                  ),
-                );
-              }
-
-              if (response.hasData && widget.shouldLoad) {
-                return FullArticle(response: response);
-              } else {
-                return LoadingArticle(widget: widget);
-              }
-            }),
-      ),
+    return FutureBuilder(
+      initialData: widget.article,
+      future: fullArticle,
+      builder: (context, response) {
+        return Scaffold(
+          appBar: AppBar(
+            title: SelectableText(widget.article.sourceName),
+            actions: [
+              response.hasData?ShareButton(fullUrl: response.data!.url):SizedBox.shrink(),
+              response.hasData?OpenUrlButton(fullUrl: response.data!.url):SizedBox.shrink(),
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: response.hasData && widget.shouldLoad
+                ? FullArticle(response: response)
+                : LoadingArticle(widget: widget),
+          ),
+        );
+      },
     );
   }
 }
@@ -145,11 +140,11 @@ class FullArticle extends StatelessWidget {
         const SizedBox(height: 12),
 
         // Excerpt
-        TranslatedText(
+        response.data!.excerpt.isNotEmpty?TranslatedText(
           response.data!.excerpt,
           style: excerptStyle,
-        ),
-        const SizedBox(height: 12),
+        ):SizedBox.shrink(),
+        response.data!.excerpt.isNotEmpty?const SizedBox(height: 12):SizedBox.shrink(),
 
         // Publisher details
         if (response.data!.publishedAt != -1)

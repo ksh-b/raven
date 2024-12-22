@@ -161,7 +161,7 @@ class SimplyTranslate {
 
   Future<Article> translateArticle(Article article) async {
     Article fullArticle =
-        await (Publisher.fromString(article.publisher)).article(article);
+        await (article.source).article(article);
     String content = fullArticle.content;
     String title = fullArticle.title;
     String excerpt = fullArticle.excerpt;

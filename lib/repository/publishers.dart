@@ -1,76 +1,30 @@
 import 'package:raven/model/publisher.dart';
 import 'package:raven/repository/news/custom/morss.dart';
 import 'package:raven/repository/news/custom/rss.dart';
-import 'package:raven/repository/news/general/national/bangladesh/prothamalo.dart';
-import 'package:raven/repository/news/general/national/bangladesh/prothamalo_english.dart';
-import 'package:raven/repository/news/general/national/china/rfa_cantonese.dart';
-import 'package:raven/repository/news/general/national/china/rfa_mandarin.dart';
-import 'package:raven/repository/news/general/national/china/rfa_tibetan.dart';
-import 'package:raven/repository/news/general/national/india/thehindu.dart';
-import 'package:raven/repository/news/general/national/india/theindianexpress.dart';
-import 'package:raven/repository/news/general/national/india/thequint.dart';
-import 'package:raven/repository/news/general/national/india/thewire.dart';
-import 'package:raven/repository/news/general/national/myanmar/rfa_burmese.dart';
-import 'package:raven/repository/news/general/world/aljazeera.dart';
-import 'package:raven/repository/news/general/world/apnews.dart';
-import 'package:raven/repository/news/general/world/bbc.dart';
-import 'package:raven/repository/news/general/world/cnn.dart';
-import 'package:raven/repository/news/general/world/rfa_english.dart';
-import 'package:raven/repository/news/general/world/theguardian.dart';
-import 'package:raven/repository/news/science/phys.dart';
-import 'package:raven/repository/news/science/space.dart';
-import 'package:raven/repository/news/technology/androidpolice.dart';
-import 'package:raven/repository/news/technology/arstechnica.dart';
-import 'package:raven/repository/news/technology/bleepingcomputer.dart';
-import 'package:raven/repository/news/technology/engadget.dart';
-import 'package:raven/repository/news/technology/theverge.dart';
-import 'package:raven/repository/news/technology/torrentfreak.dart';
-import 'package:raven/repository/news/technology/xdadevelopers.dart';
+import 'package:raven/repository/preferences/content.dart';
 
-Map<String, Publisher> publishers = {
-  for (var publisher in [
-    // technology
-    AndroidPolice(),
-    ArsTechnica(),
-    BleepingComputer(),
-    Engadget(),
-    TheVerge(),
-    TorrentFreak(),
-    XDAdevelopers(),
+List<Source> _publishers = [
+  Morss(
+    id: "morss",
+    name: "morss",
+    homePage: '',
+    hasSearchSupport: false,
+    hasCustomSupport: true,
+    iconUrl: '',
+    siteCategories: ['Custom'],
+  ),
+  RSSFeed(
+    id: "rss",
+    name: "RSS Feed",
+    homePage: '',
+    hasSearchSupport: false,
+    hasCustomSupport: true,
+    iconUrl: '',
+    siteCategories: ['Custom'],
+  )
+];
 
-    // world
-    AlJazeera(),
-    APNews(),
-    BBC(),
-    CNN(),
-    RfaEnglish(),
-    TheGuardian(),
-
-    // science
-    Phys(),
-    Space(),
-
-    // custom
-    Morss(),
-    RSSFeed(),
-
-    // bangladesh
-    ProthamAlo(),
-    ProthamAloEn(),
-
-    // china
-    RfaCantonese(),
-    RfaMandarin(),
-    RfaTibetan(),
-
-    // india
-    TheIndianExpress(),
-    TheHindu(),
-    TheWire(),
-    TheQuint(),
-
-    // myanmar
-    RfaBurmese(),
-  ])
-    publisher.name: publisher,
+Map<String, Source> publishers = {
+  for (var publisher in _publishers+ContentPref.sources)
+    publisher.id: publisher
 };
