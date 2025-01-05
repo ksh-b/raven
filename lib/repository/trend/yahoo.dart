@@ -3,7 +3,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:raven/model/trend.dart';
 import 'package:raven/repository/preferences/content.dart';
-import 'package:raven/repository/store.dart';
+import 'package:raven/repository/preferences/internal.dart';
 import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/network.dart';
 

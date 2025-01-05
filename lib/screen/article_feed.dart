@@ -53,15 +53,15 @@ class ArticleProviderConsumer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: SubscriptionPref.subscriptions.listenable(),
+      valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(),
       builder: (context, value, child) {
-        return Consumer<ArticleProvider>(
+        return Consumer<ArticleProvider>(   // todo fetch when subs change
           builder: (context, articleProvider, child) {
             List<Widget> tiles = articleProvider.filteredArticles
                 .map((article) => ArticleCard(article))
                 .toList();
 
-            if (tiles.isEmpty && SubscriptionPref.selectedSubscriptions.isEmpty) {
+            if (tiles.isEmpty && UserSubscriptionPref.selectedSubscriptions.isEmpty) {
               return const BlankPageMessage(
                   "Please select some subscriptions to get started",
               );

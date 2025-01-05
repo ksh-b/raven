@@ -42,23 +42,21 @@ class _CustomizeFiltersState extends State<CustomizeFilters> {
       ];
     }
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Customize Filters"),
-        ),
-        body: ListView(children: filters),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add_rounded),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return NewFilterPopup();
-              },
-            );
-          },
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Customize Filters"),
+      ),
+      body: ListView(children: filters),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add_rounded),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return NewFilterPopup();
+            },
+          );
+        },
       ),
     );
   }

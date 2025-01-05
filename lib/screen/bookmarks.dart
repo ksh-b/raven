@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
+import 'package:raven/repository/preferences/bookmarks.dart';
 import 'package:raven/repository/preferences/content.dart';
-import 'package:raven/repository/preferences/saved.dart';
+import 'package:raven/repository/preferences/bookmarks.dart';
 import 'package:raven/repository/preferences/internal.dart';
 import 'package:raven/screen/full_article.dart';
 import 'package:raven/utils/network.dart';
@@ -12,17 +13,17 @@ import 'package:raven/utils/string.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/blank_page_message.dart';
 
-class SavedPage extends StatefulWidget {
+class BookmarksPage extends StatefulWidget {
   final String? query;
-  final bool saved;
+  final bool bookmarks;
 
-  const SavedPage({super.key, this.query, this.saved = false});
+  const BookmarksPage({super.key, this.query, this.bookmarks = false});
 
   @override
-  State<SavedPage> createState() => _SavedPageState();
+  State<BookmarksPage> createState() => _BookmarksPageState();
 }
 
-class _SavedPageState extends State<SavedPage> {
+class _BookmarksPageState extends State<BookmarksPage> {
   @override
   void initState() {
     super.initState();
@@ -32,43 +33,25 @@ class _SavedPageState extends State<SavedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Saved"),
+        title: const Text("Bookmarks"),
       ),
       body: ValueListenableBuilder(
-        valueListenable: SavedArticles.saved.listenable(),
+        valueListenable: BookmarkedArticles.bookmarks.listenable(),
         builder: (BuildContext context, box, Widget? child) {
-          if (SavedArticles.saved.isNotEmpty) {
+          if (BookmarkedArticles.bookmarks.isNotEmpty) {
             return ListView.builder(
-              itemCount: SavedArticles.saved.keys.length,
+              itemCount: BookmarkedArticles.bookmarks.keys.length,
               itemBuilder: (context, index) {
-                Article article = SavedArticles.saved.values.toList()[index];
+                Article article = BookmarkedArticles.bookmarks.values.toList()[index];
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                  child: Dismissible(
-                    key: Key(article.url),
-                    direction: DismissDirection.endToStart,
-                    background: const Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Icon(Icons.delete_forever_rounded),
-                      ),
-                    ),
-                    confirmDismiss: (direction) async {
-                      if (direction == DismissDirection.endToStart) {
-                        SavedArticles.deleteArticle(article);
-                        return false;
-                      }
-                      return null;
-                    },
-                    child: FeedCard(article: article),
-                  ),
+                  child: FeedCard(article: article),
                 );
               },
             );
           }
           return const BlankPageMessage(
-            "🔖 Swipe articles to the right on the feed page to save them",
+            "No articles bookmarked",
           );
         },
       ),
@@ -118,7 +101,6 @@ class FeedCard extends StatelessWidget {
               MaterialPageRoute(
                 builder: (context) => ArticlePage(
                   article,
-                  shouldLoad: false,
                 ),
               ),
             );

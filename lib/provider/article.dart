@@ -42,13 +42,13 @@ class ArticleProvider extends ChangeNotifier {
     _lock = true;
     notifyListeners();
     Set<Article> articles = {};
-    Set<Source> publishers = SubscriptionPref.selectedSubscriptions
+    Set<Source> publishers = UserSubscriptionPref.selectedSubscriptions
         .map((e) => e.source)
         .toList()
         .toSet();
     for (Source publisher in publishers) {
       List<String> categories =
-          SubscriptionPref.selectedSubscriptions.where((subscription) {
+          UserSubscriptionPref.selectedSubscriptions.where((subscription) {
         return subscription.source == publisher;
       }).map((subscription) {
         return subscription.categoryPath;

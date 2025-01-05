@@ -16,17 +16,20 @@ import 'package:raven/provider/theme.dart';
 import 'package:raven/repository/git/github.dart';
 import 'package:raven/repository/news/custom/json.dart';
 import 'package:raven/repository/preferences/appearance.dart';
+import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/internal.dart';
-import 'package:raven/repository/store.dart';
 import 'package:raven/screen/home.dart';
 
 import 'model/article.dart';
+import 'model/source/watch_dart.dart';
+import 'model/watch.dart';
+import 'model/watch_item_history.dart';
 import 'provider/category_search.dart';
 import 'provider/navigation.dart';
 
 Future<void> main() async {
   await Hive.initFlutter();
-  Hive.registerAdapter<UserSubscription>(UserSubscriptionAdapter());
+  Hive.registerAdapter<UserFeedSubscription>(UserFeedSubscriptionAdapter());
   Hive.registerAdapter<Article>(ArticleAdapter());
   Hive.registerAdapter<Filter>(FilterAdapter());
   Hive.registerAdapter<ExternalSource>(ExternalSourceAdapter());
@@ -38,11 +41,18 @@ Future<void> main() async {
   Hive.registerAdapter<Locators>(LocatorsAdapter());
   Hive.registerAdapter<ExternalSourceMeta>(ExternalSourceMetaAdapter());
   Hive.registerAdapter<StoredRepo>(StoredRepoAdapter());
+  Hive.registerAdapter<Watch>(WatchAdapter());
+  Hive.registerAdapter<WatchImport>(WatchImportAdapter());
+  Hive.registerAdapter<WatchItemHistory>(WatchItemHistoryAdapter());
+  Hive.registerAdapter<Items>(ItemsAdapter());
+  Hive.registerAdapter<Option>(OptionAdapter());
+  Hive.registerAdapter<Ing>(IngAdapter());
   await Hive.openBox('settings');
+  await Hive.openBox('bookmarks');
   await Hive.openBox('saved');
   await Hive.openBox('offline-articles');
   await Hive.openBox('subscriptions');
-
+  await Hive.openBox<WatchItemHistory>("watch-subscriptions");
   if (Internal.sdkVersion == -1) {
     await DeviceInfoPlugin().androidInfo.then((value) {
       Internal.sdkVersion = value.version.sdkInt;
@@ -73,7 +83,7 @@ Future<void> main() async {
           create: (BuildContext context) => NavigationProvider(),
         ),
         ChangeNotifierProvider(
-          create: (BuildContext context) => CategorySearchProvider(),
+          create: (BuildContext context) => FeedSourceSearchProvider(),
         ),
       ],
       child: const MyApp(),
@@ -87,7 +97,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: Store.settings.listenable(),
+      valueListenable: Internal.settings.listenable(),
       builder: (context, box, child) {
         return DynamicColorBuilder(
           builder: (lightDynamic, darkDynamic) {

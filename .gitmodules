@@ -1,5 +1,3 @@
 [submodule "submodules/flutter"]
 	path = submodules/flutter
-	url = https://github.com/flutter/flutter.git
-	update = merge
-	branch = master
+	url = https://github.com/flutter/flutter

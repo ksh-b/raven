@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:raven/repository/preferences/content.dart';
-import 'package:raven/repository/store.dart';
+import 'package:raven/repository/preferences/internal.dart';
 
 class Network {
   static bool shouldLoadImage(String url) {

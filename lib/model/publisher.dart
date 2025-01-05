@@ -1,15 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/source/source_dart.dart';
-import 'package:raven/model/source/sources_json.dart';
-import 'package:raven/repository/preferences/content.dart';
-
-import '../repository/publishers.dart';
-import '../utils/string.dart';
+import 'package:raven/utils/string.dart';
 
 part 'publisher.g.dart';
 

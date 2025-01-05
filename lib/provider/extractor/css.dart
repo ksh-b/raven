@@ -132,7 +132,7 @@ Future<List<Article>> extractArticlesCss(
 
     var thumbnail = thumbnailElement?.attributes['src'];
     if (thumbnailElement != null) {
-      RegExp urlRegex = RegExp(r'https\S*(?:jpg|jpeg|png|webp|gif)');
+      RegExp urlRegex = RegExp(r'https\S*(?:jpg|jpeg|png|webp|gif|svg)');
       var urlMatch = urlRegex.firstMatch(thumbnailElement.outerHtml.toString());
       if (urlMatch != null) {
         String? url = urlMatch.group(0);

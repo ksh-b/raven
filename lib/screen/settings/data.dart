@@ -176,7 +176,7 @@ class _DataPageState extends State<DataPage> {
     );
     await file.create(recursive: true);
     var encoded = jsonEncode(
-      SubscriptionPref.selectedSubscriptions
+      UserSubscriptionPref.selectedSubscriptions
           .map((e) => e.toJson())
           .toList(),
     );
@@ -189,7 +189,7 @@ class _DataPageState extends State<DataPage> {
     );
     await file.create(recursive: true);
     encoded = jsonEncode(
-      SubscriptionPref.customSubscriptions
+      UserSubscriptionPref.customSubscriptions
           .map((e) => e.toJson())
           .toList(),
     );
@@ -251,15 +251,15 @@ class _DataPageState extends State<DataPage> {
        );
        var content = await file.readAsString();
        List decoded = jsonDecode(content);
-       List<UserSubscription> subscriptions =
-       decoded.map((e) => UserSubscription.fromJson(e)).toList();
+       List<UserFeedSubscription> subscriptions =
+       decoded.map((e) => UserFeedSubscription.fromJson(e)).toList();
        for (var subscription in subscriptions) {
-         if (SubscriptionPref.selectedSubscriptions
+         if (UserSubscriptionPref.selectedSubscriptions
              .contains(subscription)) {
            continue;
          }
-         SubscriptionPref.selectedSubscriptions =
-         SubscriptionPref.selectedSubscriptions..add(subscription);
+         UserSubscriptionPref.selectedSubscriptions =
+         UserSubscriptionPref.selectedSubscriptions..add(subscription);
        }
 
        file = File(
@@ -268,14 +268,14 @@ class _DataPageState extends State<DataPage> {
        content = await file.readAsString();
        decoded = jsonDecode(content);
        subscriptions =
-           decoded.map((e) => UserSubscription.fromJson(e)).toList();
+           decoded.map((e) => UserFeedSubscription.fromJson(e)).toList();
        for (var subscription in subscriptions) {
-         if (SubscriptionPref.customSubscriptions
+         if (UserSubscriptionPref.customSubscriptions
              .contains(subscription)) {
            continue;
          }
-         SubscriptionPref.customSubscriptions =
-         SubscriptionPref.customSubscriptions..add(subscription);
+         UserSubscriptionPref.customSubscriptions =
+         UserSubscriptionPref.customSubscriptions..add(subscription);
        }
        return true;
      } catch (e) {

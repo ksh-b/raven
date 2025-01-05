@@ -6,7 +6,7 @@ import 'package:raven/provider/extractor/json.dart';
 import 'package:raven/repository/git/github.dart';
 import 'package:raven/repository/news/custom/json.dart';
 
-class RepoProvider {
+class FeedExtractor {
 
   Future<Set<Article>> extractSearchArticles(
     JsonSource source,

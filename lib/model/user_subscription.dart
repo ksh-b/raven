@@ -6,7 +6,7 @@ part 'user_subscription.g.dart';
 
 @JsonSerializable()
 @HiveType(typeId: 0)
-class UserSubscription extends HiveObject {
+class UserFeedSubscription extends HiveObject {
   @HiveField(0)
   Source source;
 
@@ -19,13 +19,13 @@ class UserSubscription extends HiveObject {
   @HiveField(3)
   bool isCustom;
 
-  UserSubscription(this.source, this.categoryLabel, this.categoryPath,
+  UserFeedSubscription(this.source, this.categoryLabel, this.categoryPath,
       {this.isCustom = false});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserSubscription &&
+      other is UserFeedSubscription &&
           runtimeType == other.runtimeType &&
           source.id == other.source.id&&
           categoryPath == other.categoryPath &&
@@ -39,8 +39,8 @@ class UserSubscription extends HiveObject {
     return super.toString();
   }
 
-  factory UserSubscription.fromJson(Map<String, dynamic> json) => _$UserSubscriptionFromJson(json);
+  factory UserFeedSubscription.fromJson(Map<String, dynamic> json) => _$UserFeedSubscriptionFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UserSubscriptionToJson(this);
+  Map<String, dynamic> toJson() => _$UserFeedSubscriptionToJson(this);
 
 }

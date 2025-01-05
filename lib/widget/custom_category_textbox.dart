@@ -50,8 +50,8 @@ class CustomCategoryTextBox extends StatelessWidget {
 
   void saveCustomSubscription() {
     customCategoryController.text = "";
-    SubscriptionPref.customSubscriptions += [
-      UserSubscription(
+    UserSubscriptionPref.customSubscriptions += [
+      UserFeedSubscription(
         source,
         baseName(customCategoryPath),
         customCategoryPath,

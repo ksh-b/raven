@@ -25,6 +25,6 @@ List<Source> _publishers = [
 ];
 
 Map<String, Source> publishers = {
-  for (var publisher in _publishers+ContentPref.sources)
+  for (var publisher in _publishers+ContentPref.feedSources)
     publisher.id: publisher
 };

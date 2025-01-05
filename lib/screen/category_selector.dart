@@ -76,7 +76,7 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
   final TextEditingController customCategoryController =
       TextEditingController();
   final Map<String, String> categories = {};
-  final List<UserSubscription> availableSubscriptions = [];
+  final List<UserFeedSubscription> availableSubscriptions = [];
 
   @override
   void initState() {
@@ -87,7 +87,7 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: SubscriptionPref.subscriptions.listenable(),
+      valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(),
       builder: (context, value, child) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -115,15 +115,15 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
                           categories.data!.isNotEmpty) {
                         categories.data!.forEach((key, value) {
                           availableSubscriptions.add(
-                            UserSubscription(widget.source, key, value),
+                            UserFeedSubscription(widget.source, key, value),
                           );
                         });
-                        List<UserSubscription> allSubscriptions =
+                        List<UserFeedSubscription> allSubscriptions =
                             availableSubscriptions
                                 .toSet()
-                                .union(SubscriptionPref.customSubscriptions
+                                .union(UserSubscriptionPref.customSubscriptions
                                     .toSet())
-                                .union(SubscriptionPref.selectedSubscriptions
+                                .union(UserSubscriptionPref.selectedSubscriptions
                                     .toSet())
                                 .where((element) =>
                                     element.source == widget.source)
@@ -155,7 +155,7 @@ class CategoriesList extends StatelessWidget {
     required this.customCategoryController,
   });
 
-  final List<UserSubscription> allSubscriptions;
+  final List<UserFeedSubscription> allSubscriptions;
   final Source source;
   final ValueNotifier<String> customCategory;
   final TextEditingController customCategoryController;
@@ -185,7 +185,7 @@ class CategoriesList extends StatelessWidget {
 }
 
 class CategoryCheckbox extends StatelessWidget {
-  final UserSubscription subscription;
+  final UserFeedSubscription subscription;
 
   CategoryCheckbox({required this.subscription, super.key});
 
@@ -204,7 +204,7 @@ class CategoryCheckbox extends StatelessWidget {
             ),
           Checkbox(
             value:
-                SubscriptionPref.selectedSubscriptions.contains(subscription),
+                UserSubscriptionPref.selectedSubscriptions.contains(subscription),
             onChanged: (value) {
               updateSubscription(
                 value,
@@ -217,13 +217,13 @@ class CategoryCheckbox extends StatelessWidget {
     );
   }
 
-  void updateSubscription(bool? checked, UserSubscription subscription) {
+  void updateSubscription(bool? checked, UserFeedSubscription subscription) {
     if (checked!) {
-      SubscriptionPref.selectedSubscriptions =
-          SubscriptionPref.selectedSubscriptions..add(subscription);
+      UserSubscriptionPref.selectedSubscriptions =
+          UserSubscriptionPref.selectedSubscriptions..add(subscription);
     } else {
-      SubscriptionPref.selectedSubscriptions =
-          SubscriptionPref.selectedSubscriptions..remove(subscription);
+      UserSubscriptionPref.selectedSubscriptions =
+          UserSubscriptionPref.selectedSubscriptions..remove(subscription);
     }
   }
 }
@@ -284,7 +284,7 @@ class CustomCategoriesSelector extends StatelessWidget {
 }
 
 class DeleteCustomCategory extends StatelessWidget {
-  final UserSubscription subscription;
+  final UserFeedSubscription subscription;
 
   const DeleteCustomCategory({
     super.key,
@@ -299,12 +299,12 @@ class DeleteCustomCategory extends StatelessWidget {
     );
   }
 
-  void deleteCustomSubscription(UserSubscription subscription) {
-    if (SubscriptionPref.selectedSubscriptions.contains(subscription)) {
-      SubscriptionPref.selectedSubscriptions =
-          SubscriptionPref.selectedSubscriptions..remove(subscription);
+  void deleteCustomSubscription(UserFeedSubscription subscription) {
+    if (UserSubscriptionPref.selectedSubscriptions.contains(subscription)) {
+      UserSubscriptionPref.selectedSubscriptions =
+          UserSubscriptionPref.selectedSubscriptions..remove(subscription);
     }
-    SubscriptionPref.customSubscriptions = SubscriptionPref.customSubscriptions
+    UserSubscriptionPref.customSubscriptions = UserSubscriptionPref.customSubscriptions
       ..remove(subscription);
   }
 }

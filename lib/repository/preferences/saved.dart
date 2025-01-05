@@ -6,6 +6,10 @@ class SavedArticles {
     return Hive.box("saved");
   }
 
+  static bool contains(Article article) {
+    return saved.values.contains(article);
+  }
+
   static void saveArticle(Article article) async {
     if (saved.keys.contains(article.url)) {
       await deleteArticle(article);

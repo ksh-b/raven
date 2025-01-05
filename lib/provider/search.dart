@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
-import 'package:raven/repository/store.dart';
+import 'package:raven/repository/preferences/internal.dart';
 import 'package:raven/utils/string.dart';
 
 class ArticleSearchProvider extends ChangeNotifier {
@@ -43,7 +43,7 @@ class ArticleSearchProvider extends ChangeNotifier {
     _lock = true;
     notifyListeners();
     Set<Article> articles = {};
-    Set<Source> publishers = SubscriptionPref.selectedSubscriptions
+    Set<Source> publishers = UserSubscriptionPref.selectedSubscriptions
         .where((e) {
           return e.source.hasSearchSupport;
         })

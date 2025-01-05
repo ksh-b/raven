@@ -12,13 +12,15 @@ import 'package:raven/model/source/other_version.dart';
 import 'package:raven/model/source/repo.dart';
 import 'package:raven/model/source/source_dart.dart';
 import 'package:raven/model/source/sources_json.dart';
+import 'package:raven/model/source/watch_dart.dart';
 import 'package:raven/model/stored_repo.dart';
 import 'package:raven/repository/git/github.dart';
 import 'package:raven/repository/news/custom/json.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/internal.dart';
-import 'package:raven/repository/store.dart';
 import 'package:raven/service/http_client.dart';
+
+import '../model/watch.dart';
 
 class SubscriptionsManager extends StatefulWidget {
   const SubscriptionsManager({super.key});
@@ -111,83 +113,12 @@ class _SubscriptionsManagerState extends State<SubscriptionsManager> {
     return repo;
   }
 
-  Future<void> extractFromRepo(Repo repo) async {
-    await requestStoragePermission();
-    var directoryParent = await getExternalStorageDirectory();
-    var directory = "${directoryParent!.path}/providers/subscription/";
 
-    if (await Directory("${directoryParent.path}/providers/").exists()) {
-      await Directory("${directoryParent.path}/providers/")
-          .delete(recursive: true);
-    }
-    await Directory(directory).create(recursive: true);
-
-    var zipDir = '$directory/main.zip';
-    String extractedDir = await getExtractedDir(repo);
-    await dio().download(
-      repo.latestZip,
-      zipDir,
-    );
-    await extractFileToDisk(
-      zipDir,
-      directory,
-    );
-
-    final sourcesFile = File("${extractedDir}sources.json");
-    String sourcesJson = await sourcesFile.readAsString();
-    var sources = ExternalSources.fromJson(json.decode(sourcesJson));
-    repo.name = sources.name;
-    repo.description = sources.description;
-    for (var source_ in sources.sources) {
-      final file = File("$extractedDir${source_.file}");
-      String jsonString = await file.readAsString();
-      ExternalSource source =
-          ExternalSource.fromJson(json.decode(jsonString));
-      Source jsonSource = JsonSource(
-        id: '${repo.repo}/${source.name}',
-        hasCustomSupport: source.supportsCustomCategory,
-        externalSource: source,
-        hasSearchSupport: source.searchUrl.isNotEmpty,
-        homePage: source.homePage,
-        iconUrl: source.iconUrl,
-        name: source.name,
-        siteCategories: source.category,
-      );
-
-      ContentPref.sources = ContentPref.sources.toList()
-        ..removeWhere((element) {
-          return jsonSource.id == element.id;
-        });
-      for (OtherVersion ov in source_.otherversions) {
-        final file = File(
-          "$extractedDir/${ov.file}",
-        );
-        String jsonString = await file.readAsString();
-        ExternalSource source =
-            ExternalSource.fromJson(json.decode(jsonString));
-        jsonSource.otherVersions.add(JsonSource(
-          id: '${repo.repo}/${ov.name}',
-          hasCustomSupport: source.supportsCustomCategory,
-          externalSource: source,
-          hasSearchSupport: source.searchUrl.isNotEmpty,
-          homePage: source.homePage,
-          iconUrl: source.iconUrl,
-          name: source.name,
-          siteCategories: source.category,
-        ));
-      }
-      if (ContentPref.sources.map((e) => e.id).contains(jsonSource.id)) {
-        ContentPref.sources = ContentPref.sources
-          ..removeWhere((e) => e.id == jsonSource.id);
-      }
-      ContentPref.sources = ContentPref.sources.toList()..add(jsonSource);
-    }
-  }
 
   Future<String> getExtractedDir(Repo repo) async {
     await requestStoragePermission();
     var directoryParent = await getExternalStorageDirectory();
-    var directory = "${directoryParent!.path}/providers/subscription/";
+    var directory = "${directoryParent!.path}/providers/subscription";
     var extractedDir = '$directory/${repo.zipFolder}-${repo.defaultBranch}/';
     return extractedDir;
   }
@@ -199,7 +130,7 @@ class _SubscriptionsManagerState extends State<SubscriptionsManager> {
         title: Text("Manage feed providers"),
       ),
       body: ValueListenableBuilder(
-        valueListenable: Store.settings.listenable(keys: [ContentPrefType.repos.name]),
+        valueListenable: Internal.settings.listenable(keys: [ContentPrefType.repos.name]),
         builder: (context, value, child) {
           return ListView(
             children: ContentPref.repos.map(
@@ -219,6 +150,7 @@ class _SubscriptionsManagerState extends State<SubscriptionsManager> {
                       ),
                       IconButton(
                         onPressed: () async {
+                          await deleteRepo(repo);
                           await extractFromRepo(resolveRepo(repo.url));
                         },
                         icon: Icon(Icons.refresh_rounded),
@@ -245,10 +177,104 @@ class _SubscriptionsManagerState extends State<SubscriptionsManager> {
     );
   }
 
+  Future<void> extractFromRepo(Repo repo) async {
+    await requestStoragePermission();
+    var directoryParent = await getExternalStorageDirectory();
+    var directory = "${directoryParent!.path}/providers/subscription/";
+    if (await Directory("${directoryParent.path}/providers/").exists()) {
+      await Directory("${directoryParent.path}/providers/")
+          .delete(recursive: true);
+    }
+    await Directory(directory).create(recursive: true);
+
+    var zipDir = '${directory}main.zip';
+    String extractedDir = await getExtractedDir(repo);
+    if(Directory(extractedDir).existsSync()) {
+      Directory(extractedDir).deleteSync(recursive: true);
+    }
+    if(File(zipDir).existsSync()) {
+      File(zipDir).deleteSync(recursive: true);
+    }
+    await dio().download(
+      repo.latestZip,
+      zipDir,
+    );
+
+    await extractFileToDisk(
+      zipDir,
+      directory,
+    );
+    final sourcesFile = File("${extractedDir}sources.json");
+    String sourcesJson = await sourcesFile.readAsString();
+    var sources = ExternalSources.fromJson(json.decode(sourcesJson));
+    repo.name = sources.name;
+    repo.description = sources.description;
+    for (var source_ in sources.feeds) {
+      final file = File("$extractedDir${source_.file}");
+      String jsonString = await file.readAsString();
+      ExternalSource source =
+      ExternalSource.fromJson(json.decode(jsonString));
+      Source jsonSource = JsonSource(
+        id: '${repo.repo}/${source.name}',
+        hasCustomSupport: source.supportsCustomCategory,
+        externalSource: source,
+        hasSearchSupport: source.searchUrl.isNotEmpty,
+        homePage: source.homePage,
+        iconUrl: source.iconUrl,
+        name: source.name,
+        siteCategories: source.category,
+      );
+
+      ContentPref.feedSources = ContentPref.feedSources.toList()
+        ..removeWhere((element) {
+          return jsonSource.id == element.id;
+        });
+      for (OtherVersion ov in source_.otherversions) {
+        final file = File(
+          "$extractedDir/${ov.file}",
+        );
+        String jsonString = await file.readAsString();
+        ExternalSource source =
+        ExternalSource.fromJson(json.decode(jsonString));
+        jsonSource.otherVersions.add(JsonSource(
+          id: '${repo.repo}/${ov.name}',
+          hasCustomSupport: source.supportsCustomCategory,
+          externalSource: source,
+          hasSearchSupport: source.searchUrl.isNotEmpty,
+          homePage: source.homePage,
+          iconUrl: source.iconUrl,
+          name: source.name,
+          siteCategories: source.category,
+        ));
+      }
+      if (ContentPref.feedSources.map((e) => e.id).contains(jsonSource.id)) {
+        ContentPref.feedSources = ContentPref.feedSources
+          ..removeWhere((e) => e.id == jsonSource.id);
+      }
+      ContentPref.feedSources = ContentPref.feedSources.toList()..add(jsonSource);
+    }
+
+
+    for (var watch in sources.watches) {
+      final file = File("$extractedDir${watch.file}");
+      String jsonString = await file.readAsString();
+      WatchImport source = WatchImport.fromJson(json.decode(jsonString));
+      Watch watchIt = Watch(
+        id: '${repo.repo}/${source.name}',
+        watch: source,
+      );
+      if (ContentPref.watchSources.map((e) => e.id).contains(watchIt.id)) {
+        ContentPref.watchSources = ContentPref.watchSources
+          ..removeWhere((e) => e.id == watchIt.id);
+      }
+      ContentPref.watchSources = ContentPref.watchSources.toList()..add(watchIt);
+    }
+  }
+
   Future<void> deleteRepo(StoredRepo repo) async {
     var dRepo = await getExtractedDir(resolveRepo(repo.url));
     ContentPref.repos = ContentPref.repos..removeWhere((element) => element.id==repo.id,);
-    ContentPref.sources = ContentPref.sources..removeWhere((source) {
+    ContentPref.feedSources = ContentPref.feedSources..removeWhere((source) {
       int lastIndex = source.id.lastIndexOf('/');
       String repoId1 = source.id.substring(0, lastIndex);
       int index = repo.id.indexOf('/');

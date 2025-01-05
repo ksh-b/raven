@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:raven/model/article.dart';
 import 'package:raven/model/publisher.dart';
 import 'package:raven/provider/theme.dart';
+import 'package:raven/repository/preferences/bookmarks.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/saved.dart';
 import 'package:raven/screen/full_article.dart';
@@ -48,17 +45,14 @@ class _ArticleCardState extends State<ArticleCard> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => ArticlePage(widget.article)),
+          MaterialPageRoute(builder: (context) => ArticlePage(widget.article)),
         );
       },
     );
   }
-
 }
 
 class VisibleArticleCard extends StatefulWidget {
-
   VisibleArticleCard({
     super.key,
     required this.widget,
@@ -71,11 +65,12 @@ class VisibleArticleCard extends StatefulWidget {
 }
 
 class _VisibleArticleCardState extends State<VisibleArticleCard> {
-
   ValueNotifier<bool> saving = ValueNotifier<bool>(false);
+  ValueNotifier<bool> bookmarked = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
+    bookmarked.value = BookmarkedArticles.contains(widget.widget.article);
     return Flex(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -120,29 +115,54 @@ class _VisibleArticleCardState extends State<VisibleArticleCard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                IconButton(
-                  icon: Icon(Icons.share_rounded),
-                  visualDensity: VisualDensity.standard,
-                  onPressed: () {
-                    Share.shareUri(Uri.parse(widget.widget.article.url));
+                (Uri.tryParse(widget.widget.article.url)?.scheme ?? "")
+                        .isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.share_rounded),
+                        visualDensity: VisualDensity.standard,
+                        onPressed: () {
+                          Share.shareUri(Uri.parse(widget.widget.article.url));
+                        },
+                      )
+                    : SizedBox.shrink(),
+                ValueListenableBuilder(
+                  valueListenable: bookmarked,
+                  builder: (context, value, child) {
+                    return IconButton(
+                      icon: value
+                          ? Icon(Icons.bookmark_rounded)
+                          : Icon(Icons.bookmark_outline_rounded),
+                      visualDensity: VisualDensity.standard,
+                      onPressed: () {
+                        if (BookmarkedArticles.contains(widget.widget.article)) {
+                          BookmarkedArticles.deleteArticle(widget.widget.article);
+                          bookmarked.value = false;
+                        } else {
+                          BookmarkedArticles.saveArticle(widget.widget.article);
+                          bookmarked.value = true;
+                        }
+                      },
+                    );
                   },
-                ),
-                IconButton(
-                  icon: Icon(Icons.bookmark_outline_rounded),
-                  visualDensity: VisualDensity.standard,
-                  onPressed: () {},
                 ),
                 ValueListenableBuilder(
                   valueListenable: saving,
-                  builder: (BuildContext context, bool isSaving, Widget? child) {
+                  builder:
+                      (BuildContext context, bool isSaving, Widget? child) {
                     return IconButton(
-                      icon: isSaving?CircularProgressIndicator():Icon(Icons.save_alt_rounded),
+                      icon: isSaving
+                          ? CircularProgressIndicator()
+                          : SavedArticles.contains(widget.widget.article)
+                              ? Icon(Icons.download_rounded)
+                              : Icon(Icons.download_outlined),
                       visualDensity: VisualDensity.standard,
-                      onPressed: !isSaving?() async {
-                        saving.value = true;
-                        await saveArticle();
-                        saving.value = false;
-                      }:null,
+                      onPressed: !isSaving
+                          ? () async {
+                              saving.value = true;
+                              await saveArticle();
+                              saving.value = false;
+                            }
+                          : null,
                     );
                   },
                 ),
@@ -156,7 +176,7 @@ class _VisibleArticleCardState extends State<VisibleArticleCard> {
 
   Future<void> saveArticle() async {
     Article article =
-    await SimplyTranslate().translateArticle(widget.widget.article);
+        await SimplyTranslate().translateArticle(widget.widget.article);
     SavedArticles.saveArticle(article);
   }
 }
