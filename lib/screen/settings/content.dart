@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raven/repository/preferences/content.dart';
+import 'package:raven/repository/search_suggestions.dart';
 import 'package:raven/repository/trends.dart';
 import 'package:raven/screen/customize_filters.dart';
 import 'package:raven/screen/subscriptions_provider.dart';
@@ -44,23 +45,40 @@ class _ContentPageState extends State<ContentPage> {
             dense: true,
           ),
           ListTile(
-            leading: const Icon(Icons.trending_up_rounded),
+            leading: const Icon(Icons.search_rounded),
             title: const Text('Provider'),
             subtitle: Text(ContentPref.searchSuggestionsProvider),
             onTap: () {
               showPopup(
                 context,
-                "Suggestions provider",
-                (String option) {
+                "Search suggestions provider",
+                    (String option) {
                   setState(() {
                     ContentPref.searchSuggestionsProvider = option;
+                  });
+                },
+                searchSuggestions.keys.toList(),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.trending_up_rounded),
+            title: const Text('Provider'),
+            subtitle: Text(ContentPref.trendsProvider),
+            onTap: () {
+              showPopup(
+                context,
+                "Trends provider",
+                (String option) {
+                  setState(() {
+                    ContentPref.trendsProvider = option;
                   });
                 },
                 trends.keys.toList(),
               );
             },
           ),
-          ContentPref.searchSuggestionsProvider != "None"
+          ContentPref.trendsProvider != "None"
               ? ListTile(
                   leading: Icon(Icons.location_on_rounded),
                   title: Text("Location"),
@@ -74,7 +92,7 @@ class _ContentPageState extends State<ContentPage> {
                           ContentPref.country = option;
                         });
                       },
-                      trends[ContentPref.searchSuggestionsProvider]!
+                      trends[ContentPref.trendsProvider]!
                           .locations
                           .toList(),
                     );

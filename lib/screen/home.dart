@@ -7,6 +7,7 @@ import 'package:raven/screen/saved.dart';
 import 'package:raven/screen/settings/settings.dart';
 import 'package:raven/screen/subscriptions.dart';
 import 'package:raven/screen/watch.dart';
+import 'package:raven/widget/search_delegate.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -43,6 +44,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
             ),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  showSearch(
+                    context: context,
+                    delegate: MySearchDelegate(),
+                  );
+                },
+              ),
+            ],
           ),
           drawer: Drawer(
             child: ListView(
@@ -52,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 ListTile(
                   leading: Icon(Icons.article),
-                  title: Text('Feed'),
+                  title: Text("What's happening"),
                   onTap: () {
                     nav.index = 0;
                     Navigator.pop(context);

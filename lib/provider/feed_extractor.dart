@@ -23,7 +23,7 @@ class FeedExtractor {
   }
 
   Future<Article> extractArticleContent(
-      JsonSource source,
+    JsonSource source,
     Article article,
   ) async {
     if (source.externalSource?.article.extractor == "css") {

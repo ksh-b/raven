@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raven/repository/preferences/content.dart';
+import 'package:raven/repository/search_suggestions.dart';
 import 'package:raven/repository/trends.dart';
 import 'package:raven/screen/article_feed.dart';
 
@@ -36,10 +37,23 @@ class MySearchDelegate extends SearchDelegate<String> {
     return FeedPageDelegate(query: query);
   }
 
+  Future<List<String>> combined() async {
+    var topics = await trends[ContentPref.trendsProvider]?.topics;
+    var suggestions = await searchSuggestions[ContentPref.searchSuggestionsProvider]?.suggestions(query);
+    topics = (topics??List<String>.empty());
+    suggestions = (suggestions??List<String>.empty());
+    topics = topics.where((topic) {
+      return query.isEmpty
+          ? true
+          :topic.toString().toLowerCase().contains(query.toLowerCase());
+    }).toList();
+    return topics+suggestions;
+  }
+
   @override
   Widget buildSuggestions(BuildContext context) {
-    return FutureBuilder(
-      future: trends[ContentPref.searchSuggestionsProvider]?.topics,
+    return FutureBuilder<List<String>>(
+      future: combined(),
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           return ListView(
@@ -63,11 +77,7 @@ class MySearchDelegate extends SearchDelegate<String> {
         } else if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
         } else {
-          return const ListTile(
-            leading: Icon(Icons.block_rounded),
-            title: Text("No results from provider"),
-            subtitle: Text("Try changing location/provider"),
-          );
+          return SizedBox.shrink();
         }
       },
     );

@@ -1,13 +1,14 @@
 import 'package:raven/model/filter.dart';
 import 'package:raven/model/publisher.dart';
-import 'package:raven/model/source/repo.dart';
 import 'package:raven/model/stored_repo.dart';
 import 'package:raven/model/subscription_provider.dart';
 import 'package:raven/model/watch.dart';
 import 'package:raven/repository/preferences/internal.dart';
+import 'package:raven/repository/search_suggestions.dart';
 import 'package:raven/repository/trends.dart';
 
 enum ContentPrefType {
+  trendsProvider,
   searchSuggestionsProvider,
   shouldLoadImages,
   shouldFilterContent,
@@ -30,7 +31,8 @@ enum ContentPrefType {
 enum FilterType { any, title, url, tag, author, content }
 
 // default values
-final _searchSuggestionsProvider = trends.values.first.name;
+final _trendsProvider = trends.values.first.name;
+final _searchSuggestionsProvider = searchSuggestions.values.first.name;
 final _shouldLoadImages = true;
 final _shouldFilterContent = false;
 final _shouldTranslate = false;
@@ -41,14 +43,32 @@ final _translatorEngine = "google";
 final List<Map<String, List<String>>> filters = [];
 
 class ContentPref {
+  static String get trendsProvider {
+    return Internal.settings.get(
+      ContentPrefType.trendsProvider.name,
+      defaultValue: _trendsProvider,
+    );
+  }
+
+  static set trendsProvider(String provider) {
+    Internal.settings.put(
+      ContentPrefType.trendsProvider.name,
+      provider,
+    );
+  }
+
   static String get searchSuggestionsProvider {
-    return Internal.settings.get(ContentPrefType.searchSuggestionsProvider.name,
-        defaultValue: _searchSuggestionsProvider);
+    return Internal.settings.get(
+      ContentPrefType.searchSuggestionsProvider.name,
+      defaultValue: _searchSuggestionsProvider,
+    );
   }
 
   static set searchSuggestionsProvider(String provider) {
-    Internal.settings
-        .put(ContentPrefType.searchSuggestionsProvider.name, provider);
+    Internal.settings.put(
+      ContentPrefType.searchSuggestionsProvider.name,
+      provider,
+    );
   }
 
   static bool get shouldLoadImages {
@@ -66,7 +86,8 @@ class ContentPref {
   }
 
   static set shouldFilterContent(bool shouldFilter) {
-    Internal.settings.put(ContentPrefType.shouldFilterContent.name, shouldFilter);
+    Internal.settings
+        .put(ContentPrefType.shouldFilterContent.name, shouldFilter);
   }
 
   static bool get shouldTranslate {
@@ -75,7 +96,8 @@ class ContentPref {
   }
 
   static set shouldTranslate(bool shouldTranslate) {
-    Internal.settings.put(ContentPrefType.shouldTranslate.name, shouldTranslate);
+    Internal.settings
+        .put(ContentPrefType.shouldTranslate.name, shouldTranslate);
   }
 
   static String get translator {
@@ -112,7 +134,8 @@ class ContentPref {
   }
 
   static set translatorEngine(String translatorEngine) {
-    Internal.settings.put(ContentPrefType.translatorEngine.name, translatorEngine);
+    Internal.settings
+        .put(ContentPrefType.translatorEngine.name, translatorEngine);
   }
 
   static String get country {
@@ -186,5 +209,4 @@ class ContentPref {
   static set repos(List<StoredRepo> repos) {
     Internal.settings.put(ContentPrefType.repos.name, repos);
   }
-
 }
