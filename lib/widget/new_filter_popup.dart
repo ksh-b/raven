@@ -154,7 +154,7 @@ class SourceTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return RawAutocomplete<String>(
       optionsBuilder: (TextEditingValue textEditingValue) {
-        return (["any"] + publishers.keys.toList()).where((String option) {
+        return (["any"] + publishers().keys.toList()).where((String option) {
           return option
               .toLowerCase()
               .contains(textEditingValue.text.toLowerCase());

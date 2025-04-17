@@ -1,9 +1,8 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:klaws/model/source/watch_dart.dart';
 import 'package:raven/model/user_subscription.dart';
-import 'package:raven/model/watch.dart';
+import 'package:klaws/model/watch.dart';
 import 'package:raven/model/watch_item_history.dart';
-
-import '../../model/source/watch_dart.dart';
 
 class UserSubscriptionPref {
   static Box get feedSubscriptions {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/repository/publishers.dart';
 import 'package:raven/utils/string.dart';
 
-class CustomCategoryTextBox extends StatelessWidget {
-  const CustomCategoryTextBox({
+class CustomCategoryValidation extends StatelessWidget {
+  const CustomCategoryValidation({
     super.key,
     required this.source,
     required this.customCategoryPath,
@@ -19,28 +19,27 @@ class CustomCategoryTextBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var userDefinedCategory = publishers[source.id]
-        ?.articles(category: customCategoryPath);
-    return Flexible(
+    var userDefinedCategory = customCategoryController.text.isNotEmpty?publishers()[source.id]
+        ?.articles(category: customCategoryController.text):null;
+    return Expanded(
       flex: 1,
       child: FutureBuilder(
         future: userDefinedCategory,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          }
-          if (snapshot.hasError ||
-              (snapshot.hasData && snapshot.data!.isEmpty)) {
-            return const Icon(Icons.cancel);
-          }
-          if (customCategoryController.text.isEmpty) {
-            return const SizedBox.shrink();
-          }
           if (snapshot.hasData) {
             return IconButton(
               onPressed: () => saveCustomSubscription(),
               icon: const Icon(Icons.save_alt),
             );
+          }
+          if (customCategoryController.text.isEmpty || customCategoryPath.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          if (snapshot.data==null || snapshot.hasError || (snapshot.hasData && snapshot.data!.isEmpty)) {
+            return const Icon(Icons.cancel);
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Icon(Icons.access_time_rounded);
           }
           return const SizedBox.shrink();
         },
@@ -49,14 +48,14 @@ class CustomCategoryTextBox extends StatelessWidget {
   }
 
   void saveCustomSubscription() {
-    customCategoryController.text = "";
     UserSubscriptionPref.customSubscriptions += [
       UserFeedSubscription(
         source,
-        baseName(customCategoryPath),
-        customCategoryPath,
+        baseName(customCategoryController.text),
+        customCategoryController.text,
         isCustom: true,
       )
     ];
+    customCategoryController.text = "";
   }
 }

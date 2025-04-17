@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:raven/provider/article.dart';
+import 'package:raven/provider/category_article.dart';
 
 class Tags extends StatelessWidget {
   const Tags({super.key});
@@ -11,10 +11,10 @@ class Tags extends StatelessWidget {
       padding: const EdgeInsets.only(left: 16, right: 16),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Consumer<ArticleProvider>(
+        child: Consumer<CategoryArticleProvider>(
           builder: (
             BuildContext context,
-            ArticleProvider articleProvider,
+            CategoryArticleProvider articleProvider,
             Widget? child,
           ) {
             return Row(

@@ -2,10 +2,10 @@ import 'dart:core';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:raven/model/publisher.dart';
-import 'package:raven/model/watch.dart';
+import 'package:klaws/model/publisher.dart';
+import 'package:klaws/model/watch.dart';
 import 'package:raven/provider/category_search.dart';
 import 'package:raven/provider/watch_search.dart';
 import 'package:raven/repository/preferences/content.dart';
@@ -13,6 +13,7 @@ import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/screen/category_selector.dart';
 import 'package:raven/screen/watch_sources.dart';
 
+import '../repository/preferences/internal.dart';
 import '../repository/publishers.dart';
 
 class SubscriptionsPage extends StatefulWidget {
@@ -29,21 +30,22 @@ class _SubscriptionsPageState extends State<SubscriptionsPage>
     super.build(context);
     return Consumer<FeedSourceSearchProvider>(
       builder: (context, search, child) {
-        return DefaultTabController(
-          length: 2,
-          child: Scaffold(
-            appBar: AppBar(
-              bottom: TabBar(tabs: [
-                Tab(icon: Text("Feeds")),
-                Tab(icon: Text("Watches")),
-              ]),
-            ),
-            body: TabBarView(children: [
-              FeedSelector(),
-              WatchSelector(),
-            ]),
-          ),
-        );
+        return FeedSelector();
+        // return DefaultTabController(
+        //   length: 1,
+        //   child: Scaffold(
+        //     appBar: AppBar(
+        //       bottom: TabBar(tabs: [
+        //         // Tab(icon: Text("Feeds")),
+        //         // Tab(icon: Text("Watches")),
+        //       ]),
+        //     ),
+        //     body: TabBarView(children: [
+        //       // FeedSelector(),
+        //       // WatchSelector(),
+        //     ]),
+        //   ),
+        // );
       },
     );
   }
@@ -221,8 +223,8 @@ class _FeedSelectorState extends State<FeedSelector> {
                     search.searchPublishersByCategory(_value);
                   },
                   items: (["All"] +
-                          (publishers.values
-                                  .map((value) => value.siteCategories))
+                          (publishers().values
+                              .map((value) => value.siteCategories))
                               .expand((i) => i)
                               .toList())
                       .toSet()
@@ -239,64 +241,59 @@ class _FeedSelectorState extends State<FeedSelector> {
                 ),
               ),
               Expanded(
-                child: ValueListenableBuilder(
-                  valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(),
-                  builder: (BuildContext context, value, Widget? child) {
-                    return ListView.builder(
-                      itemCount: search.filteredPublishers.length,
-                      itemBuilder: (context, sourceIndex) {
-                        Source source = search.filteredPublishers[sourceIndex];
-                        var categories = getSelectedCategories(source);
-                        return ListTile(
-                          title: Text(source.name),
-                          leading: ClipOval(
-                            child: CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl: source.iconUrl,
-                              progressIndicatorBuilder: (
-                                context,
-                                url,
-                                downloadProgress,
-                              ) {
-                                return CircularProgressIndicator(
-                                  value: downloadProgress.progress,
-                                );
-                              },
-                              height: 40,
-                              width: 40,
-                              errorWidget: (context, url, error) =>
-                                  CircleAvatar(
-                                child: Text(
-                                  source.name.characters.first,
-                                ),
-                              ),
+                child: ListView.builder(
+                  itemCount: publishers().length,
+                  itemBuilder: (context, sourceIndex) {
+                    Source source = publishers().entries.toList().elementAt(sourceIndex).value;
+                    var categories = getSelectedCategories(source);
+                    return ListTile(
+                      title: Text(source.name),
+                      leading: ClipOval(
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: source.iconUrl,
+                          progressIndicatorBuilder: (
+                            context,
+                            url,
+                            downloadProgress,
+                          ) {
+                            return CircularProgressIndicator(
+                              value: downloadProgress.progress,
+                            );
+                          },
+                          height: 40,
+                          width: 40,
+                          errorWidget: (context, url, error) =>
+                              CircleAvatar(
+                            child: Text(
+                              source.name.characters.first,
                             ),
                           ),
-                          subtitle: categories.isNotEmpty
-                              ? Text(
-                                  categories,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                )
-                              : SizedBox.shrink(),
-                          trailing: categories.isEmpty
-                              ? const SizedBox.shrink()
-                              : const Icon(Icons.check_circle),
-                          onTap: () {
-                            Navigator.of(context)
-                                .push(
-                              MaterialPageRoute(
-                                builder: (context) => CategorySelector(
-                                  publishers,
-                                  source,
-                                ),
-                              ),
+                        ),
+                      ),
+                      subtitle: categories.isNotEmpty
+                          ? Text(
+                              categories,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             )
-                                .whenComplete(() {
-                              categories = getSelectedCategories(source);
-                            });
-                          },
-                        );
+                          : SizedBox.shrink(),
+                      trailing: categories.isEmpty
+                          ? const SizedBox.shrink()
+                          : const Icon(Icons.check_circle),
+                      onTap: () {
+                        Navigator.of(context)
+                            .push(
+                          MaterialPageRoute(
+                            builder: (context) => CategorySelector(
+                              publishers(),
+                              source,
+                            ),
+                          ),
+                        )
+                            .whenComplete(() {
+                          categories = getSelectedCategories(source);
+                        });
                       },
                     );
                   },

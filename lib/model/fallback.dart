@@ -1,4 +1,4 @@
-import 'package:raven/model/article.dart';
+import 'package:klaws/model/article.dart';
 
 abstract class Fallback {
   String get name;

@@ -2,10 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:raven/model/watch_item_history.dart';
-import 'package:raven/provider/watch_extractor.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
+import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/html_widget.dart';
+import 'package:klaws/provider/watch_extractor.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WatchPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _WatchPageState extends State<WatchPage> {
     super.initState();
     UserSubscriptionPref.getAllWatchSubs().forEach((history) async {
       var content = await WatchExtractor()
-          .extractWatchContent(history.watch, history.itemsHistory.last.url);
+          .extractWatchContent(history.watch, history.itemsHistory.last.url, dio());
       if (content != null) {
         UserSubscriptionPref.upsertWatchItem(history.watch, content);
       }

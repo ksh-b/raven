@@ -1,39 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:raven/model/article.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:klaws/model/article.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
-import 'package:raven/repository/preferences/internal.dart';
 import 'package:raven/utils/string.dart';
 
-class ArticleSearchProvider extends ChangeNotifier {
+import 'article.dart';
+
+class SearchArticleProvider extends ChangeNotifier implements ArticleProvider {
   int _page = 1;
   bool _lock = false;
   Map<String, int> _tags = {};
+  @override
   List<String> selectedTags = [];
 
+  @override
   int get page => _page;
 
+  @override
   Map<String, int> get tags => _tags;
 
+  @override
   bool get isLoading => _lock;
   Set<Article> _articles = {};
   Set<Article> _filteredArticles = {};
 
+  @override
   Set<Article> get filteredArticles => _filteredArticles;
   String _searchQuery = "";
 
-  Future<void> refresh(String query) async {
+  @override
+  Future<void> refresh([String? query]) async {
     _page = 1;
     _articles = {};
     _tags = {};
     selectedTags = [];
-    _searchQuery = query;
+    _searchQuery = query??"";
     fetchSearchedArticles();
   }
 
+  @override
   Set<Article> get articles =>
       _filteredArticles.isNotEmpty ? _filteredArticles : _articles;
 
+  @override
   Future<void> nextPage() async {
     _page = _page + 1;
     fetchSearchedArticles();
@@ -76,6 +85,7 @@ class ArticleSearchProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
   void updateTags(bool selected, String tag) {
     if (selected) {
       selectedTags = selectedTags..add(tag);
@@ -88,6 +98,7 @@ class ArticleSearchProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
   void filter() {
     if (selectedTags.isEmpty) {
       _filteredArticles = _articles;
@@ -103,5 +114,11 @@ class ArticleSearchProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  @override
+  Future<void> fetchArticles() {
+    // TODO: implement fetchArticles
+    throw UnimplementedError();
   }
 }

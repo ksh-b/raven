@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:raven/model/article.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:hive_ce_flutter/adapters.dart';
+import 'package:klaws/model/article.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/saved.dart';
 import 'package:raven/repository/preferences/internal.dart';

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:raven/provider/article.dart';
-import 'package:raven/provider/search.dart';
+import 'package:raven/provider/category_article.dart';
+import 'package:raven/provider/search_article.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/widget/article_card.dart';
 import 'package:raven/widget/blank_page_message.dart';
-import 'package:raven/widget/tags.dart';
 
 class FeedPageDelegate extends StatefulWidget {
   final String query;
@@ -23,11 +23,11 @@ class _FeedPageDelegateState extends State<FeedPageDelegate> {
     super.initState();
     if (widget.query.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<ArticleSearchProvider>().refresh(widget.query);
+        context.read<SearchArticleProvider>().refresh(widget.query);
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<ArticleProvider>().refresh();
+        context.read<CategoryArticleProvider>().refresh();
       });
     }
   }
@@ -55,7 +55,7 @@ class ArticleProviderConsumer extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(),
       builder: (context, value, child) {
-        return Consumer<ArticleProvider>(   // todo fetch when subs change
+        return Consumer<CategoryArticleProvider>(
           builder: (context, articleProvider, child) {
             List<Widget> tiles = articleProvider.filteredArticles
                 .map((article) => ArticleCard(article))
@@ -63,7 +63,7 @@ class ArticleProviderConsumer extends StatelessWidget {
 
             if (tiles.isEmpty && UserSubscriptionPref.selectedSubscriptions.isEmpty) {
               return const BlankPageMessage(
-                  "Please select some subscriptions to get started",
+                "Please select some subscriptions to get started",
               );
             }
 
@@ -71,31 +71,9 @@ class ArticleProviderConsumer extends StatelessWidget {
               onRefresh: () {
                 return articleProvider.refresh();
               },
-              child: ListView.separated(
-
-                itemCount: tiles.length + 2,
-                itemBuilder: (BuildContext context, int index) {
-                  if (index == 0) {
-                    // if (articleProvider.isLoading) {
-                    //   return const LinearProgressIndicator();
-                    // } return const Tags();
-                    return SizedBox.shrink();
-                  } else if (tiles.isNotEmpty && index - 1 < tiles.length) {
-                    return tiles[index - 1];
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: ElevatedButton(
-                        onPressed: articleProvider.isLoading
-                            ? null
-                            : () => articleProvider.nextPage(),
-                        child: Text(
-                          articleProvider.isLoading ? "Loading" : "Load More",
-                        ),
-                      ),
-                    );
-                  }
-                }, separatorBuilder: (BuildContext context, int index) => Divider() ,
+              child: ArticleList(
+                tiles: tiles,
+                articleProvider: articleProvider,
               ),
             );
           },
@@ -115,41 +93,54 @@ class SearchArticleProviderConsumer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ArticleSearchProvider>(
+    return Consumer<SearchArticleProvider>(
       builder: (context, articleProvider, child) {
         List<Widget> tiles = articleProvider.filteredArticles
             .map((article) => ArticleCard(article))
             .toList();
-        return RefreshIndicator(
-          onRefresh: () {
-            return articleProvider.refresh(widget.query);
-          },
-          child: ListView.builder(
-            itemCount: tiles.length + 2,
-            itemBuilder: (BuildContext context, int index) {
-              if (index == 0) {
-                if (articleProvider.isLoading) {
-                  return const LinearProgressIndicator();
-                } return const Tags();
-              } else if (tiles.isNotEmpty && index - 1 < tiles.length) {
-                return tiles[index - 1];
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: ElevatedButton(
-                    onPressed: articleProvider.isLoading
-                        ? null
-                        : () => articleProvider.nextPage(),
-                    child: Text(
-                      articleProvider.isLoading ? "Loading" : "Load More",
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
+        return ArticleList(
+          tiles: tiles,
+          articleProvider: articleProvider,
         );
       },
+    );
+  }
+}
+
+class ArticleList extends StatelessWidget {
+  const ArticleList({
+    super.key,
+    required this.tiles,
+    required this.articleProvider,
+  });
+
+  final List<Widget> tiles;
+  final ArticleProvider articleProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemCount: tiles.length + 2,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          return SizedBox.shrink();
+        } else if (tiles.isNotEmpty && index - 1 < tiles.length) {
+          return tiles[index - 1];
+        } else {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: articleProvider.isLoading
+                  ? null
+                  : () => articleProvider.nextPage(),
+              child: Text(
+                articleProvider.isLoading ? "Loading" : "Load More",
+              ),
+            ),
+          );
+        }
+      },
+      separatorBuilder: (BuildContext context, int index) => Divider(),
     );
   }
 }

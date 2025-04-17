@@ -1,4 +1,5 @@
-import 'package:raven/model/publisher.dart';
+
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/news/custom/morss.dart';
 import 'package:raven/repository/news/custom/rss.dart';
 import 'package:raven/repository/preferences/content.dart';
@@ -24,7 +25,10 @@ List<Source> _publishers = [
   )
 ];
 
-Map<String, Source> publishers = {
-  for (var publisher in _publishers+ContentPref.feedSources)
-    publisher.id: publisher
-};
+
+Map<String, Source> publishers() {
+  return {
+    for (var publisher in _publishers+ContentPref.feedSources)
+      publisher.id: publisher
+  };
+}

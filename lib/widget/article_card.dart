@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:raven/model/article.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:klaws/model/article.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/provider/theme.dart';
 import 'package:raven/repository/preferences/bookmarks.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/saved.dart';
 import 'package:raven/screen/full_article.dart';
+import 'package:raven/service/favicon_extractor.dart';
 import 'package:raven/service/simplytranslate.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/rounded_chip.dart';
@@ -191,8 +192,12 @@ class ArticlePublisherDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String relativeTime = unixToString(widget.article.publishedAt);
+    if (relativeTime.isNotEmpty) {
+      relativeTime = " • $relativeTime";
+    }
     return Text(
-      "${widget.article.sourceName} • ${unixToString(widget.article.publishedAt)}",
+      "${widget.article.sourceName}$relativeTime",
     );
   }
 }
@@ -281,7 +286,7 @@ class ArticleThumbnail extends StatelessWidget {
       direction: Axis.horizontal,
       children: [
         Expanded(
-          child: CachedNetworkImage(
+          child: widget.article.thumbnail.isNotEmpty?CachedNetworkImage(
             fit: BoxFit.cover,
             imageUrl: widget.article.thumbnail,
             placeholder: (context, url) {
@@ -290,7 +295,7 @@ class ArticleThumbnail extends StatelessWidget {
             errorWidget: (context, url, error) {
               return Container(color: Colors.black38, height: 200);
             },
-          ),
+          ):SizedBox.shrink(),
         ),
       ],
     );
@@ -308,6 +313,13 @@ class PublisherFavicon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Source publisher = widget.article.source;
+    if (["rss", "morss"].contains(publisher.id)) {
+      return CircleAvatar(
+        backgroundImage: CachedNetworkImageProvider(
+            FaviconExtractor.favicon(widget.article.category)
+        ),
+      );
+    }
     return CircleAvatar(
       backgroundImage: CachedNetworkImageProvider(publisher.iconUrl),
     );

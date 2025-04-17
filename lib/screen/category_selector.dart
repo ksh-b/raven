@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
-import 'package:raven/repository/publishers.dart';
 import 'package:raven/widget/custom_category_textbox.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -42,16 +41,22 @@ class _CategorySelectorState extends State<CategorySelector> {
           ],
           bottom: TabBar(
             tabs: [Tab(icon: Text("Main"))] +
-            widget.mainSource.otherVersions.map((e) => Tab(icon: Text(e.name)),).toList(),
+                widget.mainSource.otherVersions
+                    .map((e) => Tab(icon: Text(e.name)))
+                    .toList(),
           ),
         ),
-        body: TabBarView(children: [
-          SourceCategoryTabContent(
-            source: widget.mainSource,
-          )
-        ]+widget.mainSource.otherVersions.map((e) => SourceCategoryTabContent(
-          source: e,
-        )).toList()),
+        body: TabBarView(
+            children: [
+                  SourceCategoryTabContent(
+                    source: widget.mainSource,
+                  )
+                ] +
+                widget.mainSource.otherVersions
+                    .map((e) => SourceCategoryTabContent(
+                          source: e,
+                        ))
+                    .toList()),
       ),
     );
   }
@@ -86,6 +91,7 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
 
   @override
   Widget build(BuildContext context) {
+
     return ValueListenableBuilder(
       valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(),
       builder: (context, value, child) {
@@ -96,47 +102,50 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
             children: [
               widget.source.hasSearchSupport
                   ? ActionChip(
-                      label: const Text("Has search support"),
-                      avatar: const Icon(Icons.search_rounded),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    )
+                label: const Text("Has search support"),
+                avatar: const Icon(Icons.search_rounded),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              )
                   : const SizedBox.shrink(),
               Flexible(
                 child: FutureBuilder<Map<String, String>>(
-                    future: futureCategories,
-                    builder: (context, categories) {
-                      var noData =
-                          categories.hasData && categories.data!.isEmpty;
-                      if (categories.hasError || noData) {
-                        return const SizedBox.shrink();
-                      } else if (categories.hasData &&
-                          categories.data!.isNotEmpty) {
-                        categories.data!.forEach((key, value) {
-                          availableSubscriptions.add(
-                            UserFeedSubscription(widget.source, key, value),
-                          );
-                        });
-                        List<UserFeedSubscription> allSubscriptions =
-                            availableSubscriptions
-                                .toSet()
-                                .union(UserSubscriptionPref.customSubscriptions
-                                    .toSet())
-                                .union(UserSubscriptionPref.selectedSubscriptions
-                                    .toSet())
-                                .where((element) =>
-                                    element.source == widget.source)
-                                .toList();
-                        return CategoriesList(
-                          allSubscriptions: allSubscriptions,
-                          source: widget.source,
-                          customCategory: customCategory,
-                          customCategoryController: customCategoryController,
+                  future: futureCategories,
+                  builder: (context, categories) {
+                    if (categories.connectionState ==
+                        ConnectionState.done) {
+                      // categories.hasData && categories.data!.isNotEmpty
+                      categories.data!.forEach((key, value) {
+                        availableSubscriptions.add(
+                          UserFeedSubscription(widget.source, key, value),
                         );
-                      }
-                      return const LinearProgressIndicator();
-                    }),
+                      });
+                      List<UserFeedSubscription> allSubscriptions =
+                      availableSubscriptions
+                          .toSet()
+                          .union(UserSubscriptionPref.customSubscriptions
+                          .toSet())
+                          .union(UserSubscriptionPref.selectedSubscriptions
+                          .toSet())
+                          .where(
+                              (element) => element.source.id == widget.source.id)
+                          .toList();
+                      return CategoriesList(
+                        allSubscriptions: allSubscriptions,
+                        source: widget.source,
+                        customCategory: customCategory,
+                        customCategoryController: customCategoryController,
+                      );
+                    }
+                    return CategoriesList(
+                      allSubscriptions: [],
+                      source: widget.source,
+                      customCategory: customCategory,
+                      customCategoryController: customCategoryController,
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -164,21 +173,25 @@ class CategoriesList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: allSubscriptions.length + 2,
+      itemCount: allSubscriptions.length + 1,
       itemBuilder: (context, index) {
-        var shouldShowCustom = index == (allSubscriptions.length + 1) &&
-            source.hasCustomSupport;
-        if (index < allSubscriptions.length) {
-          return CategoryCheckbox(subscription: allSubscriptions[index]);
+        var shouldShowCustom = source.hasCustomSupport;
+        if (index == allSubscriptions.length) {
+          // custom categories selector
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CustomCategoriesSelector(
+              customCategory: customCategory,
+              customCategoryController: customCategoryController,
+              source: source,
+              shouldShowCustom: shouldShowCustom,
+            ),
+          );
         }
+        return CategoryCheckbox(subscription: allSubscriptions[index]);
 
-        // custom categories selector
-        return CustomCategoriesSelector(
-          customCategory: customCategory,
-          customCategoryController: customCategoryController,
-          source: source,
-          shouldShowCustom: shouldShowCustom,
-        );
+
+
       },
     );
   }
@@ -203,8 +216,8 @@ class CategoryCheckbox extends StatelessWidget {
               subscription: subscription,
             ),
           Checkbox(
-            value:
-                UserSubscriptionPref.selectedSubscriptions.contains(subscription),
+            value: UserSubscriptionPref.selectedSubscriptions
+                .contains(subscription),
             onChanged: (value) {
               updateSubscription(
                 value,
@@ -247,35 +260,35 @@ class CustomCategoriesSelector extends StatelessWidget {
     if (!shouldShowCustom) {
       return SizedBox.shrink();
     }
+
     return ValueListenableBuilder(
       valueListenable: customCategory,
       builder: (BuildContext context, value, Widget? child) {
         return Flex(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.start,
           direction: Axis.horizontal,
           children: [
-            Flexible(
-              flex: 3,
-              fit: FlexFit.tight,
+            Expanded(
+              flex: 5,
               child: TextField(
                 controller: customCategoryController,
                 decoration: const InputDecoration(
+                  label: Text("Custom URL"),
                   border: OutlineInputBorder(),
-                  hintText: "Custom URL",
                 ),
                 onSubmitted: (value) {
                   customCategory.value = value;
                 },
               ),
             ),
-            if (customCategory.value.isEmpty)
-              const Flexible(child: SizedBox.shrink())
-            else
-              CustomCategoryTextBox(
-                source: source,
-                customCategoryPath: customCategory.value,
-                customCategoryController: customCategoryController,
-              )
+            // if (customCategory.value.isEmpty)
+            //   const Flexible(child: SizedBox.shrink())
+            // else
+            CustomCategoryValidation(
+              source: source,
+              customCategoryPath: customCategory.value,
+              customCategoryController: customCategoryController,
+            )
           ],
         );
       },
@@ -304,7 +317,7 @@ class DeleteCustomCategory extends StatelessWidget {
       UserSubscriptionPref.selectedSubscriptions =
           UserSubscriptionPref.selectedSubscriptions..remove(subscription);
     }
-    UserSubscriptionPref.customSubscriptions = UserSubscriptionPref.customSubscriptions
-      ..remove(subscription);
+    UserSubscriptionPref.customSubscriptions =
+        UserSubscriptionPref.customSubscriptions..remove(subscription);
   }
 }

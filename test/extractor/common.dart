@@ -1,9 +1,9 @@
 // import 'dart:io';
 //
-// import 'package:hive_flutter/hive_flutter.dart';
+// import 'package:hive_ce_flutter/hive_flutter.dart';
 // import 'package:path_provider/path_provider.dart';
-// import 'package:raven/model/article.dart';
-// import 'package:raven/model/publisher.dart';
+// import 'package:klaws/model/article.dart';
+// import 'package:klaws/model/publisher.dart';
 // import 'package:raven/model/user_subscription.dart';
 // import 'package:raven/provider/fallback_provider.dart';
 // import 'package:test/test.dart';

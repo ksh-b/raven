@@ -38,6 +38,14 @@ class _ContentPageState extends State<ContentPage> {
               );
             },
           ),
+          SwitchListTile(
+            secondary: const Icon(Icons.update),
+            title: const Text('Auto update on app start'),
+            onChanged: (value) {
+              ContentPref.autoUpdate = value;
+            },
+            value: ContentPref.autoUpdate,
+          ),
           Divider(),
           ListTile(
             subtitle: Text("Search suggestions"),

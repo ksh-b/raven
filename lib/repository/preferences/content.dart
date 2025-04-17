@@ -1,8 +1,8 @@
+import 'package:klaws/model/publisher.dart';
+import 'package:klaws/model/watch.dart';
 import 'package:raven/model/filter.dart';
-import 'package:raven/model/publisher.dart';
 import 'package:raven/model/stored_repo.dart';
 import 'package:raven/model/subscription_provider.dart';
-import 'package:raven/model/watch.dart';
 import 'package:raven/repository/preferences/internal.dart';
 import 'package:raven/repository/search_suggestions.dart';
 import 'package:raven/repository/trends.dart';
@@ -13,6 +13,7 @@ enum ContentPrefType {
   shouldLoadImages,
   shouldFilterContent,
   shouldTranslate,
+  autoUpdate,
   translator,
   translateTo,
   translatorInstance,
@@ -36,6 +37,7 @@ final _searchSuggestionsProvider = searchSuggestions.values.first.name;
 final _shouldLoadImages = true;
 final _shouldFilterContent = false;
 final _shouldTranslate = false;
+final _autoUpdate = true;
 final _translator = "SimplyTranslate";
 final _translateTo = "English";
 final _translatorInstance = "simplytranslate.org";
@@ -90,9 +92,25 @@ class ContentPref {
         .put(ContentPrefType.shouldFilterContent.name, shouldFilter);
   }
 
+  static bool get autoUpdate {
+    return Internal.settings.get(
+      ContentPrefType.autoUpdate.name,
+      defaultValue: _autoUpdate,
+    );
+  }
+
+  static set autoUpdate(bool autoUpdate) {
+    Internal.settings.put(
+      ContentPrefType.autoUpdate.name,
+      autoUpdate,
+    );
+  }
+
   static bool get shouldTranslate {
-    return Internal.settings.get(ContentPrefType.shouldTranslate.name,
-        defaultValue: _shouldTranslate);
+    return Internal.settings.get(
+      ContentPrefType.shouldTranslate.name,
+      defaultValue: _shouldTranslate,
+    );
   }
 
   static set shouldTranslate(bool shouldTranslate) {

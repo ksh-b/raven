@@ -17,7 +17,9 @@ class BlankPageMessage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           direction: Axis.vertical,
-          children: [Text(text)],
+          children: [
+            Text(text)
+          ],
         ),
       ),
     );

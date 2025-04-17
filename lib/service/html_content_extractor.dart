@@ -1,5 +1,5 @@
 import 'package:html/parser.dart' as html_parser;
-import 'package:raven/model/article.dart';
+import 'package:klaws/model/article.dart';
 import 'package:raven/model/fallback.dart';
 import 'package:raven/utils/html_helper.dart';
 

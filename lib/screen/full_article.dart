@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:raven/model/article.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:klaws/model/article.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/ladders.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/utils/time.dart';
@@ -156,10 +156,11 @@ class FullArticle extends StatelessWidget {
 
         // Thumbnail
         const SizedBox(height: 12),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: CachedNetworkImage(imageUrl: response.data!.thumbnail),
-        ),
+        if (response.data!.thumbnail.isNotEmpty)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: CachedNetworkImage(imageUrl: response.data!.thumbnail),
+          ),
         const SizedBox(height: 12),
 
         // Content

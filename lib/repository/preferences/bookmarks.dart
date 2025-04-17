@@ -1,5 +1,5 @@
-import 'package:hive/hive.dart';
-import 'package:raven/model/article.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:klaws/model/article.dart';
 
 class BookmarkedArticles {
   static Box get bookmarks {

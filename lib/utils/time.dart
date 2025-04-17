@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:intl/intl.dart';
 
 int stringToUnix(String timestamp, {String? format}) {
   try {
+    if (format == "RFC-1123") {
+      DateTime dateTime = HttpDate.parse(timestamp);
+      return dateTime.toUtc().millisecondsSinceEpoch;
+    }
     if (format != null) {
       DateFormat inputFormat = DateFormat(format);
       DateTime parsedTime = inputFormat

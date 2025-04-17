@@ -1,4 +1,4 @@
-import 'package:raven/model/article.dart';
+import 'package:klaws/model/article.dart';
 import 'package:raven/utils/string.dart';
 
 abstract class Extractor {

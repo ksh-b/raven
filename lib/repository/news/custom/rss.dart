@@ -1,15 +1,18 @@
 import 'package:dart_rss/dart_rss.dart';
 import 'package:dio/src/response.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:raven/model/article.dart';
-import 'package:raven/model/category.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:klaws/model/article.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/provider/fallback_provider.dart';
 import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/time.dart';
 
+part 'rss.g.dart';
+
+@HiveType(typeId: 30)
 class RSSFeed extends Source {
   RSSFeed({
     required super.id,
@@ -168,7 +171,7 @@ class RSSFeed extends Source {
           thumbnail: images.isNotEmpty
               ? images.first
               : _thumbnail(item.description ?? ""),
-          publishedAt: item.pubDate != null ? stringToUnix(item.pubDate!) : -1,
+          publishedAt: item.pubDate != null ? stringToUnix(item.pubDate!, format: "RFC-1123") : -1,
           publishedAtString: item.pubDate ?? "",
           category: category,
         ),

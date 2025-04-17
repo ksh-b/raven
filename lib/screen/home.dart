@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raven/provider/navigation.dart';
+import 'package:raven/provider/theme.dart';
 import 'package:raven/screen/bookmarks.dart';
 import 'package:raven/screen/feed.dart';
 import 'package:raven/screen/saved.dart';
@@ -17,14 +18,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   Map pageNames = {
     0: "Feed",
     1: "Bookmarks",
     2: "Saved",
     3: "Subscriptions",
-    4: "Widgets",
-    5: "Settings",
+    4: "Settings",
   };
 
   @override
@@ -59,12 +58,36 @@ class _MyHomePageState extends State<MyHomePage> {
           drawer: Drawer(
             child: ListView(
               children: [
-                DrawerHeader(
-                  child: Text('Hello'),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: ThemeProvider().getCurrentTheme().cardColor,
+                      borderRadius: BorderRadius.circular(15.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.15),
+                          blurRadius: 5,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      visualDensity: VisualDensity.compact,
+                      leading: CircleAvatar(
+                        child: Icon(
+                          Icons.person_rounded,
+                        ),
+                      ),
+                      title: Text("Raven"),
+                    ),
+                  ),
                 ),
+                Divider(),
                 ListTile(
                   leading: Icon(Icons.article),
-                  title: Text("What's happening"),
+                  title: Text("Feed"),
                   onTap: () {
                     nav.index = 0;
                     Navigator.pop(context);
@@ -74,35 +97,44 @@ class _MyHomePageState extends State<MyHomePage> {
                   leading: Icon(Icons.bookmark),
                   title: Text('Bookmarks'),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const BookmarksPage()),);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const BookmarksPage()),
+                    );
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.download_rounded),
                   title: Text('Saved'),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SavedPage()),);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SavedPage()),
+                    );
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.favorite_rounded),
                   title: Text('Subscriptions'),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SubscriptionsPage()),);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.show_chart_rounded),
-                  title: Text('Widgets'),
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const WatchPage()),);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SubscriptionsPage()),
+                    );
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.settings_rounded),
                   title: Text('Settings'),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()),);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SettingsPage()),
+                    );
                   },
                 ),
               ],

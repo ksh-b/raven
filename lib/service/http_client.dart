@@ -5,7 +5,7 @@ import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:raven/repository/preferences/internal.dart';
@@ -26,7 +26,18 @@ CacheOptions _cacheOptions() {
 }
 
 Dio dio() {
-  Dio dio_ = Dio();
+  var headers = {
+    'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+    'Accept':
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+  };
+  Dio dio_ = Dio(
+    BaseOptions(
+      headers: headers,
+    ),
+  );
 
   List<String> retryBlacklist = ["SocketException: Failed host lookup"];
 
@@ -53,7 +64,8 @@ Dio dio() {
       File logs = File(
         '${directory.path}/raven_logs.txt',
       );
-      String log = "$object\n".replaceAll("║", "")
+      String log = "$object\n"
+          .replaceAll("║", "")
           .replaceAll("╚", "")
           .replaceAll("╔╣", "")
           .replaceAll("╝", "")

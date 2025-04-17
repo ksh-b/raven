@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/publishers.dart';
 
 class FeedSourceSearchProvider extends ChangeNotifier {
-  final List<Source> _publishers = publishers.values.toList();
-  List<Source> filteredPublishers = publishers.values.toList();
+  final List<Source> _publishers = publishers().values.toList();
+  List<Source> filteredPublishers = publishers().values.toList();
 
   bool _isInProgress = false;
 

@@ -1,8 +1,8 @@
 
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:raven/model/source/watch_dart.dart';
-import 'package:raven/model/watch.dart';
+import 'package:klaws/model/source/watch_dart.dart';
+import 'package:klaws/model/watch.dart';
 
 part 'watch_item_history.g.dart';
 

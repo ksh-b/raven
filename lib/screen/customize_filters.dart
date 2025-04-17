@@ -22,7 +22,7 @@ class _CustomizeFiltersState extends State<CustomizeFilters> {
           height: 32,
           child: e.publisher == "any"
               ? Icon(Icons.all_inclusive_rounded)
-              : CachedNetworkImage(imageUrl: publishers[e.publisher]!.iconUrl),
+              : CachedNetworkImage(imageUrl: publishers()[e.publisher]!.iconUrl),
         ),
         title: Text(e.keyword),
         subtitle: Text(e.publisher),

@@ -23,13 +23,14 @@ class StoredRepoAdapter extends TypeAdapter<StoredRepo> {
       description: fields[3] as String,
       lastChecked: fields[4] as int,
       lastUpdated: fields[5] as int,
+      directory: fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, StoredRepo obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class StoredRepoAdapter extends TypeAdapter<StoredRepo> {
       ..writeByte(4)
       ..write(obj.lastChecked)
       ..writeByte(5)
-      ..write(obj.lastUpdated);
+      ..write(obj.lastUpdated)
+      ..writeByte(6)
+      ..write(obj.directory);
   }
 
   @override

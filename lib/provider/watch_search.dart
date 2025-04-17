@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:raven/model/publisher.dart';
-import 'package:raven/model/watch.dart';
+import 'package:klaws/model/publisher.dart';
+import 'package:klaws/model/watch.dart';
 import 'package:raven/repository/preferences/content.dart' show ContentPref;
 import 'package:raven/repository/publishers.dart';
 

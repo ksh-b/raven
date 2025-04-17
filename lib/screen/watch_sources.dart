@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:raven/model/source/watch_dart.dart';
-import 'package:raven/model/watch.dart';
+import 'package:klaws/model/source/watch_dart.dart';
+import 'package:klaws/model/watch.dart';
 import 'package:raven/model/watch_item_history.dart';
-import 'package:raven/provider/watch_extractor.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
+import 'package:klaws/provider/watch_extractor.dart';
+import 'package:raven/service/http_client.dart';
 
 class WatchSources extends StatefulWidget {
   final Watch watch;
@@ -29,7 +30,7 @@ class _WatchSourcesState extends State<WatchSources> {
     setState(() {
       saving = true;
     });
-    Items? wItems = await WatchExtractor().extractWatchContent(widget.watch, url);
+    Items? wItems = await WatchExtractor().extractWatchContent(widget.watch, url, dio());
     var notDuplicate = items.where((element) => element.watch.watch.url==url).isEmpty;
     if (url.isNotEmpty && wItems!=null && notDuplicate) {
       setState(() {

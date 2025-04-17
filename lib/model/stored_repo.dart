@@ -1,5 +1,5 @@
 
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 part 'stored_repo.g.dart';
 @HiveType(typeId: 15)
 class StoredRepo {
@@ -15,6 +15,8 @@ class StoredRepo {
   int lastChecked;
   @HiveField(5)
   int lastUpdated;
+  @HiveField(6)
+  String directory;
 
   StoredRepo({
     required this.id,
@@ -23,5 +25,6 @@ class StoredRepo {
     required this.description,
     required this.lastChecked,
     required this.lastUpdated,
+    required this.directory,
   });
 }

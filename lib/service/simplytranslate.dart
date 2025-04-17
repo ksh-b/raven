@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as html_parser;
 import 'package:html/parser.dart';
-import 'package:raven/model/article.dart';
-import 'package:raven/model/publisher.dart';
+import 'package:klaws/model/article.dart';
+import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/service/http_client.dart';
 
