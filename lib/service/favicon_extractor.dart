@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:raven/repository/two_letter_tld.dart';
 
 class FaviconExtractor {
 

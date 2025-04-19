@@ -48,13 +48,13 @@ class _ContentPageState extends State<ContentPage> {
           ),
           Divider(),
           ListTile(
-            subtitle: Text("Search suggestions"),
+            subtitle: Text("Search Providers"),
             visualDensity: VisualDensity.compact,
             dense: true,
           ),
           ListTile(
             leading: const Icon(Icons.search_rounded),
-            title: const Text('Provider'),
+            title: const Text('Suggestions'),
             subtitle: Text(ContentPref.searchSuggestionsProvider),
             onTap: () {
               showPopup(
@@ -71,7 +71,7 @@ class _ContentPageState extends State<ContentPage> {
           ),
           ListTile(
             leading: const Icon(Icons.trending_up_rounded),
-            title: const Text('Provider'),
+            title: const Text('Trends'),
             subtitle: Text(ContentPref.trendsProvider),
             onTap: () {
               showPopup(

@@ -1,4 +1,3 @@
-
 import 'package:hive_ce/hive.dart';
 
 @HiveType(typeId: 3)

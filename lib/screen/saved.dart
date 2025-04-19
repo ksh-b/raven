@@ -2,14 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 import 'package:klaws/model/article.dart';
-import 'package:klaws/model/publisher.dart';
-import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/saved.dart';
-import 'package:raven/repository/preferences/internal.dart';
-import 'package:raven/screen/full_article.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/string.dart';
-import 'package:raven/utils/time.dart';
+import 'package:raven/widget/article_card.dart';
 import 'package:raven/widget/blank_page_message.dart';
 
 class SavedPage extends StatefulWidget {
@@ -38,33 +34,19 @@ class _SavedPageState extends State<SavedPage> {
         valueListenable: SavedArticles.saved.listenable(),
         builder: (BuildContext context, box, Widget? child) {
           if (SavedArticles.saved.isNotEmpty) {
-            return ListView.builder(
+            return ListView.separated(
               itemCount: SavedArticles.saved.keys.length,
               itemBuilder: (context, index) {
                 Article article = SavedArticles.saved.values.toList()[index];
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                  child: Dismissible(
-                    key: Key(article.url),
-                    direction: DismissDirection.endToStart,
-                    background: const Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Icon(Icons.delete_forever_rounded),
-                      ),
-                    ),
-                    confirmDismiss: (direction) async {
-                      if (direction == DismissDirection.endToStart) {
-                        SavedArticles.deleteArticle(article);
-                        return false;
-                      }
-                      return null;
-                    },
-                    child: FeedCard(article: article),
-                  ),
+                return ArticleCard(
+                  article,
+                  showSaveIcon: false,
+                  showBookmarkIcon: true,
+                  deleteSaved: true,
+                  shouldLoadArticle: false,
                 );
               },
+              separatorBuilder: (BuildContext context, int index) => Divider(),
             );
           }
           return const BlankPageMessage(
@@ -76,58 +58,58 @@ class _SavedPageState extends State<SavedPage> {
   }
 }
 
-class FeedCard extends StatelessWidget {
-  const FeedCard({
-    super.key,
-    required this.article,
-  });
-
-  final Article article;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        child: InkWell(
-          child: Flex(
-            direction: Axis.vertical,
-            children: [
-              ContentPref.shouldLoadImages
-                  ? Stack(
-                      children: [
-                        ArticleThumbnail(article: article),
-                        ArticleTags(article: article),
-                      ],
-                    )
-                  : const SizedBox.shrink(),
-              ListTile(
-                title: SelectableText(article.title),
-                leading: ArticlePublisherIcon(article: article),
-                subtitle: article.publishedAt != -1
-                    ? SelectableText(
-                        unixToString(article.publishedAt),
-                      )
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ArticlePage(
-                  article,
-                  shouldLoad: false,
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
+// class FeedCard extends StatelessWidget {
+//   const FeedCard({
+//     super.key,
+//     required this.article,
+//   });
+//
+//   final Article article;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Card(
+//       child: ClipRRect(
+//         borderRadius: BorderRadius.circular(8.0),
+//         child: InkWell(
+//           child: Flex(
+//             direction: Axis.vertical,
+//             children: [
+//               ContentPref.shouldLoadImages
+//                   ? Stack(
+//                       children: [
+//                         ArticleThumbnail(article: article),
+//                         ArticleTags(article: article),
+//                       ],
+//                     )
+//                   : const SizedBox.shrink(),
+//               ListTile(
+//                 title: SelectableText(article.title),
+//                 leading: ArticlePublisherIcon(article: article),
+//                 subtitle: article.publishedAt != -1
+//                     ? SelectableText(
+//                         unixToString(article.publishedAt),
+//                       )
+//                     : const SizedBox.shrink(),
+//               ),
+//             ],
+//           ),
+//           onTap: () {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(
+//                 builder: (context) => ArticlePage(
+//                   article,
+//                   shouldLoad: false,
+//                 ),
+//               ),
+//             );
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class ArticlePublisherIcon extends StatelessWidget {
   const ArticlePublisherIcon({

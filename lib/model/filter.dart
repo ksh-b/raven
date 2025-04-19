@@ -6,10 +6,8 @@ part 'filter.g.dart';
 class Filter {
   @HiveField(0)
   String publisher;
-
   @HiveField(1)
   String keyword;
-
   @HiveField(2)
   bool inAny;
   @HiveField(3)

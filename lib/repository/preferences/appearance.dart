@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:raven/repository/preferences/internal.dart';
 
 enum Appearance {

@@ -18,8 +18,21 @@ import 'package:visibility_detector/visibility_detector.dart';
 class ArticleCard extends StatefulWidget {
   final Article article;
   final List<Key> keys = [];
+  final bool showSaveIcon;
+  final bool showBookmarkIcon;
+  final bool shouldLoadArticle;
+  final bool deleteSaved;
+  final bool deleteBookmarked;
 
-  ArticleCard(this.article, {super.key});
+  ArticleCard(
+    this.article, {
+    super.key,
+    this.showSaveIcon = true,
+    this.deleteSaved = false,
+    this.showBookmarkIcon = true,
+    this.deleteBookmarked = false,
+    this.shouldLoadArticle = true,
+  });
 
   @override
   State<ArticleCard> createState() => _ArticleCardState();
@@ -46,7 +59,12 @@ class _ArticleCardState extends State<ArticleCard> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ArticlePage(widget.article)),
+          MaterialPageRoute(
+            builder: (context) => ArticlePage(
+              widget.article,
+              shouldLoad: widget.shouldLoadArticle,
+            ),
+          ),
         );
       },
     );
@@ -126,47 +144,96 @@ class _VisibleArticleCardState extends State<VisibleArticleCard> {
                         },
                       )
                     : SizedBox.shrink(),
-                ValueListenableBuilder(
-                  valueListenable: bookmarked,
-                  builder: (context, value, child) {
-                    return IconButton(
-                      icon: value
-                          ? Icon(Icons.bookmark_rounded)
-                          : Icon(Icons.bookmark_outline_rounded),
-                      visualDensity: VisualDensity.standard,
-                      onPressed: () {
-                        if (BookmarkedArticles.contains(widget.widget.article)) {
-                          BookmarkedArticles.deleteArticle(widget.widget.article);
-                          bookmarked.value = false;
-                        } else {
-                          BookmarkedArticles.saveArticle(widget.widget.article);
-                          bookmarked.value = true;
-                        }
-                      },
-                    );
-                  },
-                ),
-                ValueListenableBuilder(
+                widget.widget.showBookmarkIcon
+                    ? ValueListenableBuilder(
+                        valueListenable: bookmarked,
+                        builder: (context, value, child) {
+                          return IconButton(
+                            icon: value
+                                ? Icon(Icons.bookmark_rounded)
+                                : Icon(Icons.bookmark_outline_rounded),
+                            visualDensity: VisualDensity.standard,
+                            onPressed: () {
+                              if (BookmarkedArticles.contains(
+                                  widget.widget.article)) {
+                                BookmarkedArticles.deleteArticle(
+                                    widget.widget.article);
+                                bookmarked.value = false;
+                              } else {
+                                BookmarkedArticles.saveArticle(
+                                    widget.widget.article);
+                                bookmarked.value = true;
+                              }
+                            },
+                          );
+                        },
+                      )
+                    : SizedBox.shrink(),
+                widget.widget.showSaveIcon
+                    ? ValueListenableBuilder(
+                        valueListenable: saving,
+                        builder: (BuildContext context, bool isSaving,
+                            Widget? child) {
+                          return IconButton(
+                            icon: isSaving
+                                ? CircularProgressIndicator()
+                                : SavedArticles.contains(widget.widget.article)
+                                    ? Icon(Icons.download_rounded)
+                                    : Icon(Icons.download_outlined),
+                            visualDensity: VisualDensity.standard,
+                            onPressed: !isSaving
+                                ? () async {
+                                    saving.value = true;
+                                    await saveArticle();
+                                    saving.value = false;
+                                  }
+                                : null,
+                          );
+                        },
+                      )
+                    : SizedBox.shrink(),
+                widget.widget.deleteBookmarked
+                    ? ValueListenableBuilder(
+                        valueListenable: saving,
+                        builder: (
+                          BuildContext context,
+                          bool isSaving,
+                          Widget? child,
+                        ) {
+                          return IconButton(
+                            icon: Icon(Icons.delete_forever_rounded),
+                            visualDensity: VisualDensity.standard,
+                            onPressed: !isSaving
+                                ? () async {
+                                    BookmarkedArticles.deleteArticle(
+                                      widget.widget.article,
+                                    );
+                                  }
+                                : null,
+                          );
+                        },
+                      )
+                    : SizedBox.shrink(),
+                widget.widget.deleteSaved
+                    ? ValueListenableBuilder(
                   valueListenable: saving,
-                  builder:
-                      (BuildContext context, bool isSaving, Widget? child) {
+                  builder: (
+                      BuildContext context,
+                      bool isSaving,
+                      Widget? child,
+                      ) {
                     return IconButton(
-                      icon: isSaving
-                          ? CircularProgressIndicator()
-                          : SavedArticles.contains(widget.widget.article)
-                              ? Icon(Icons.download_rounded)
-                              : Icon(Icons.download_outlined),
+                      icon: Icon(Icons.delete_forever_rounded),
                       visualDensity: VisualDensity.standard,
                       onPressed: !isSaving
                           ? () async {
-                              saving.value = true;
-                              await saveArticle();
-                              saving.value = false;
-                            }
+                        SavedArticles.deleteArticle(widget.widget.article);
+                      }
                           : null,
                     );
                   },
-                ),
+                )
+                    : SizedBox.shrink(),
               ],
             ),
           ),
@@ -286,16 +353,18 @@ class ArticleThumbnail extends StatelessWidget {
       direction: Axis.horizontal,
       children: [
         Expanded(
-          child: widget.article.thumbnail.isNotEmpty?CachedNetworkImage(
-            fit: BoxFit.cover,
-            imageUrl: widget.article.thumbnail,
-            placeholder: (context, url) {
-              return Container(color: Colors.black38, height: 200);
-            },
-            errorWidget: (context, url, error) {
-              return Container(color: Colors.black38, height: 200);
-            },
-          ):SizedBox.shrink(),
+          child: widget.article.thumbnail.isNotEmpty
+              ? CachedNetworkImage(
+                  fit: BoxFit.cover,
+                  imageUrl: widget.article.thumbnail,
+                  placeholder: (context, url) {
+                    return Container(color: Colors.black38, height: 200);
+                  },
+                  errorWidget: (context, url, error) {
+                    return SizedBox.shrink();
+                  },
+                )
+              : SizedBox.shrink(),
         ),
       ],
     );
@@ -316,8 +385,7 @@ class PublisherFavicon extends StatelessWidget {
     if (["rss", "morss"].contains(publisher.id)) {
       return CircleAvatar(
         backgroundImage: CachedNetworkImageProvider(
-            FaviconExtractor.favicon(widget.article.category)
-        ),
+            FaviconExtractor.favicon(widget.article.category)),
       );
     }
     return CircleAvatar(

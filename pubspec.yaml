@@ -13,7 +13,8 @@ dependencies:
   dart_rss: ^3.0.3
   device_info_plus: ^11.3.3
   dio: ^5.8.0+1
-  dio_cache_interceptor_hive_store: ^4.0.0
+  http_cache_hive_store: ^5.0.1
+  pretty_dio_logger: ^1.4.0
   dio_smart_retry: ^7.0.1
   dynamic_color: ^1.7.0
   flutter:
@@ -27,7 +28,6 @@ dependencies:
   package_info_plus: ^8.3.0
   share_plus: ^10.1.4
   url_launcher: ^6.3.1
-  pretty_dio_logger: ^1.4.0
   path_provider: ^2.1.5
   visibility_detector: ^0.4.0+2
   shimmer: ^3.0.0
@@ -42,6 +42,7 @@ dependencies:
     git:
       url: https://github.com/ksh-b/klaws.git
       ref: master
+  readability: ^0.2.2
 
 dev_dependencies:
   build_runner: ^2.4.15

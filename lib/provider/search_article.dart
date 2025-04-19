@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:klaws/model/article.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
+import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/string.dart';
 
 import 'article.dart';
@@ -63,7 +64,7 @@ class SearchArticleProvider extends ChangeNotifier implements ArticleProvider {
       _tags.putIfAbsent(publisher.toString().toCapitalized, () => 1); // fixme
       _tags.putIfAbsent(publisher.name, () => 3);
       var searchedArticles = await publisher
-          .searchedArticles(searchQuery: _searchQuery, page: page);
+          .searchedArticles(searchQuery: _searchQuery, page: page, dio:  dio());
       articles.addAll(searchedArticles);
       for (var cArticle in searchedArticles) {
         for (var tag in cArticle.tags) {

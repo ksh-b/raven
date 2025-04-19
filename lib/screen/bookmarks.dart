@@ -2,15 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 import 'package:klaws/model/article.dart';
-import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/preferences/bookmarks.dart';
-import 'package:raven/repository/preferences/content.dart';
-import 'package:raven/repository/preferences/bookmarks.dart';
-import 'package:raven/repository/preferences/internal.dart';
-import 'package:raven/screen/full_article.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/string.dart';
-import 'package:raven/utils/time.dart';
+import 'package:raven/widget/article_card.dart';
 import 'package:raven/widget/blank_page_message.dart';
 
 class BookmarksPage extends StatefulWidget {
@@ -39,15 +34,18 @@ class _BookmarksPageState extends State<BookmarksPage> {
         valueListenable: BookmarkedArticles.bookmarks.listenable(),
         builder: (BuildContext context, box, Widget? child) {
           if (BookmarkedArticles.bookmarks.isNotEmpty) {
-            return ListView.builder(
+            return ListView.separated(
               itemCount: BookmarkedArticles.bookmarks.keys.length,
               itemBuilder: (context, index) {
                 Article article = BookmarkedArticles.bookmarks.values.toList()[index];
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                  child: FeedCard(article: article),
+                return ArticleCard(
+                  article,
+                  showBookmarkIcon: false,
+                  showSaveIcon: true,
+                  deleteBookmarked: true,
                 );
               },
+              separatorBuilder: (BuildContext context, int index) => Divider(),
             );
           }
           return const BlankPageMessage(
@@ -59,57 +57,57 @@ class _BookmarksPageState extends State<BookmarksPage> {
   }
 }
 
-class FeedCard extends StatelessWidget {
-  const FeedCard({
-    super.key,
-    required this.article,
-  });
-
-  final Article article;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        child: InkWell(
-          child: Flex(
-            direction: Axis.vertical,
-            children: [
-              ContentPref.shouldLoadImages
-                  ? Stack(
-                      children: [
-                        ArticleThumbnail(article: article),
-                        ArticleTags(article: article),
-                      ],
-                    )
-                  : const SizedBox.shrink(),
-              ListTile(
-                title: SelectableText(article.title),
-                leading: ArticlePublisherIcon(article: article),
-                subtitle: article.publishedAt != -1
-                    ? SelectableText(
-                        unixToString(article.publishedAt),
-                      )
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ArticlePage(
-                  article,
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
+// class FeedCard extends StatelessWidget {
+//   const FeedCard({
+//     super.key,
+//     required this.article,
+//   });
+//
+//   final Article article;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Card(
+//       child: ClipRRect(
+//         borderRadius: BorderRadius.circular(8.0),
+//         child: InkWell(
+//           child: Flex(
+//             direction: Axis.vertical,
+//             children: [
+//               ContentPref.shouldLoadImages
+//                   ? Stack(
+//                       children: [
+//                         ArticleThumbnail(article: article),
+//                         ArticleTags(article: article),
+//                       ],
+//                     )
+//                   : const SizedBox.shrink(),
+//               ListTile(
+//                 title: SelectableText(article.title),
+//                 leading: ArticlePublisherIcon(article: article),
+//                 subtitle: article.publishedAt != -1
+//                     ? SelectableText(
+//                         unixToString(article.publishedAt),
+//                       )
+//                     : const SizedBox.shrink(),
+//               ),
+//             ],
+//           ),
+//           onTap: () {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(
+//                 builder: (context) => ArticlePage(
+//                   article,
+//                 ),
+//               ),
+//             );
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class ArticlePublisherIcon extends StatelessWidget {
   const ArticlePublisherIcon({

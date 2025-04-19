@@ -3,6 +3,7 @@ import 'package:klaws/model/article.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
+import 'package:raven/service/http_client.dart';
 
 import 'article.dart';
 
@@ -70,7 +71,7 @@ class CategoryArticleProvider extends ChangeNotifier implements ArticleProvider 
       for (String category in categories) {
         Set<Article> categoryArticles = {};
         try {
-          categoryArticles = await publisher.categoryArticles(category: category, page: _page);
+          categoryArticles = await publisher.categoryArticles(category: category, page: _page, dio: dio(),);
         } catch (e) {
           continue;
         }

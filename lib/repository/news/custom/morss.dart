@@ -1,10 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:klaws/model/article.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/provider/fallback_provider.dart';
-import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/html_helper.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/time.dart';
@@ -29,22 +29,23 @@ class Morss extends Source {
   }
 
   @override
-  Future<Article> article(Article newsArticle) async {
-    if (newsArticle.content.isEmpty) {
-      newsArticle = await FallbackProvider().get(newsArticle);
-      if (newsArticle.thumbnail.isEmpty && newsArticle.content.isNotEmpty) {
-        Document document = html_parser.parse(newsArticle.content);
-        newsArticle.thumbnail =
+  Future<Article> article(Article article, Dio dio) async {
+    if (article.content.isEmpty) {
+      article = await FallbackProvider().get(article);
+      if (article.thumbnail.isEmpty && article.content.isNotEmpty) {
+        Document document = html_parser.parse(article.content);
+        article.thumbnail =
             document.querySelector("img[src]")?.attributes["src"] ?? "";
       }
     }
-    return newsArticle;
+    return article;
   }
 
   @override
   Future<Set<Article>> categoryArticles({
     String category = "/",
     int page = 1,
+    required Dio dio
   }) async {
     if (page > 1) return {};
     Set<Article> articles = {};
@@ -56,7 +57,7 @@ class Morss extends Source {
       url = "$homePage/:format=json:cors/$category";
     }
     try {
-      var response = await dio().get(url);
+      var response = await dio.get(url);
       if (response.successful) {
         var data = response.data;
         var items = data["items"];
@@ -96,6 +97,7 @@ class Morss extends Source {
   Future<Set<Article>> searchedArticles({
     required String searchQuery,
     int page = 1,
+    required Dio dio
   }) async {
     return {};
   }

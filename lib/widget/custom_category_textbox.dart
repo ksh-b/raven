@@ -3,6 +3,7 @@ import 'package:klaws/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/repository/publishers.dart';
+import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/string.dart';
 
 class CustomCategoryValidation extends StatelessWidget {
@@ -20,26 +21,23 @@ class CustomCategoryValidation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var userDefinedCategory = customCategoryController.text.isNotEmpty?publishers()[source.id]
-        ?.articles(category: customCategoryController.text):null;
+        ?.articles(category: customCategoryController.text, dio: dio()):null;
     return Expanded(
       flex: 1,
       child: FutureBuilder(
         future: userDefinedCategory,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return IconButton(
-              onPressed: () => saveCustomSubscription(),
-              icon: const Icon(Icons.save_alt),
-            );
+            saveCustomSubscription();
           }
           if (customCategoryController.text.isEmpty || customCategoryPath.isEmpty) {
             return const SizedBox.shrink();
           }
-          if (snapshot.data==null || snapshot.hasError || (snapshot.hasData && snapshot.data!.isEmpty)) {
-            return const Icon(Icons.cancel);
-          }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Icon(Icons.access_time_rounded);
+          }
+          if (snapshot.data==null || snapshot.hasError || (snapshot.hasData && snapshot.data!.isEmpty)) {
+            return const Icon(Icons.cancel);
           }
           return const SizedBox.shrink();
         },

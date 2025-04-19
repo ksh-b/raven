@@ -3,6 +3,7 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
+import 'package:raven/service/http_client.dart';
 import 'package:raven/widget/custom_category_textbox.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -86,7 +87,7 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
   @override
   void initState() {
     super.initState();
-    futureCategories = widget.source.categories();
+    futureCategories = widget.source.categories(dio());
   }
 
   @override

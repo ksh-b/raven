@@ -4,6 +4,7 @@ import 'package:klaws/model/article.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/ladders.dart';
 import 'package:raven/repository/preferences/content.dart';
+import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/html_widget.dart';
 import 'package:raven/widget/options_popup.dart';
@@ -37,7 +38,7 @@ class _ArticlePageState extends State<ArticlePage> {
   @override
   void initState() {
     super.initState();
-    fullArticle = widget.article.source.article(widget.article);
+    fullArticle = widget.article.source.article(widget.article, dio());
   }
 
   @override

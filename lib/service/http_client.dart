@@ -28,16 +28,11 @@ CacheOptions _cacheOptions() {
 Dio dio() {
   var headers = {
     'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-    'Accept':
-        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
     'Accept-Language': 'en-US,en;q=0.9',
   };
-  Dio dio_ = Dio(
-    BaseOptions(
-      headers: headers,
-    ),
-  );
+  Dio dio_ = Dio();
 
   List<String> retryBlacklist = ["SocketException: Failed host lookup"];
 
@@ -46,8 +41,9 @@ Dio dio() {
   );
 
   dio_.options = BaseOptions(
+    headers: headers,
     validateStatus: (status) => true,
-    connectTimeout: const Duration(seconds: 15),
+    connectTimeout: const Duration(seconds: 5),
   );
 
   dio_.interceptors.add(PrettyDioLogger(

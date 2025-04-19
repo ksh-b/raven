@@ -1,6 +1,6 @@
 import 'package:klaws/model/article.dart';
 import 'package:raven/repository/publishers.dart';
-import 'package:raven/service/html_content_extractor.dart';
+import 'package:readability/readability.dart' as readability;
 
 class FallbackProvider {
   Future<Article> get(Article article) async {
@@ -9,10 +9,20 @@ class FallbackProvider {
       article.url = homePage + article.url;
     }
 
-    var maybeArticle = await HtmlContentExtractor().fallback(article);
-    if (!maybeArticle.key) {
-      return article;
-    }
-    return maybeArticle.value;
+    var fullArticle = await readability.parseAsync(article.url);
+    return Article(
+      source: article.source,
+      sourceName: article.sourceName,
+      title: fullArticle.title ?? article.title,
+      content: fullArticle.content ?? article.content,
+      excerpt: fullArticle.excerpt ?? article.excerpt,
+      author: fullArticle.author ?? article.author,
+      url: article.url,
+      thumbnail: fullArticle.imageUrl ?? article.thumbnail,
+      category: article.category,
+      tags: article.tags,
+      publishedAt: article.publishedAt,
+      publishedAtString: fullArticle.publishedTime ?? article.publishedAtString,
+    );
   }
 }

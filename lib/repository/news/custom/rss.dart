@@ -1,12 +1,11 @@
 import 'package:dart_rss/dart_rss.dart';
-import 'package:dio/src/response.dart';
+import 'package:dio/dio.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:klaws/model/article.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/provider/fallback_provider.dart';
-import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/network.dart';
 import 'package:raven/utils/time.dart';
 
@@ -36,24 +35,25 @@ class RSSFeed extends Source {
   }
 
   @override
-  Future<Article> article(Article newsArticle) async {
-    newsArticle = await FallbackProvider().get(newsArticle);
+  Future<Article> article(Article article, Dio dio) async {
+    article = await FallbackProvider().get(article);
     // remove thumbnail if content has it already
-    if (newsArticle.thumbnail == _thumbnail(newsArticle.content)) {
-      newsArticle.thumbnail = "";
+    if (article.thumbnail == _thumbnail(article.content)) {
+      article.thumbnail = "";
     }
-    return newsArticle;
+    return article;
   }
 
   @override
   Future<Set<Article>> categoryArticles({
     String category = "",
     int page = 1,
+    required Dio dio
   }) async {
     if (page > 1) return {};
     Set<Article> articles = {};
     try {
-      var response = await dio().get(category);
+      var response = await dio.get(category);
       if (response.successful) {
         WebFeed feed = WebFeed.fromXmlString(response.data);
         if (feed.rssVersion == RssVersion.rss2) {
@@ -83,9 +83,7 @@ class RSSFeed extends Source {
           content: item.body,
           excerpt: "",
           author: "",
-          url: item.links.isNotEmpty
-              ? (item.links.first?.trim() ?? "")
-              : "",
+          url: item.links.isNotEmpty ? (item.links.first?.trim() ?? "") : "",
           tags: [],
           thumbnail: _thumbnail(item.body),
           publishedAt: item.updated?.millisecondsSinceEpoch ?? -1,
@@ -157,7 +155,9 @@ class RSSFeed extends Source {
     Set<Article> articles = {};
     var rssFeed = RssFeed.parse(response.data);
     for (var item in rssFeed.items) {
-      var images = item.content?.images.toList() ?? [];
+      var images = item.media?.thumbnails.map((e) => e.url ?? "").toList() ??
+          item.content?.images.toList() ??
+          [];
       articles.add(
         Article(
           source: this,
@@ -171,7 +171,9 @@ class RSSFeed extends Source {
           thumbnail: images.isNotEmpty
               ? images.first
               : _thumbnail(item.description ?? ""),
-          publishedAt: item.pubDate != null ? stringToUnix(item.pubDate!, format: "RFC-1123") : -1,
+          publishedAt: item.pubDate != null
+              ? stringToUnix(item.pubDate!, format: "RFC-1123")
+              : -1,
           publishedAtString: item.pubDate ?? "",
           category: category,
         ),
@@ -184,6 +186,7 @@ class RSSFeed extends Source {
   Future<Set<Article>> searchedArticles({
     required String searchQuery,
     int page = 1,
+    required Dio dio
   }) async {
     return {};
   }
