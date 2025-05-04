@@ -4,7 +4,7 @@ import 'package:raven/repository/search_suggestions.dart';
 import 'package:raven/repository/trends.dart';
 import 'package:raven/screen/customize_filters.dart';
 import 'package:raven/screen/subscriptions_provider.dart';
-import 'package:raven/service/simplytranslate.dart';
+import 'package:raven/service/mlkit_translation.dart';
 import 'package:raven/widget/options_popup.dart';
 
 class ContentPage extends StatefulWidget {
@@ -176,41 +176,9 @@ class _ContentPageState extends State<ContentPage> {
                 (String option) {
                   ContentPref.translateTo = option;
                 },
-                SimplyTranslate().languages.keys.toList(),
+                MLKitTranslation().languages().keys.toList(),
               );
             },
-          ),
-          ListTile(
-            title: const Text('Translator instance'),
-            subtitle: Text(ContentPref.translatorInstance),
-            onTap: () {
-              showPopup(
-                context,
-                "Translator instance",
-                (String option) {
-                  ContentPref.translatorInstance = option;
-                  ContentPref.translatorInstance = SimplyTranslate()
-                      .instances[ContentPref.translatorInstance]!
-                      .first;
-                },
-                SimplyTranslate().instances.keys.toList(),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Translator engine'),
-            subtitle: Text(ContentPref.translatorInstance),
-            onTap: () {
-              showPopup(
-                context,
-                "Translate engine",
-                (String option) {
-                  ContentPref.translatorInstance = option;
-                },
-                SimplyTranslate().instances[ContentPref.translatorInstance]!,
-              );
-            },
-            enabled: false,
           ),
         ],
       ),

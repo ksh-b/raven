@@ -23,10 +23,10 @@ class RepoHelper {
     if (repo2==null) {
       return "Failed to resolve ${repo.name}";
     }
-    if(repo2.lastUpdate>repo.lastUpdated) {
+    // if(repo2.lastUpdate>repo.lastUpdated) {
       await deleteRepo(repo);
       await tryImportingRepo(repo.url);
-    }
+    // }
     return "Updated ${repo.name}";
   }
 

@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:raven/repository/preferences/internal.dart';
@@ -16,7 +16,7 @@ CacheOptions _cacheOptions() {
         ? HiveCacheStore(Internal.appDirectory)
         : MemCacheStore(),
     policy: CachePolicy.request,
-    hitCacheOnErrorExcept: [401, 403],
+    hitCacheOnNetworkFailure: true,
     maxStale: const Duration(minutes: 60),
     priority: CachePriority.normal,
     cipher: null,

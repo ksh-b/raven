@@ -38,11 +38,13 @@ dependencies:
   json_path: ^0.7.5
   file_picker: ^10.1.2
   flutter_svg: ^2.0.17
+  dio_cache_interceptor: ^4.0.3
+  google_mlkit_translation: ^0.13.0
+  google_mlkit_language_id: ^0.13.0
   klaws:
     git:
       url: https://github.com/ksh-b/klaws.git
       ref: master
-  readability: ^0.2.2
 
 dev_dependencies:
   build_runner: ^2.4.15

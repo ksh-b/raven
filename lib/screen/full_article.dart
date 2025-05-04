@@ -166,7 +166,7 @@ class FullArticle extends StatelessWidget {
 
         // Content
         ContentPref.shouldTranslate
-            ? TranslatedText(response.data?.content ?? "")
+            ? TranslatedText(response.data?.content ?? "", isHtml: true)
             : HtmlWidget(response.data?.content ?? "")
       ],
     );

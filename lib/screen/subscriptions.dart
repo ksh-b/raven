@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_ce_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:klaws/model/watch.dart';
@@ -107,62 +108,67 @@ class _FeedSelectorState extends State<FeedSelector> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: publishers().length,
-                  itemBuilder: (context, sourceIndex) {
-                    Source source = publishers().entries.toList().elementAt(sourceIndex).value;
-                    var categories = getSelectedCategories(source);
-                    return ListTile(
-                      title: Text(source.name),
-                      leading: ClipOval(
-                        child: CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          imageUrl: source.iconUrl,
-                          progressIndicatorBuilder: (
-                            context,
-                            url,
-                            downloadProgress,
-                          ) {
-                            return CircularProgressIndicator(
-                              value: downloadProgress.progress,
-                            );
-                          },
-                          height: 40,
-                          width: 40,
-                          errorWidget: (context, url, error) =>
-                              CircleAvatar(
-                            child: Text(
-                              source.name.characters.first,
+                child: ValueListenableBuilder(
+                  valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(),
+                  builder: (context, value, child) {
+                    return ListView.builder(
+                      itemCount: search.filteredPublishers.length,
+                      itemBuilder: (context, sourceIndex) {
+                        Source source = search.filteredPublishers.toList().elementAt(sourceIndex);
+                        var categories = getSelectedCategories(source);
+                        return ListTile(
+                          title: Text(source.name),
+                          leading: ClipOval(
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: source.iconUrl,
+                              progressIndicatorBuilder: (
+                                context,
+                                url,
+                                downloadProgress,
+                              ) {
+                                return CircularProgressIndicator(
+                                  value: downloadProgress.progress,
+                                );
+                              },
+                              height: 40,
+                              width: 40,
+                              errorWidget: (context, url, error) =>
+                                  CircleAvatar(
+                                child: Text(
+                                  source.name.characters.first,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      subtitle: categories.isNotEmpty
-                          ? Text(
-                              categories,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                          subtitle: categories.isNotEmpty
+                              ? Text(
+                                  categories,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              : SizedBox.shrink(),
+                          trailing: categories.isEmpty
+                              ? const SizedBox.shrink()
+                              : const Icon(Icons.check_circle),
+                          onTap: () {
+                            Navigator.of(context)
+                                .push(
+                              MaterialPageRoute(
+                                builder: (context) => CategorySelector(
+                                  publishers(),
+                                  source,
+                                ),
+                              ),
                             )
-                          : SizedBox.shrink(),
-                      trailing: categories.isEmpty
-                          ? const SizedBox.shrink()
-                          : const Icon(Icons.check_circle),
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(
-                          MaterialPageRoute(
-                            builder: (context) => CategorySelector(
-                              publishers(),
-                              source,
-                            ),
-                          ),
-                        )
-                            .whenComplete(() {
-                          categories = getSelectedCategories(source);
-                        });
+                                .whenComplete(() {
+                              categories = getSelectedCategories(source);
+                            });
+                          },
+                        );
                       },
                     );
-                  },
+                  }
                 ),
               ),
             ],

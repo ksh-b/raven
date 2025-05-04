@@ -1,11 +1,5 @@
-import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:raven/provider/theme.dart';
-import 'package:raven/repository/preferences/internal.dart';
-import 'package:raven/repository/trends.dart';
-import 'package:raven/service/simplytranslate.dart';
-import 'package:raven/widget/options_popup.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatefulWidget {

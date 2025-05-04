@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:raven/provider/theme.dart';
-import 'package:raven/service/simplytranslate.dart';
+import 'package:raven/service/mlkit_translation.dart';
 import 'package:shimmer/shimmer.dart';
 
 class TranslatedText extends StatefulWidget {
   final String text;
   final TextStyle? style;
+  final bool isHtml;
 
-  const TranslatedText(this.text, {super.key, this.style});
+  const TranslatedText(this.text, {super.key, this.style, this.isHtml=false});
 
   @override
   State<TranslatedText> createState() => _TranslatedTextState();
@@ -20,7 +21,7 @@ class _TranslatedTextState extends State<TranslatedText>
     super.build(context);
     var text = widget.text;
     return FutureBuilder(
-      future: SimplyTranslate().translate(text),
+      future: MLKitTranslation().translate(text, isHtml: widget.isHtml),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return SelectableText(

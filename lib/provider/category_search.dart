@@ -30,7 +30,7 @@ class FeedSourceSearchProvider extends ChangeNotifier {
 
   void searchPublishersByName(String query) {
     filteredPublishers = _publishers.where((publisher) {
-      return publisher.id.toLowerCase().contains(query);
+      return publisher.name.toLowerCase().contains(query);
     }).toList();
 
     notifyListeners();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
+import 'package:raven/provider/category_search.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/service/http_client.dart';
 import 'package:raven/widget/custom_category_textbox.dart';
@@ -10,7 +11,6 @@ import 'package:url_launcher/url_launcher_string.dart';
 class CategorySelector extends StatefulWidget {
   final Map<String, Source> publishers;
   final Source mainSource;
-
   const CategorySelector(this.publishers, this.mainSource, {super.key});
 
   @override

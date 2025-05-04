@@ -8,7 +8,8 @@ import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/repository/preferences/saved.dart';
 import 'package:raven/screen/full_article.dart';
 import 'package:raven/service/favicon_extractor.dart';
-import 'package:raven/service/simplytranslate.dart';
+import 'package:raven/service/http_client.dart';
+import 'package:raven/service/mlkit_translation.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/rounded_chip.dart';
 import 'package:share_plus/share_plus.dart';
@@ -243,8 +244,9 @@ class _VisibleArticleCardState extends State<VisibleArticleCard> {
   }
 
   Future<void> saveArticle() async {
-    Article article =
-        await SimplyTranslate().translateArticle(widget.widget.article);
+    // TODO: Load article before hand somewhere else
+    await widget.widget.article.source.article(widget.widget.article, dio());
+    Article article = await MLKitTranslation().translateArticle(widget.widget.article);
     SavedArticles.saveArticle(article);
   }
 }
@@ -298,10 +300,9 @@ class _ArticleTitleState extends State<ArticleTitle> {
           setState(() {
             translating = true;
           });
-          title.value = await SimplyTranslate()
+          title.value = await MLKitTranslation()
               .translate(
             widget.widget.article.title,
-            language: ContentPref.translateTo,
           )
               .onError(
             (error, stackTrace) {
