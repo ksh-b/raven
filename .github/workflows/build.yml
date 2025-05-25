@@ -28,9 +28,6 @@ jobs:
 
       - name: Switch Flutter channel
         run: flutter channel master --disable-analytics
-
-      - name: Upgrade Flutter
-        run: flutter upgrade
         
       - name: Display Flutter version
         run: flutter --version
