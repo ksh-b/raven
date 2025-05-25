@@ -19,7 +19,7 @@ jobs:
           submodules: true
           
       - name: Set up Flutter SDK path
-        run: echo "::add-path::$(pwd)/submodules/flutter/bin"
+        run: echo "$(pwd)/submodules/flutter/bin" >> $GITHUB_PATH
 
       - name: Display Flutter version
         run: flutter --version
