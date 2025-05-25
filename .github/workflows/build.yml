@@ -23,9 +23,12 @@ jobs:
       - name: Set up Flutter SDK path
         run: echo "$(pwd)/submodules/flutter/bin" >> $GITHUB_PATH
 
-      - name: Display Flutter version
+      - name: Switch Flutter channel
         run: flutter channel master
 
+      - name: Upgrade Flutter
+        run: flutter upgrade
+        
       - name: Display Flutter version
         run: flutter --version
 
