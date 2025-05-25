@@ -11,8 +11,6 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
-    env:
-      FLUTTER_GIT_URL: https://github.com/flutter/flutter.git
 
     steps:
       - name: Checkout repository (including submodules)
