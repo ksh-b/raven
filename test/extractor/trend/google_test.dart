@@ -1,4 +1,4 @@
-import 'package:raven/extractor/trend/google.dart';
+import 'package:raven/repository/trend/google.dart';
 import 'package:test/test.dart';
 
 void main() {

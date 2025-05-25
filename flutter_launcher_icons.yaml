@@ -1,0 +1,27 @@
+# flutter pub run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "fastlane/metadata/android/en-US/images/icon.png"
+
+  android: true
+  min_sdk_android: 21
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "fastlane/metadata/android/en-US/images/icon.png"
+  adaptive_icon_monochrome: "fastlane/metadata/android/en-US/images/icon.png"
+
+  ios: false
+  remove_alpha_channel_ios: true
+
+  web:
+    generate: false
+    image_path: "path/to/image.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+
+  windows:
+    generate: false
+    image_path: "path/to/image.png"
+    icon_size: 48 # min:48, max:256, default: 48
+
+  macos:
+    generate: false
+    image_path: "path/to/image.png"

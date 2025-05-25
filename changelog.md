@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-alpha] - 2024-06-29
+
+### Added
+- Ability to add your own sources (Example: https://github.com/raven-repo/sources-world-news)
+- Option to bookmark articles
+- RSS Feed articles will now show their favicon and URL.
+- Import / Export option for saved articles, bookmarks and subscriptions.
+- Content filter - Hide articles containing specified keywords
+- Network logs (stored locally only)
+
+### Changed
+- Navigation - From Bottom Bar to Side Navigation Bar
+- Translation - Uses Google's MLKit* instead of SimplyTranslate.
+
+### Removed
+- All sources except RSS Feed and Morss
+
+* This may connect to Firebase, although attempts have been made to prevent that.
+
+### Added
+- Extractors: Android Police, XDA Developers (#13)
+- Option to filter with tags
+- Context menu action to translate parts of article (#12)
+
+### Changed
+- "Save" button is removed from category selector. Changes are auto saved
+- Articles will now be saved with just swipe (#23)
+- Ladder options are moved to full article page
+- Minor layout changes
+
+### Fixed
+- Article sorting (really) (#22)
+- Article text not selectable (#32)
+- Fixed extractor: Guardian
+
 ## [0.14.0] - 2024-06-29
 
 ### Added

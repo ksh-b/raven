@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:intl/intl.dart';
 
 int stringToUnix(String timestamp, {String? format}) {
   try {
+    if (format == "RFC-1123") {
+      DateTime dateTime = HttpDate.parse(timestamp);
+      return dateTime.toUtc().millisecondsSinceEpoch;
+    }
     if (format != null) {
       DateFormat inputFormat = DateFormat(format);
       DateTime parsedTime = inputFormat
@@ -19,8 +25,14 @@ String unixToString(int then) {
   const int hour = 60 * minute;
   const int day = 24 * hour;
   const int month = 30 * day;
-  var now = DateTime.now().millisecondsSinceEpoch;
-  var timePassed = (now - then)~/1000;
+
+  if (then > 9999999999) {
+    then = (then ~/ 1000).toInt();
+  }
+
+  var now = DateTime.now().millisecondsSinceEpoch / 1000;
+
+  var timePassed = (now - then).toInt();
 
   if (then == -1) {
     return '';
@@ -46,6 +58,7 @@ String unixToString(int then) {
     return '$months ${(months == 1) ? 'month' : 'months'} ago';
   }
 }
+
 
 int isoToUnix(String timestamp) {
   return DateTime.parse(timestamp).millisecondsSinceEpoch;
@@ -81,7 +94,9 @@ int relativeStringToUnix(String timeString) {
       default:
         seconds = 0;
     }
-    return DateTime.now().subtract(Duration(seconds: seconds)).millisecondsSinceEpoch;
+    return DateTime.now()
+        .subtract(Duration(seconds: seconds))
+        .millisecondsSinceEpoch;
   } catch (e) {
     return -1;
   }

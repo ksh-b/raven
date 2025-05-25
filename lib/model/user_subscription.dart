@@ -1,30 +1,46 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:klaws/model/publisher.dart';
 
 part 'user_subscription.g.dart';
 
+@JsonSerializable()
 @HiveType(typeId: 0)
-class UserSubscription extends HiveObject {
+class UserFeedSubscription extends HiveObject {
   @HiveField(0)
-  String publisher;
+  Source source;
 
   @HiveField(1)
-  String category;
+  String categoryPath;
 
-  UserSubscription(this.publisher, this.category);
+  @HiveField(2)
+  String categoryLabel;
 
-  @override
-  String toString() {
-    return "$publisher~$category";
-  }
+  @HiveField(3)
+  bool isCustom;
+
+  UserFeedSubscription(this.source, this.categoryLabel, this.categoryPath,
+      {this.isCustom = false});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserSubscription &&
+      other is UserFeedSubscription &&
           runtimeType == other.runtimeType &&
-          publisher == other.publisher &&
-          category == other.category;
+          source.id == other.source.id&&
+          categoryPath == other.categoryPath &&
+          categoryLabel == other.categoryLabel;
 
   @override
-  int get hashCode => publisher.hashCode ^ category.hashCode;
+  int get hashCode => source.id.hashCode ^ categoryPath.hashCode;
+
+  @override
+  String toString() {
+    return super.toString();
+  }
+
+  factory UserFeedSubscription.fromJson(Map<String, dynamic> json) => _$UserFeedSubscriptionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserFeedSubscriptionToJson(this);
+
 }
