@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
+          fetch-depth: 0
       
       - name: Initialize and update submodules
         run: |
@@ -34,9 +35,6 @@ jobs:
 
       - name: Switch Flutter channel
         run: flutter channel master --disable-analytics
-
-      - name: Switch Flutter channel
-        run: flutter upgrade
         
       - name: Display Flutter version
         run: flutter --version
