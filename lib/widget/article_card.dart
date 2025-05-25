@@ -12,6 +12,7 @@ import 'package:raven/service/http_client.dart';
 import 'package:raven/service/mlkit_translation.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/rounded_chip.dart';
+import 'package:raven/widget/translatable_text.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -284,56 +285,9 @@ class ArticleTitle extends StatefulWidget {
 }
 
 class _ArticleTitleState extends State<ArticleTitle> {
-  bool translating = false;
-
   @override
   Widget build(BuildContext context) {
-    ValueNotifier<String> title =
-        ValueNotifier<String>(widget.widget.article.title);
-    return VisibilityDetector(
-      key: Key(widget.widget.article.url),
-      onVisibilityChanged: (VisibilityInfo visibility) async {
-        var isVisible = visibility.visibleFraction == 1;
-        var firstVisit =
-            !widget.widget.keys.contains(Key(widget.widget.article.url));
-        if (isVisible && firstVisit) {
-          setState(() {
-            translating = true;
-          });
-          title.value = await MLKitTranslation()
-              .translate(
-            widget.widget.article.title,
-          )
-              .onError(
-            (error, stackTrace) {
-              setState(() {
-                translating = false;
-              });
-              return title.value;
-            },
-          );
-          widget.widget.article.title = title.value;
-          widget.widget.keys.add(Key(widget.widget.article.url));
-          setState(() {
-            translating = false;
-          });
-        }
-      },
-      child: ValueListenableBuilder(
-        valueListenable: title,
-        builder: (BuildContext context, value, Widget? child) {
-          var baseColor =
-              ThemeProvider().getCurrentTheme().textTheme.titleLarge!.color!;
-          return translating
-              ? Shimmer.fromColors(
-                  baseColor: baseColor,
-                  highlightColor: Colors.white30,
-                  child: Text(value),
-                )
-              : Text(value);
-        },
-      ),
-    );
+    return TranslatableText(widget.widget.article.title);
   }
 }
 

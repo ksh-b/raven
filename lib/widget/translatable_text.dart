@@ -1,29 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:raven/provider/theme.dart';
+import 'package:raven/repository/preferences/content.dart';
 import 'package:raven/service/mlkit_translation.dart';
 import 'package:shimmer/shimmer.dart';
 
-class TranslatedText extends StatefulWidget {
+import 'html_widget.dart';
+
+class TranslatableText extends StatefulWidget {
   final String text;
   final TextStyle? style;
   final bool isHtml;
 
-  const TranslatedText(this.text, {super.key, this.style, this.isHtml=false});
+  const TranslatableText(this.text, {super.key, this.style, this.isHtml=false});
 
   @override
-  State<TranslatedText> createState() => _TranslatedTextState();
+  State<TranslatableText> createState() => _TranslatableTextState();
 }
 
-class _TranslatedTextState extends State<TranslatedText>
+class _TranslatableTextState extends State<TranslatableText>
     with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
     var text = widget.text;
-    return FutureBuilder(
+
+    return ContentPref.shouldTranslate?
+     FutureBuilder(
       future: MLKitTranslation().translate(text, isHtml: widget.isHtml),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          if(widget.isHtml) {
+           return HtmlWidget(snapshot.data ?? widget.text);
+          }
           return SelectableText(
             snapshot.data!,
             style: widget.style,
@@ -50,6 +58,9 @@ class _TranslatedTextState extends State<TranslatedText>
           style: widget.style,
         );
       },
+    ): SelectableText(
+    text,
+    style: widget.style,
     );
   }
 

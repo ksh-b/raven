@@ -22,8 +22,6 @@ class MLKitTranslation extends TranslationService {
       return article;
     }
 
-    final modelManager = OnDeviceTranslatorModelManager();
-
     String content = article.content;
     String title = article.title;
     String excerpt = article.excerpt;
@@ -85,24 +83,49 @@ class MLKitTranslation extends TranslationService {
     );
   }
 
-  @override
-  Future<String> translate(String text, {bool isHtml=false}) async {
-    // todo: identify this automatically. make it more clean
-    // clean html
-    if(isHtml) {
-      dom.Document document = html_parser.parse(text.replaceAll("<", " <"));
+  Future<dom.Document> translateDocument(dom.Document document) async {
+    Future<void> processNode(dom.Node node, TranslateLanguage? sourceLanguage) async {
+      if (node.nodeType == dom.Node.TEXT_NODE) {
+        String originalText = node.text?.trim() ?? '';
+        if (originalText.isNotEmpty) {
+          String translatedText = await translate(originalText, sourceLanguage: sourceLanguage);
+          node.text = translatedText;
+        }
+      } else {
+        for (dom.Node child in node.nodes) {
+          await processNode(child, sourceLanguage);
+        }
+      }
+    }
+
+    if (document.body != null) {
       document.querySelectorAll('script,noscript').forEach((tag) {
         tag.remove();
       });
-      text = document.body?.text ?? text;
+      String identifiedLanguageCode = await identifySourceLanguage(document.text??"");
+      TranslateLanguage? sourceLanguage = confirmSourceLanguage(identifiedLanguageCode);
+      await processNode(document.body!, sourceLanguage);
+    }
+    return document;
+  }
+
+  @override
+  Future<String> translate(String text, {bool isHtml=false, TranslateLanguage? sourceLanguage}) async {
+    // todo: identify this automatically. make it more clean
+    // clean html
+    if(isHtml) {
+      dom.Document document = html_parser.parse(text);
+      return (await translateDocument(document)).body!.outerHtml;
     }
 
     // identify source language
     String identifiedLanguageCode = await identifySourceLanguage(text);
-    TranslateLanguage? sourceLanguage = confirmSourceLanguage(identifiedLanguageCode);
-    // und = undetermined
-    if (identifiedLanguageCode == "und" || sourceLanguage == null) {
-      return text;
+    if(sourceLanguage==null) {
+      sourceLanguage = confirmSourceLanguage(identifiedLanguageCode);
+      // und = undetermined
+      if (identifiedLanguageCode == "und" || sourceLanguage == null) {
+        return text;
+      }
     }
 
     // download models

@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/model/user_subscription.dart';
-import 'package:raven/provider/category_search.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/service/http_client.dart';
 import 'package:raven/widget/custom_category_textbox.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class CategorySelector extends StatefulWidget {
-  final Map<String, Source> publishers;
   final Source mainSource;
-  const CategorySelector(this.publishers, this.mainSource, {super.key});
+
+  const CategorySelector(this.mainSource, {super.key});
 
   @override
   State<CategorySelector> createState() => _CategorySelectorState();
@@ -92,7 +91,6 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
 
   @override
   Widget build(BuildContext context) {
-
     return ValueListenableBuilder(
       valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(),
       builder: (context, value, child) {
@@ -103,19 +101,18 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
             children: [
               widget.source.hasSearchSupport
                   ? ActionChip(
-                label: const Text("Has search support"),
-                avatar: const Icon(Icons.search_rounded),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              )
+                      label: const Text("Has search support"),
+                      avatar: const Icon(Icons.search_rounded),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    )
                   : const SizedBox.shrink(),
               Flexible(
                 child: FutureBuilder<Map<String, String>>(
                   future: futureCategories,
                   builder: (context, categories) {
-                    if (categories.connectionState ==
-                        ConnectionState.done) {
+                    if (categories.connectionState == ConnectionState.done) {
                       // categories.hasData && categories.data!.isNotEmpty
                       categories.data!.forEach((key, value) {
                         availableSubscriptions.add(
@@ -123,15 +120,15 @@ class _SourceCategoryTabContentState extends State<SourceCategoryTabContent> {
                         );
                       });
                       List<UserFeedSubscription> allSubscriptions =
-                      availableSubscriptions
-                          .toSet()
-                          .union(UserSubscriptionPref.customSubscriptions
-                          .toSet())
-                          .union(UserSubscriptionPref.selectedSubscriptions
-                          .toSet())
-                          .where(
-                              (element) => element.source.id == widget.source.id)
-                          .toList();
+                          availableSubscriptions
+                              .toSet()
+                              .union(UserSubscriptionPref.customSubscriptions
+                                  .toSet())
+                              .union(UserSubscriptionPref.selectedSubscriptions
+                                  .toSet())
+                              .where((element) =>
+                                  element.source.id == widget.source.id)
+                              .toList();
                       return CategoriesList(
                         allSubscriptions: allSubscriptions,
                         source: widget.source,
@@ -190,9 +187,6 @@ class CategoriesList extends StatelessWidget {
           );
         }
         return CategoryCheckbox(subscription: allSubscriptions[index]);
-
-
-
       },
     );
   }
@@ -205,29 +199,21 @@ class CategoryCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return CheckboxListTile(
       title: Text(subscription.categoryLabel),
       subtitle: Text(subscription.categoryPath),
-      trailing: Flex(
-        mainAxisSize: MainAxisSize.min,
-        direction: Axis.horizontal,
-        children: [
-          if (subscription.isCustom)
-            DeleteCustomCategory(
+      secondary: subscription.isCustom
+          ? DeleteCustomCategory(
               subscription: subscription,
-            ),
-          Checkbox(
-            value: UserSubscriptionPref.selectedSubscriptions
-                .contains(subscription),
-            onChanged: (value) {
-              updateSubscription(
-                value,
-                subscription,
-              );
-            },
-          ),
-        ],
-      ),
+            )
+          : SizedBox.shrink(),
+      value: UserSubscriptionPref.selectedSubscriptions.contains(subscription),
+      onChanged: (bool? value) {
+        updateSubscription(
+          value,
+          subscription,
+        );
+      },
     );
   }
 
@@ -308,6 +294,7 @@ class DeleteCustomCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      visualDensity: VisualDensity.compact,
       icon: const Icon(Icons.delete_forever),
       onPressed: () => deleteCustomSubscription(subscription),
     );

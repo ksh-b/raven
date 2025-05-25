@@ -50,66 +50,13 @@ class _SavedPageState extends State<SavedPage> {
             );
           }
           return const BlankPageMessage(
-            "🔖 Swipe articles to the right on the feed page to save them",
+            "No articles saved",
           );
         },
       ),
     );
   }
 }
-
-// class FeedCard extends StatelessWidget {
-//   const FeedCard({
-//     super.key,
-//     required this.article,
-//   });
-//
-//   final Article article;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       child: ClipRRect(
-//         borderRadius: BorderRadius.circular(8.0),
-//         child: InkWell(
-//           child: Flex(
-//             direction: Axis.vertical,
-//             children: [
-//               ContentPref.shouldLoadImages
-//                   ? Stack(
-//                       children: [
-//                         ArticleThumbnail(article: article),
-//                         ArticleTags(article: article),
-//                       ],
-//                     )
-//                   : const SizedBox.shrink(),
-//               ListTile(
-//                 title: SelectableText(article.title),
-//                 leading: ArticlePublisherIcon(article: article),
-//                 subtitle: article.publishedAt != -1
-//                     ? SelectableText(
-//                         unixToString(article.publishedAt),
-//                       )
-//                     : const SizedBox.shrink(),
-//               ),
-//             ],
-//           ),
-//           onTap: () {
-//             Navigator.push(
-//               context,
-//               MaterialPageRoute(
-//                 builder: (context) => ArticlePage(
-//                   article,
-//                   shouldLoad: false,
-//                 ),
-//               ),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class ArticlePublisherIcon extends StatelessWidget {
   const ArticlePublisherIcon({

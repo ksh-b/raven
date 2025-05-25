@@ -3,15 +3,14 @@ import 'dart:core';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/adapters.dart';
-import 'package:provider/provider.dart';
 import 'package:klaws/model/publisher.dart';
-import 'package:klaws/model/watch.dart';
+import 'package:provider/provider.dart';
 import 'package:raven/provider/category_search.dart';
 import 'package:raven/repository/preferences/content.dart';
+import 'package:raven/repository/preferences/internal.dart';
 import 'package:raven/repository/preferences/subscriptions.dart';
 import 'package:raven/screen/category_selector.dart';
-import 'package:raven/screen/watch_sources.dart';
-import 'package:raven/repository/publishers.dart';
+import 'package:raven/screen/subscriptions_provider.dart';
 
 class SubscriptionsPage extends StatefulWidget {
   const SubscriptionsPage({super.key});
@@ -90,8 +89,8 @@ class _FeedSelectorState extends State<FeedSelector> {
                     search.searchPublishersByCategory(_value);
                   },
                   items: (["All"] +
-                          (publishers().values
-                              .map((value) => value.siteCategories))
+                          (search.filteredPublishers
+                                  .map((value) => value.siteCategories))
                               .expand((i) => i)
                               .toList())
                       .toSet()
@@ -109,12 +108,14 @@ class _FeedSelectorState extends State<FeedSelector> {
               ),
               Expanded(
                 child: ValueListenableBuilder(
-                  valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(),
+                  valueListenable: UserSubscriptionPref.feedSubscriptions.listenable(keys: ["selected"]),
                   builder: (context, value, child) {
                     return ListView.builder(
                       itemCount: search.filteredPublishers.length,
                       itemBuilder: (context, sourceIndex) {
-                        Source source = search.filteredPublishers.toList().elementAt(sourceIndex);
+                        Source source = search.filteredPublishers
+                            .toList()
+                            .elementAt(sourceIndex);
                         var categories = getSelectedCategories(source);
                         return ListTile(
                           title: Text(source.name),
@@ -123,18 +124,17 @@ class _FeedSelectorState extends State<FeedSelector> {
                               fit: BoxFit.cover,
                               imageUrl: source.iconUrl,
                               progressIndicatorBuilder: (
-                                context,
-                                url,
-                                downloadProgress,
-                              ) {
+                                  context,
+                                  url,
+                                  downloadProgress,
+                                  ) {
                                 return CircularProgressIndicator(
                                   value: downloadProgress.progress,
                                 );
                               },
                               height: 40,
                               width: 40,
-                              errorWidget: (context, url, error) =>
-                                  CircleAvatar(
+                              errorWidget: (context, url, error) => CircleAvatar(
                                 child: Text(
                                   source.name.characters.first,
                                 ),
@@ -143,10 +143,10 @@ class _FeedSelectorState extends State<FeedSelector> {
                           ),
                           subtitle: categories.isNotEmpty
                               ? Text(
-                                  categories,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                )
+                            categories,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          )
                               : SizedBox.shrink(),
                           trailing: categories.isEmpty
                               ? const SizedBox.shrink()
@@ -156,7 +156,6 @@ class _FeedSelectorState extends State<FeedSelector> {
                                 .push(
                               MaterialPageRoute(
                                 builder: (context) => CategorySelector(
-                                  publishers(),
                                   source,
                                 ),
                               ),
@@ -168,10 +167,21 @@ class _FeedSelectorState extends State<FeedSelector> {
                         );
                       },
                     );
-                  }
+                  },
                 ),
               ),
             ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SubscriptionsManager()),
+              ).then((_) {
+                search.update();
+              });
+            },
           ),
         );
       },

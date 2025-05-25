@@ -3,12 +3,15 @@ import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/publishers.dart';
 
 class FeedSourceSearchProvider extends ChangeNotifier {
-  final List<Source> _publishers = publishers().values.toList();
-  List<Source> filteredPublishers = publishers().values.toList();
 
   bool _isInProgress = false;
-
+  List<Source> _publishers = [];
+  List<Source> filteredPublishers= [];
   bool get isInProgress => _isInProgress;
+
+  FeedSourceSearchProvider () {
+    update();
+  }
 
   set isInProgress(bool value) {
     _isInProgress = value;
@@ -33,6 +36,13 @@ class FeedSourceSearchProvider extends ChangeNotifier {
       return publisher.name.toLowerCase().contains(query);
     }).toList();
 
+    notifyListeners();
+  }
+
+
+  void update() {
+    _publishers = publishers().values.toList();
+    filteredPublishers = publishers().values.toList();
     notifyListeners();
   }
 }

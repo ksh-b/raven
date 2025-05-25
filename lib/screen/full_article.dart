@@ -4,11 +4,12 @@ import 'package:klaws/model/article.dart';
 import 'package:klaws/model/publisher.dart';
 import 'package:raven/repository/ladders.dart';
 import 'package:raven/repository/preferences/content.dart';
+import 'package:raven/repository/publishers.dart';
 import 'package:raven/service/http_client.dart';
 import 'package:raven/utils/time.dart';
 import 'package:raven/widget/html_widget.dart';
 import 'package:raven/widget/options_popup.dart';
-import 'package:raven/widget/translated_text.dart';
+import 'package:raven/widget/translatable_text.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,7 +39,7 @@ class _ArticlePageState extends State<ArticlePage> {
   @override
   void initState() {
     super.initState();
-    fullArticle = widget.article.source.article(widget.article, dio());
+    fullArticle = publishers()[widget.article.source.id]!.article(widget.article, dio());
   }
 
   @override
@@ -134,14 +135,14 @@ class FullArticle extends StatelessWidget {
     return ListView(
       children: [
         // Title
-        TranslatedText(
+        TranslatableText(
           response.data!.title,
           style: titleStyle,
         ),
         const SizedBox(height: 12),
 
         // Excerpt
-        response.data!.excerpt.isNotEmpty?TranslatedText(
+        response.data!.excerpt.isNotEmpty?TranslatableText(
           response.data!.excerpt,
           style: excerptStyle,
         ):SizedBox.shrink(),
@@ -166,7 +167,7 @@ class FullArticle extends StatelessWidget {
 
         // Content
         ContentPref.shouldTranslate
-            ? TranslatedText(response.data?.content ?? "", isHtml: true)
+            ? TranslatableText(response.data?.content ?? "", isHtml: true)
             : HtmlWidget(response.data?.content ?? "")
       ],
     );
