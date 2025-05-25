@@ -11,6 +11,8 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    env:
+      FLUTTER_GIT_URL: https://github.com/flutter/flutter.git
 
     steps:
       - name: Checkout repository (including submodules)
@@ -20,6 +22,9 @@ jobs:
           
       - name: Set up Flutter SDK path
         run: echo "$(pwd)/submodules/flutter/bin" >> $GITHUB_PATH
+
+      - name: Display Flutter version
+        run: flutter channel master
 
       - name: Display Flutter version
         run: flutter --version
