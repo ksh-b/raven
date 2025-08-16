@@ -30,24 +30,24 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "kshib.raven"
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion "26.1.10909125"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
         applicationId "kshib.raven"
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     signingConfigs {
