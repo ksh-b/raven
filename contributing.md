@@ -5,13 +5,10 @@ Thank you for considering contributing to Raven! Your help is greatly appreciate
 ## Issue Reporting and Feature Requests
 
 - Before submitting a new issue or feature request, please check if a similar one already exists in the [existing issues](https://github.com/ksh-b/raven/issues?q=).
-- If you have multiple (non-source) requests, please create a separate issue for each distinct request to facilitate better tracking and discussion.
 
-### For Source Requests
+## Source Requests
 
-- Please ensure that the source(s) you are requesting do not spread disinformation.
-- If you have multiple source requests, categorize them and create separate issues for each category. Refer to [this example](https://github.com/ksh-b/raven/issues/13) for guidance.
-- Higher priority may be given to sources with greater popularity or relevance.
+- Starting with v1, most sources can be created wihout having to be dependent on the app. Please do not create issues to add new sources. If you think the extractor could be improved, create issues in [klaws](https://github.com/ksh-b/klaws) instead.
 
 ## Code Contributions
 

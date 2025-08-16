@@ -9,18 +9,33 @@ on:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - name: Checkout repository (including submodules)
         uses: actions/checkout@v4
         with:
           submodules: true
+          fetch-depth: 0
+      
+      - name: Initialize and update submodules
+        run: |
+          git submodule init
+          git submodule update --init --recursive --remote
           
       - name: Set up Flutter SDK path
         run: echo "$(pwd)/submodules/flutter/bin" >> $GITHUB_PATH
 
+      - name: Switch Flutter channel
+        run: flutter channel master --disable-analytics
+        
       - name: Display Flutter version
         run: flutter --version
 
@@ -32,12 +47,23 @@ jobs:
 
       - name: Upgrade Flutter Dependencies
         run: flutter pub upgrade
-        
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+          
+      - name: Create key.properties
+        run: |
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=keystore.jks" >> android/key.properties
+          
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --split-per-abi
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/*.apk
